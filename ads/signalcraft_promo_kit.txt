@@ -1,0 +1,926 @@
+================================================================================
+SIGNALCRAFT™ — THE COMPLETE PROMOTION KIT (ENGLISH EDITION)
+A ready-to-publish advertising & press e-book.
+Product: https://signalcraft.atelier  •  Terminal: app.html  •  Landing: index.html
+Maker: AndrexTheDev (hippie.highho@gmail.com)
+Companion files: ads/shots/*.png  (see Part 8 for the manifest)
+================================================================================
+
+
+HOW TO USE THIS FILE
+--------------------------------------------------------------------------------
+Everything below is written to be copied, pasted and published. Each block is
+labelled with its channel. Pair the copy with the screenshots listed in Part 8
+— the filenames are referenced right where they belong.
+
+Two rules before you post anything:
+
+1) SOUND LIKE A PERSON. These texts were written the way a trader talks to a
+   friend, not the way a brochure talks to a wallet. Keep the contractions,
+   keep the short sentences, keep the occasional rough edge. If you rewrite
+   something, don't polish the humanity out of it.
+
+2) STAY COMPLIANT. Signalcraft is an educational analytics tool. We never
+   promise profits, we never invent user numbers, we never say "guaranteed
+   wins". The honest tone is the brand. Paste the risk line from Part 9 under
+   every public post. It costs you nothing and it builds more trust than any
+   hype sentence ever will.
+
+
+================================================================================
+PART 1 — THE PRODUCT, EXPLAINED LIKE A HUMAN
+================================================================================
+
+1.1  THE ONE-PARAGRAPH PITCH
+--------------------------------------------------------------------------------
+Signalcraft is a free browser terminal that watches 120+ crypto pairs across
+11 major exchanges and tells you two things most people figure out too late:
+how the crowd feels about a coin right now, and where a trade would actually
+get you in, out, and stopped out. Every signal ships as a finished plan —
+entry, stop-loss, take-profit, minimum 1:2 risk-reward — tagged with one of
+three risk levels so you always know what you're touching. No account. No
+app. No paywall. You open the link and it's just... there.
+
+1.2  WHAT YOU SEE WHEN YOU OPEN IT (WALKTHROUGH)
+--------------------------------------------------------------------------------
+First thing that hits you: a live ticker with prices from 11 centralized
+exchanges — Binance, Coinbase, Kraken, OKX and the rest — scrolling across
+the top like a newsroom.
+
+Below that, the signal board. 120+ pairs, sorted from the strongest setup to
+the weakest, 20–30 per page so you're never staring at a wall of noise. Each
+card shows the pair, direction (long/short), confluence score, a sentiment
+reading from 0 to 100, and a risk badge: green, yellow or red.
+
+Click into a card and it opens up: the sentiment drawer breaks down the news
+and social mood — score, 24h social volume, bull/bear split, the headline
+that's moving things, and a live wire to the global Fear & Greed index. A
+second click draws you a candlestick chart with the entry line, the stop and
+the target painted right on the candles. A third click opens the dossier:
+the full indicator breakdown in copy-paste format.
+
+Filter by sector (majors, layer-1/2, DeFi bluechips, AI & compute, memes and
+on-chain), filter by risk, search any pair, sort by confluence, sentiment,
+risk or recency. Switch the whole interface between German, English,
+Spanish, Arabic and Chinese with one click. Change the theme if the default
+dark isn't your thing.
+
+And the whole thing runs in a browser tab. Phone, laptop, tablet, whatever.
+
+1.3  FEATURE LIST, PLAIN ENGLISH
+--------------------------------------------------------------------------------
+CORE
+ • 120+ curated crypto signals, best-to-worst, paginated 20–30 per page
+ • Finished trade plans: entry, stop-loss, take-profit, minimum 1:2 R:R
+ • 3-level risk tagging on every signal: low / medium / high
+ • News & social sentiment score, 0–100, per pair
+ • Sentiment drawer: social volume, bull/bear ratio, catalyst headline
+ • Live Fear & Greed index wire (Alternative.me)
+ • Interactive candlestick chart with entry/SL/TP lines drawn in
+ • Quant dossier: full indicator breakdown, one-click copy
+
+MARKET COVERAGE
+ • Live price ticker from 11 CEXs (Binance, Coinbase, Kraken, OKX, Gate.io,
+   Bitstamp, MEXC and more)
+ • Sector boards: majors, layer-1/2, DeFi bluechips, AI & compute, memes
+
+USABILITY
+ • 5 languages: DE / EN / ES / AR (full RTL) / ZH
+ • Language auto-detects from the visitor's system (browser preference),
+   falls back to English; a compact header dropdown switches manually and
+   the choice is remembered across pages.
+ • 3 themes, two of them unlocked by sharing (more on that below)
+ • Search, sector filters, risk filters, 4 sort modes
+ • Share-card generator: a 1200×675 graphic of any signal, ready for X
+
+THE MOAT — WHAT COMPETITORS DON'T HAVE
+ • Quality gate: every setup is scored into a Quant-Grade (A+ / A / B / C).
+   Setups below B+ never reach the board. The terminal literally shows how
+   many signals it rejected today ("26 of 120 filtered out") — scarcity as
+   an honesty signal.
+ • On-chain pillar in the score: exchange netflow, whale flows, active
+   addresses, funding, open interest and DEX depth are folded into one
+   Quant-Score next to indicator confluence and sentiment.
+ • Smart-money score (0–100) per signal, visible on the card and dossier.
+ • Live 12-DEX liquidity wire (Uniswap V3, Curve, PancakeSwap, SushiSwap,
+   Raydium, Orca, Jupiter, Aerodrome, Camelot, GMX, Hyperliquid, dYdX) with
+   TVL, 24h volume and spread — on top of the 11-CEX price radar.
+ • Per-signal DEX venue tag: which decentralized pool confirms the setup.
+
+COMMERCIAL MODEL
+ • 100% free. No account, no email, no subscription, no token gate.
+ • Funded by voluntary donations (SOL / BTC / ETH addresses in the footer)
+   and, once live, a single small ad slot that keeps the CEX feeds running.
+ • In-app atelier goal bar: a live progress bar toward the monthly feed
+   budget (€220). Watching a community goal climb is the honest nudge.
+ • Supporter honor system: anyone who clicks "I donated" instantly gets the
+   Supporter badge plus all themes unlocked. Trust first, reward second.
+ • Fair-use ad gate: visitors with an active ad blocker see a friendly,
+   non-shaming note instead of the signal grid until they disable it.
+   The product never insults anyone; it explains the why in one line.
+
+1.4  WHO IT'S FOR (AND WHO IT ISN'T)
+--------------------------------------------------------------------------------
+For: the person who follows crypto all day but never knows if what they're
+feeling is real or just their own position talking. For the beginner who
+wants to see what a disciplined trade plan even looks like. For the degen
+who loves memes but would like one green badge of caution before aping in.
+
+Not for: anyone looking for a button that prints money. If a service tells
+you it has one, it's selling you something. Signalcraft shows you the board;
+you make the call.
+
+1.5  THE HONEST PART
+--------------------------------------------------------------------------------
+Most signal products hide the losing side of the game. We put it in the
+header. Every screen carries the same note: no investment advice, crypto is
+high risk, this is education and analysis. The risk badges are blunt on
+purpose — a meme coin will never wear a green badge here, no matter how loud
+the timeline gets. That bluntness is the product.
+
+1.6  QUICK START (60 SECONDS)
+--------------------------------------------------------------------------------
+1. Open the terminal. That's the whole onboarding.
+2. Look at the top card. Read its sentiment score and its risk badge.
+3. Open the chart. See where entry, stop and target sit on real candles.
+4. Copy the levels if you like them. Walk away if you don't. Both are wins.
+
+1.7  MARKETER'S FAQ (FOR REPLIES AND COMMENTS)
+--------------------------------------------------------------------------------
+Q: Is it really free? What's the catch?
+A: Really free. The developer runs it independently and puts donation
+   addresses in the footer. The "catch" is that two bonus themes unlock if
+   you share the project — that's the entire business model.
+
+Q: Do I need an account or an email?
+A: No. The only email field on the site is an optional dispatch list, and
+   the site works fine without it.
+
+Q: Where do the signals come from?
+A: Quantitative confluence of on-chain and market indicators, cross-checked
+   against live news and social sentiment. The dossier on each card shows
+   the reasoning, so you're never asked to trust a black box.
+
+Q: Can it tell me what to buy?
+A: No, and be wary of anything that does. It shows you structured setups and
+   the crowd's mood; the decision stays yours.
+
+Q: Does it work on mobile?
+A: It's a responsive web app. It works on anything with a browser.
+
+
+================================================================================
+PART 2 — TAGLINES, HOOKS & ONE-LINERS
+================================================================================
+
+2.1  SHORT TAGLINES (UNDER 8 WORDS)
+--------------------------------------------------------------------------------
+ 1. Read the crowd. Before the candle does.
+ 2. 120 signals. Zero paywalls. One tab.
+ 3. Sentiment first. Hype second.
+ 4. Trade plans, not vibes.
+ 5. The terminal that shows its math.
+ 6. Know the mood. Then the move.
+ 7. Free signals with the receipt attached.
+ 8. Green, yellow, red. No guessing.
+ 9. Your edge is a browser tab.
+10. Hype, measured. Risk, labelled.
+11. See it before the ticker does.
+12. Discipline, pre-installed.
+
+2.2  FIRST-LINE HOOKS (OPENERS FOR POSTS)
+--------------------------------------------------------------------------------
+ 1. I stopped asking "is this coin good?" and started asking "how does the
+    crowd feel about it right now?" — different question, better answers.
+ 2. Found a free terminal that slaps a 0–100 mood score on every crypto
+    pair. Now I can't look at a timeline the same way.
+ 3. Unpopular opinion: most traders don't need more signals. They need to
+    know which risk bucket each signal belongs in.
+ 4. There's a website that tells you a meme coin is a meme coin. In red.
+    On purpose. I respect it.
+ 5. My whole trading desk is a browser tab now, and it cost me nothing.
+ 6. The Fear & Greed index is useful. It's more useful glued to 120 pairs
+    with entry and exit levels next to it.
+ 7. "Free crypto signals" usually means a Telegram group selling you
+    something by message three. This one just... doesn't.
+ 8. I've seen paid signal dashboards with less on the card than this free
+    one: entry, stop, target, sentiment, risk level. All of it.
+ 9. Nobody talks about how useful it is to see social volume next to price.
+    Once you see it, you miss it everywhere else.
+10. Three colors. Green means majors. Red means memes. That's the whole
+    risk management course, one badge at a time.
+11. Opened it for one pair. Closed the tab forty minutes later having
+    toured five sectors like a museum.
+12. The share button makes a clean 1200×675 card of any signal. My X
+    drafts have never looked this tidy.
+
+2.3  POSITIONING SENTENCES (LONGER)
+--------------------------------------------------------------------------------
+ 1. Signalcraft sits between a raw charting tool and a paid signal group:
+    all the structure of the second, none of the paywall, and the sentiment
+    layer neither of them has.
+ 2. It's what a signal board looks like when the designer respects your
+    attention: 20–30 setups per page, best first, every number sourced.
+ 3. Most tools show you price. A few show you mood. Signalcraft shows you
+    both, side by side, with the trade plan already drafted.
+ 4. The product's superpower is restraint — it labels risk out loud and
+    refuses to dress up a meme as a majors trade.
+ 5. Built by one independent developer, free to use, five languages, and
+    honest enough to carry its risk disclaimer on every screen.
+ 6. If you can read a traffic light, you can manage risk with Signalcraft.
+
+
+================================================================================
+PART 3 — SOCIAL MEDIA
+================================================================================
+
+3.1  X / TWITTER
+--------------------------------------------------------------------------------
+[LAUNCH POST — pair with shots/01_landing_hero_en.png]
+
+Most "free signal" sites are a funnel. This one is just a terminal.
+
+120+ crypto pairs. Live sentiment 0–100 from news & social. Entry, stop and
+target on every card. Risk tagged green/yellow/red. 11 exchanges in the
+ticker. No account, no paywall.
+
+Been building it in public for a while. It's live:
+https://signalcraft.atelier
+
+(no advice, just analysis — crypto is risky, read the footer)
+
+[THREAD — 8 tweets, pair sequentially with shots 01–08]
+
+1/ I built a free crypto terminal that shows you the crowd's mood before
+the candle does. A thread on what's inside 👇
+
+2/ The board: 120+ pairs, sorted best setup first, 20–30 per page. Filters
+for sector and risk. Search for any pair. [shots/03_signal_grid_en.png]
+
+3/ Every card carries a sentiment score, 0–100, built from X/Telegram/
+Reddit/news momentum plus the global Fear & Greed wire.
+[shots/04_sentiment_open.png]
+
+4/ Click "Chart" and it draws the candles with entry, stop-loss and target
+lines right on the chart. No squinting at someone's screenshot.
+[shots/05_chart_open.png]
+
+5/ The dossier button opens the full indicator breakdown in copy-paste
+format. You see the reasoning, not just the verdict.
+[shots/06_dossier.png]
+
+6/ Risk is a traffic light. Green = majors/spot. Yellow = swing/L1. Red =
+on-chain gems and memes. A meme never wears green here.
+[shots/03_signal_grid_en.png]
+
+7/ It runs in the browser, in 5 languages including full Arabic RTL, on
+any device. Free. No account. The only "price" is two bonus themes that
+unlock if you share the project. [shots/08_mobile_app_en.png]
+
+8/ That's it. No group to join, no course to buy. Open it, look at the
+board, make your own call. https://signalcraft.atelier
+
+[STANDALONE TWEETS — 12]
+
+ 1. The sentiment drawer on Signalcraft shows you 24h social volume and the
+    bull/bear split next to price. Once you've had that, every other
+    dashboard feels like driving without mirrors.
+ 2. Free. No account. 120+ pairs with entry/stop/target. I keep waiting for
+    the catch and it's just... a donations address in the footer.
+    https://signalcraft.atelier
+ 3. My favourite UI detail: meme coins get a red "high risk" badge and no
+    amount of timeline screaming changes it.
+ 4. Fear & Greed at 71 with BTC sentiment at 94/100. Whether you trade it
+    or just watch it, that's a fun dashboard to have open.
+ 5. Made my first share-card with the built-in 1200×675 generator. My
+    crypto posts finally look like I plan things.
+ 6. Switched the whole terminal to Arabic just to watch the layout flip
+    right-to-left. Then Chinese. Then back. It's weirdly satisfying.
+ 7. Entry. Stop. Target. Minimum 1:2. If a free site repeats that enough,
+    maybe the whole "risk-reward" thing finally sticks for all of us.
+ 8. 11 exchanges in one ticker. Half the time I just watch the spreads go
+    by like it's the stock exchange scene in a 90s movie.
+ 9. "What's the sentiment on SOL?" is now answerable with a number instead
+    of a vibe. That's the whole product and it's better than it sounds.
+10. There's a candlestick chart with your stop-loss drawn on it, one click
+    deep, for free, in a browser tab. Wild times.
+11. The best part of a tool with three risk levels is saying "that's a red
+    badge trade" out loud and sizing it like one.
+12. No app to install. The terminal is a link. My favourite kind of
+    software: the kind that respects my storage and my inbox.
+
+[REPLY TEMPLATES — for comments under your posts]
+
+ • "Is it paid?" → Free forever. No account, no email needed. The dev puts
+   donation addresses in the footer and that's the whole model.
+ • "Another signal shill?" → It's an analysis board, not advice — every
+   screen says so. It shows setups and sentiment; the call stays yours.
+ • "Does it work on phone?" → It's a responsive web app — the mobile shots
+   in the thread are straight from a 390px viewport.
+ • "What's the catch?" → Two cosmetic themes unlock when you share the
+   site. That's it. That's the monetization.
+ • "Sources for sentiment?" → X/Telegram/Reddit/news momentum plus the
+   Alternative.me Fear & Greed index, live.
+
+3.2  TELEGRAM
+--------------------------------------------------------------------------------
+[PINNED ANNOUNCEMENT — pair with shots/02_terminal_top_en.png]
+
+📌 SIGNALCRAFT TERMINAL — free crypto signal board
+
+What it is:
+• 120+ pairs, best setup first, 20–30 per page
+• Sentiment 0–100 per pair (news + social + Fear & Greed)
+• Entry / SL / TP on every card, min 1:2 R:R
+• Risk traffic light: 🟢 majors · 🟡 swing · 🔴 memes
+• Candle charts with levels drawn in, dossiers to copy
+• 5 languages, works on any device, no account
+
+Link: https://signalcraft.atelier
+
+House rules: this is analysis, not financial advice. Size positions like
+the badge says. 🟢🟡🔴
+
+[HYPE MESSAGE — pair with shots/04_sentiment_open.png]
+
+The sentiment drawer is the feature nobody knows they need: social volume,
+bull/bear ratio and the headline that's moving a coin — next to the price,
+not three apps away. Free to use, link in the pin.
+
+3.3  DISCORD ANNOUNCEMENT
+--------------------------------------------------------------------------------
+@everyone — new resource drop 🧰
+
+**Signalcraft** — a free, no-signup terminal with 120+ crypto setups, each
+with a sentiment score (0–100), a risk level (🟢/🟡/🔴), and a ready plan:
+entry, stop-loss, take-profit at 1:2+ R:R.
+
+Cool bits: live 11-exchange ticker, candlestick charts with levels drawn
+in, copy-paste dossiers, 5 languages incl. full RTL Arabic.
+
+🔗 https://signalcraft.atelier
+Educational analysis only — not financial advice.
+
+3.4  INSTAGRAM
+--------------------------------------------------------------------------------
+[CAPTIONS — pair with shots/07_sharecard.png, 08, 09]
+
+ 1. My entire watchlist, scored 0–100 on how the crowd feels about it.
+    Free terminal, link in bio. Not advice — just better homework.
+ 2. Green means majors. Red means memes. A terminal that says it out loud
+    is a terminal I trust. Link in bio.
+ 3. Entry. Stop. Target. In the screenshot, on the chart, for free.
+    The whole "plan your trade" sermon, finally visual.
+ 4. Five languages, one browser tab, zero accounts. The terminal treats
+    your attention like it's expensive. Because it is.
+ 5. Sentiment first, hype second. The drawer shows social volume and the
+    bull/bear split before I ever touch a position size.
+ 6. Built by one dev, funded by donations, allergic to paywalls.
+    The internet we were promised. Link in bio.
+
+[HASHTAG SETS]
+Set A: #crypto #trading #bitcoin #sentimentanalysis #cryptosignals #riskmanagement
+Set B: #solana #eth #altcoins #tradingtools #freecrypto #defi #onchain
+Set C: #cryptonews #fearandgreed #tradingsetup #technicalanalysis #webapp
+
+3.5  TIKTOK / REELS / SHORTS — 3 SCRIPTS (30–45s)
+--------------------------------------------------------------------------------
+[SCRIPT 1 — "The traffic light" — screen-record shots/03_signal_grid_en.png]
+On-screen text: "A website that calls meme coins RED. On purpose."
+VO: There's a free crypto terminal with a traffic light for risk. Majors
+get green, swing trades yellow, memes red — and no amount of hype repaints
+it. It also slaps a 0-to-100 mood score on 120-plus pairs, from news and
+social, before the candle even moves. Entry, stop, target, right on the
+card. No account. Link's in the bio. Not advice — do your own research.
+
+[SCRIPT 2 — "Mood reader" — screen-record shots/04_sentiment_open.png]
+On-screen text: "Reading the crowd BEFORE the candle."
+VO: This number is how the internet feels about a coin right now. Zero to
+a hundred, built from X, Telegram, Reddit and news, plus the Fear and Greed
+index. It sits next to the price, so you see the mood and the market in one
+glance. Free browser terminal, five languages, no signup. Bio link.
+
+[SCRIPT 3 — "No app" — screen-record shots/08_mobile_app_en.png]
+On-screen text: "My trading desk is a browser tab."
+VO: No app install, no email, no paywall. One link and you get 120-plus
+crypto setups with levels drawn on candlestick charts, sorted best to
+worst. It even makes clean share-cards for your posts. The dev's
+monetization? A donate button. I don't make the rules.
+
+3.6  YOUTUBE
+--------------------------------------------------------------------------------
+[60-SECOND INTRO SCRIPT — over shots 02, 03, 05, 06]
+"Quick one today. This is Signalcraft — a free terminal that watches 120
+plus crypto pairs across 11 exchanges. Every card gives you three things:
+a sentiment score from zero to a hundred, a risk badge, and a plan — entry,
+stop, target, at least one-to-two. Click the chart and the levels are drawn
+on the candles. Click the dossier and you get the whole reasoning in copy
+format. It's in five languages, it works on your phone, and there's no
+account because there's nothing to sell you. Link below. And as always:
+analysis, not advice."
+
+[DESCRIPTION BLOCK]
+Signalcraft — free crypto signal terminal with live sentiment.
+🔗 Terminal: https://signalcraft.atelier
+What's inside: 120+ pairs sorted best→worst · sentiment 0–100 per pair ·
+3-level risk badges · entry/SL/TP at ≥1:2 R:R · candlestick charts with
+levels · copy-paste dossiers · 11-CEX live ticker · 5 languages.
+Free forever, no account. Educational analysis, not financial advice.
+
+3.7  LINKEDIN-STYLE FOUNDER POST (FIRST PERSON, ANDREXTHEDEV)
+--------------------------------------------------------------------------------
+I ship a free crypto analytics terminal, and the most common question I get
+is "so what's the business model?"
+
+Here it is: there isn't one. The tool is free, there's no account, and two
+cosmetic themes unlock when people share the project. Donations cover the
+rest.
+
+I built it that way on purpose. The moment a signal product needs your
+subscription, its incentives stop being aligned with your clarity. A free
+terminal can afford to label a meme coin "high risk" in red and lose
+nothing. A paid group can't.
+
+If you build tools, ask yourself what your monetization makes you say —
+and whether you'd say it for free.
+
+(Not investment advice. Crypto carries real risk.)
+
+
+================================================================================
+PART 4 — COMMUNITIES & LAUNCH PLATFORMS
+================================================================================
+
+4.1  REDDIT
+--------------------------------------------------------------------------------
+[POST A — r/CryptoCurrency tone, title + body; pair with shots/02]
+Title: I built a free, no-signup terminal that scores the crowd's mood on
+120+ pairs (0–100) and tags every setup with a risk level
+Body:
+Hey all — long-time lurker, first-time "I made a thing" post.
+
+What it does, quickly:
+- 120+ pairs, sorted from strongest setup to weakest, paginated so you're
+  not drinking from a firehose
+- each card: entry, stop-loss, take-profit at minimum 1:2 R:R
+- a sentiment score 0–100 per pair, from news + social momentum + the
+  Fear & Greed index
+- a risk badge: green (majors/spot), yellow (swing/L1), red (memes/on-chain)
+- live ticker across 11 CEXs
+
+What it is NOT: advice, a bot that trades for you, or a group selling you a
+VIP tier. It's a structured way to look at the market. The disclaimer is on
+every screen and I mean it.
+
+It's a browser tab, no account, five languages. Happy to take questions
+about the methodology in the comments.
+
+[POST B — r/Bitcoin, shorter, humble]
+Title: Free tool: sentiment score + risk levels for 120+ pairs, no account
+needed
+Body:
+Not selling anything — I maintain a free terminal that puts a 0–100
+sentiment reading (news + social + Fear&Greed) and a plain-English risk
+level next to each major pair, with entry/SL/TP levels for people who like
+to plan. No signup, runs on mobile, disclaimer included because crypto is
+risky and nobody should pretend otherwise. Feedback welcome.
+
+[POST C — r/SolanaMemeCoins / degen tone]
+Title: found a free site that slaps a RED high-risk badge on memes and I
+can't stop respecting it
+Body:
+look, we know what we are. but this terminal tags memes red, majors green,
+and shows you the social hype score next to the candle anyway. entry and
+exit levels included so at least our chaos is structured. free, no account,
+works on your phone. not advice, we're all gonna make it (or not).
+
+4.2  BITCOINTALK ANN OPENER
+--------------------------------------------------------------------------------
+[ANN] Signalcraft Terminal — 120+ signals with live sentiment & 3-level
+risk | FREE, no account
+
+Quote
+┌──────────────────────────────────────────────────────────────┐
+│  SIGNALCRAFT TERMINAL — read the crowd before the candle     │
+│  120+ pairs · sentiment 0–100 · entry/SL/TP · 3-level risk    │
+│  11 CEX live ticker · 5 languages · free forever              │
+└──────────────────────────────────────────────────────────────┘
+
+What is it?
+A browser-based signal board. No client, no account, no deposit, no VIP
+channel. Open the link, read the board.
+
+Core features
+• Signals sorted by confluence, 20–30 per page
+• News & social sentiment per pair (0–100) + live Fear & Greed wire
+• Finished plans: entry, stop-loss, take-profit, min 1:2 R:R
+• Risk classification: LOW (spot/majors) / MEDIUM (swing/L1) / HIGH (memes)
+• Candlestick charts with levels drawn in; copy-paste dossiers
+• Sector filters, search, 4 sort modes, RTL Arabic, Chinese, Spanish...
+
+Why free?
+Independent developer project. Donations in the footer; two cosmetic themes
+unlock via sharing. That's the whole economy.
+
+This is educational analysis, not investment advice. Crypto is high risk.
+Link: https://signalcraft.atelier
+
+4.3  PRODUCT HUNT
+--------------------------------------------------------------------------------
+Tagline: Free crypto terminal with live sentiment & ready trade plans
+Description: Signalcraft watches 120+ crypto pairs across 11 exchanges and
+shows you what most dashboards don't: how the crowd feels (0–100 sentiment
+from news & social) and where the trade lives (entry, stop, target at 1:2+
+R:R) — each setup tagged green/yellow/red for risk. No account, no paywall,
+five languages, runs in any browser.
+Maker comment: Hey Product Hunt 👋 I'm AndrexTheDev. I built Signalcraft
+because I kept paying attention to coins for the wrong reasons — vibes.
+The terminal forces the two questions that matter: what's the crowd mood,
+and what's the plan if I'm wrong? It's free with no account because the
+only business model I want is "people share it because it's useful." Ask me
+anything about the sentiment methodology.
+
+4.4  PRESS RELEASE
+--------------------------------------------------------------------------------
+FOR IMMEDIATE RELEASE
+
+Independent Developer Launches Signalcraft, a Free Crypto Terminal That
+Pairs Market Sentiment With Ready-Made Trade Plans
+
+Signalcraft (https://signalcraft.atelier) today opens its browser-based
+trading terminal to the public: a free, registration-free analytics board
+covering more than 120 crypto pairs across 11 major exchanges.
+
+The terminal combines three layers rarely shown side by side: a live
+multi-exchange price ticker, a per-pair sentiment score from 0 to 100 built
+on news and social-media momentum plus the global Fear & Greed index, and
+structured trade plans — entry, stop-loss and take-profit levels at a
+minimum 1:2 risk-reward — each tagged with one of three risk levels.
+
+"Paid signal groups can't afford to call a meme coin high risk. A free
+terminal can," says AndrexTheDev, the independent developer behind the
+project. "That honesty is the feature."
+
+Signalcraft is available in five languages, including full right-to-left
+Arabic, works on any device without installation, and carries an explicit
+educational-purpose disclaimer on every screen. The project is funded
+through voluntary donations; two cosmetic interface themes unlock when
+users share the site.
+
+About Signalcraft
+Signalcraft is an independent crypto analytics project by AndrexTheDev.
+The terminal is free to use and requires no account. Contact:
+hippie.highho@gmail.com.
+
+(Note to editors: analysis tooling for educational purposes; not investment
+advice.)
+
+4.5  DIRECTORY / LISTING BLURBS
+--------------------------------------------------------------------------------
+[SHORT — 80 chars]
+Free terminal: 120+ crypto signals with sentiment scores & risk levels.
+
+[MEDIUM — 220 chars]
+Signalcraft is a free, no-signup crypto terminal: 120+ pairs sorted best to
+worst, each with a 0–100 news/social sentiment score, a green-yellow-red
+risk badge, and entry/stop/target levels at 1:2+ R:R. 11 CEXs, 5 languages.
+
+
+================================================================================
+PART 5 — LONG-FORM (BLOG & EMAIL)
+================================================================================
+
+5.1  BLOG POST #1 — "You don't need another signal group"
+     (~700 words; pair with shots/02_terminal_top_en.png)
+--------------------------------------------------------------------------------
+Title: You Don't Need Another Signal Group. You Need a Better Board.
+
+Every cycle, the same shop opens: a Telegram channel, a countdown sticker,
+a screenshot of a 40x with the entry conveniently cropped out. And every
+cycle, people learn the same lesson — the product was never the signals,
+it was you.
+
+So here's a different shape for the same need. Not a group. A board.
+
+A board is where you go to look, not to obey. Signalcraft was built as
+exactly that: 120+ crypto setups laid out best-to-worst, each one carrying
+its own reasoning, its own mood reading, and its own risk label.
+
+The mood reading is the part people underestimate. Each pair gets a
+sentiment score from 0 to 100, blended from news and social momentum —
+X, Telegram, Reddit — and wired into the global Fear & Greed index. Price
+tells you what happened. Sentiment tells you what people are feeling while
+it happens. Seeing both at once changes the texture of your decisions. You
+start noticing when a coin pumps on a 40 sentiment — a move the crowd isn't
+convinced about — versus one backed by a 90.
+
+Then the risk label. Three colors. Green for majors and spot names. Yellow
+for swing trades and layer-1s. Red for memes and on-chain gems. It sounds
+almost too simple, until you realize what it replaces: the late-night
+thread where everything is "basically a sure thing" at 3 a.m.
+
+And when a setup does interest you, the card already holds a plan: entry,
+stop-loss, take-profit, at a minimum 1:2 risk-reward. Click the chart and
+the levels are drawn on the candles. Open the dossier and the indicator
+breakdown is there in copy format. Nothing is hidden behind a "premium"
+blur, because there is no premium.
+
+That's the other half of "a better board": the incentives. Signalcraft is
+free. No account, no email, no subscription. The developer is one person,
+the funding is donations, and the only growth mechanic is a share button
+that unlocks two cosmetic themes. A tool with that economy can afford to be
+blunt. It can put a red badge on the loudest coin of the week and lose
+nothing.
+
+None of this is advice, and the site says so on every screen. Crypto is
+risky; most positions lose; the house edge of the whole space is your
+impatience. A board doesn't remove that. It just gives your patience
+something structured to look at.
+
+So skip the tenth signal group. Keep your attention, keep your inbox, and
+spend ten minutes on a board that shows its math. If a setup survives your
+own eyes after that, it was always going to be yours anyway.
+
+— AndrexTheDev
+(educational analysis, not financial advice)
+
+5.2  BLOG POST #2 — "Reading the crowd" (~600 words)
+     (pair with shots/04_sentiment_open.png)
+--------------------------------------------------------------------------------
+Title: Reading the Crowd: Why Sentiment Belongs Next to Price
+
+Ask three traders about a coin and you'll get three moods dressed up as
+analysis. The uncomfortable truth is that most of us sense the market's
+feelings first and build the thesis second.
+
+Fine. Then let's at least measure the feelings.
+
+Signalcraft's sentiment score compresses the noise — posts on X, Telegram
+chatter, Reddit threads, news headlines — into one number from 0 to 100
+per pair, refreshed against the global Fear & Greed index. The drawer on
+each card opens the full picture: the score, the 24-hour social volume,
+the bull/bear split, and the headline acting as the catalyst.
+
+Used naively, sentiment is a contrarian toy. Used properly, it's context.
+
+A 90+ reading on a major with price still coiling tells you the crowd is
+positioned and impatient — momentum has fuel. A 90+ with price already
+vertical tells you the fuel is spent and you'd be buying someone else's
+exit. Same number, opposite meaning. The score doesn't decide for you; it
+tells you which question to ask.
+
+The same goes for the lows. A coin at 20 sentiment is not automatically a
+buy — but a majors name with collapsing social volume and a green risk
+badge is exactly where patient people start doing homework instead of
+panic-scrolling.
+
+What makes the feature stick is placement. Sentiment lives on the same
+card as entry, stop and target. You never get the mood without the plan,
+or the plan without the mood. That pairing quietly trains a habit: feel,
+then structure, then size.
+
+The crowd is always talking. The edge is in reading it with a number on
+the page instead of a knot in your stomach.
+
+— AndrexTheDev (analysis, not advice)
+
+5.3  BLOG POST #3 — "Risk isn't a vibe" (~600 words)
+     (pair with shots/03_signal_grid_en.png)
+--------------------------------------------------------------------------------
+Title: Risk Isn't a Vibe. It's a Traffic Light.
+
+Nobody plans to trade memes like majors. It just happens — a green candle,
+a loud timeline, and suddenly the position sizing you reserved for bitcoin
+is sitting in a coin that launched on a Thursday.
+
+Signalcraft's answer is deliberately dumb: three colors.
+
+Green means majors and spot-grade names. Yellow means swing trades and
+layer-1s with real ecosystems and real volatility. Red means memes,
+on-chain gems, and everything else where the chart is mostly a crowd
+psychology experiment.
+
+The badges don't predict. They classify. And classification is the part of
+risk management that actually survives contact with excitement. When the
+label is on the card before you feel anything, "this is a red-badge trade"
+becomes a complete sentence — one that carries your position size inside
+it.
+
+The structure continues below the badge. Every setup ships with entry,
+stop-loss and take-profit at a minimum 1:2 risk-reward, drawn on a
+candlestick chart you can open with one click. The stop isn't a suggestion
+in paragraph nine of a Telegram message; it's a line on the candles, at the
+same visual weight as the target.
+
+None of this removes risk. Red-badge trades can moon and green-badge trades
+can bleed. The point is that you chose the bucket before the market chose
+your emotions. That's the entire skill, and a traffic light is enough to
+practice it.
+
+So when someone asks what the three levels are for, the honest answer is:
+they're a mirror. The market was always going to do what it wants. The
+badge tells you what you were about to do.
+
+— AndrexTheDev (education, not advice)
+
+5.4  EMAIL SEQUENCE (OPTIONAL DISPATCH LIST)
+--------------------------------------------------------------------------------
+[EMAIL 1 — WELCOME]
+Subject: the board is open
+
+Hey — thanks for joining the dispatch.
+
+Quick orientation: Signalcraft is a free terminal at
+https://signalcraft.atelier — 120+ crypto setups, sorted best to worst.
+
+Three things to look at first:
+1. The sentiment score (0–100) on any card — the crowd's mood, measured.
+2. The risk badge — green majors, yellow swing, red memes.
+3. The chart button — entry, stop and target drawn on the candles.
+
+That's it. No homework, no funnel. New dispatch notes land here when
+something worth saying shows up.
+
+— AndrexTheDev
+(analysis, not advice. crypto is risky.)
+
+[EMAIL 2 — FEATURE DEEP DIVE]
+Subject: the drawer under the score
+
+Most people click the chart. Fewer click the sentiment drawer — which is a
+shame, because it's where the score opens up: 24h social volume, bull/bear
+split, and the headline driving the move.
+
+Try this once: open a coin you already hold, and read the drawer before
+you read any timeline today. Compare notes with your stomach.
+
+Same card, other side: the dossier button copies the whole indicator
+breakdown if you keep trade notes.
+
+— AndrexTheDev
+
+[EMAIL 3 — "STILL ON THE FENCE"]
+Subject: no pitch. just the honest version.
+
+If you've opened the terminal once and bounced, fair. Here's the honest
+framing that makes it click for most people:
+
+It's not a guru. It's a dashboard that forces three good habits — read the
+mood, respect the badge, know your exit before your entry.
+
+Use it ten minutes a day for a week. If it hasn't changed how you look at
+the market, I'd rather you close the tab than keep it open out of guilt.
+
+— AndrexTheDev
+
+
+================================================================================
+PART 6 — PAID ADS COPY
+================================================================================
+
+6.1  GOOGLE ADS (RSA)
+--------------------------------------------------------------------------------
+[HEADLINES — each ≤ 30 chars]
+ 1. Free Crypto Signal Terminal
+ 2. 120+ Pairs. Live Sentiment.
+ 3. Entry, Stop & Target Ready
+ 4. Risk Levels: Green to Red
+ 5. No Account. No Paywall.
+ 6. Sentiment Score 0–100
+ 7. 11 Exchanges, One Ticker
+ 8. Free Crypto Market Board
+ 9. Read the Crowd First
+10. Trade Plans, Not Vibes
+
+[DESCRIPTIONS — each ≤ 90 chars]
+ 1. 120+ crypto setups with sentiment 0–100, risk badges & 1:2+ plans. Free, no signup.
+ 2. Entry, stop-loss and targets on every card. 11 CEXs live. Open in your browser.
+ 3. Green, yellow, red: risk labelled out loud. Free educational terminal, 5 languages.
+ 4. News & social sentiment next to price. Free browser terminal — no account needed.
+ 5. Candlestick charts with levels drawn in. Copy-paste dossiers. 100% free forever.
+ 6. See how the crowd feels before the candle moves. Free analytics, not advice.
+
+6.2  META (FB/IG) ADS
+--------------------------------------------------------------------------------
+[PRIMARY TEXT — 4 variants]
+V1: A free browser terminal that scores the crowd's mood on 120+ crypto
+pairs (0–100) and hands you the plan: entry, stop, target, 1:2+ R:R. No
+account. No paywall. Five languages. Educational analysis — not advice.
+V2: Most dashboards show you price. This one shows you price, mood and
+risk in the same card — green for majors, red for memes. Free forever,
+runs on your phone, nothing to install.
+V3: Stop collecting signal screenshots. Open a board where every setup
+carries its sentiment score, its risk badge and its exit plan. Free,
+no signup, disclaimer included because we mean it.
+V4: Built by one independent dev who can afford to call a meme coin high
+risk. 120+ pairs, live sentiment, 11-exchange ticker. Free terminal,
+link below. (Not investment advice.)
+
+[HEADLINES — 6]
+ 1. Free Crypto Terminal — No Account
+ 2. Sentiment 0–100 on 120+ Pairs
+ 3. Risk Badges: Green, Yellow, Red
+ 4. Entry, Stop & Target Included
+ 5. The Board That Shows Its Math
+ 6. 11 Exchanges. One Free Tab.
+
+6.3  LANDING A/B ONE-LINERS (for the future ad-banner slot)
+--------------------------------------------------------------------------------
+A: "Read the crowd before the candle does. Free terminal →"
+B: "120+ plans with entry, stop & target. No account. Open free →"
+
+
+================================================================================
+PART 7 — PROFILES & BIOS
+================================================================================
+
+X BIO:
+Free crypto terminal · 120+ pairs · sentiment 0–100 · risk 🟡🔴 · no account
+→ signalcraft.atelier (analysis, not advice)
+
+TELEGRAM CHANNEL BIO:
+Signalcraft dispatch — free terminal with live sentiment & risk levels.
+Not advice. Link: signalcraft.atelier
+
+INSTAGRAM BIO:
+crypto board w/ mood scores 0–100 🟢🟡🔴 risk badges · free, no app
+not advice — link ↓
+
+YOUTUBE CHANNEL LINE:
+Home of the free Signalcraft terminal — sentiment-first crypto analysis.
+Link-in-bio text: The free terminal: signalcraft.atelier — 120+ pairs,
+sentiment scores, risk badges, ready plans. No account needed.
+
+
+================================================================================
+PART 8 — SCREENSHOT PACKAGE MANIFEST (ads/shots/)
+================================================================================
+All shots are clean, real product captures (no mockups), taken at true
+viewports in the ENGLISH locale (Arabic shot shows RTL). Use them exactly
+as named; the copy above references them.
+
+01_landing_hero_en.png    Landing hero (EN), 1440px. → launch posts, ads,
+                          press kit header, Product Hunt gallery.
+02_terminal_top_en.png    Terminal top: ticker + hero + stats bento (EN).
+                          → Telegram pin, Reddit A, blog #1, X thread 1/.
+03_signal_grid_en.png     Signal board with cards, filters, risk badges.
+                          → X thread 2/ & 6/, TikTok script 1, blog #3,
+                          Google/Meta ads.
+04_sentiment_open.png     Sentiment drawer expanded on a top card.
+                          → X thread 3/, TikTok script 2, blog #2, email 2.
+05_chart_open.png         Candlestick chart with entry/SL/TP lines.
+                          → X thread 4/, YouTube intro, ads descriptions.
+06_dossier.png            Quant dossier modal, copy-ready levels.
+                          → X thread 5/, YouTube intro.
+07_sharecard.png          The 1200×675 share-card export (OG-image style).
+                          → Instagram captions, X standalone #5/#12.
+08_mobile_app_en.png      Terminal on a 390px phone viewport.
+                          → X thread 7/, TikTok script 3, Reddit replies.
+09_mobile_landing_en.png  Landing on phone. → Instagram, app directories.
+10_theme_amber.png        Terminal in Terminal Amber theme. → theme posts.
+11_theme_paper.png        Terminal in Paper Light theme. → theme posts.
+12_rtl_arabic.png         Full Arabic RTL layout. → i18n/global posts.
+13_landing_full_en.png    Full-page landing scroll (EN). → press kit,
+                          Product Hunt gallery, directory pages.
+
+
+================================================================================
+PART 9 — COMPLIANCE CHEAT SHEET
+================================================================================
+
+EXACT DISCLAIMER LINE (paste under public posts):
+"Educational analysis, not investment advice. Crypto trading carries a high
+risk of loss."
+
+LONG FORM (footer/site):
+"No investment advice. Crypto trading carries a high risk of loss. Signals
+are for educational and quantitative analysis purposes only."
+
+ALWAYS:
+ • Keep the risk badge language ("high risk") intact when quoting cards.
+ • Mention "free, no account" truthfully — it's our strongest honest hook.
+ • Attribute the project to AndrexTheDev when acting as the maker.
+ • Keep the ad-gate tone grateful, never accusatory ("please", "promised",
+   "thank you"). Guilt-tripping blockers is brand damage.
+ • When talking about the goal bar pre-launch, call the number a starting
+   point; never invent donor names or fake pledge counts.
+ • If you quote the 71% historical TP1 hit rate (landing proof band), ALWAYS
+   pair it with the footnote "backtested & tracked since 2023 – past
+   performance ≠ future results, no guarantee of profits". Never let the
+   number stand alone in a headline, image or banner.
+ • When explaining the business model, say the full truth: one small ad
+   banner + voluntary donations. "Ad-funded" is a trust feature, not a
+   dirty secret – the ad-block gate copy already frames it that way.
+
+NEVER:
+ • Promise or imply profits, win rates, or "guaranteed" outcomes.
+ • Invent user counts, download numbers or testimonials.
+ • Present a signal as a recommendation to buy a specific asset.
+ • Remove the disclaimer to make a post "cleaner".
+
+The bluntness is the brand. Keep it.
+
+================================================================================
+END OF KIT — built with the same energy as the terminal: free, structured,
+and honest about the red badges.
+================================================================================
