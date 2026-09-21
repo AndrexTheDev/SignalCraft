@@ -1,6 +1,0 @@
-# Signalcraft Atelier – robots.txt (deploy at domain root: /robots.txt)
-User-agent: *
-Allow: /
-Disallow: /ads/
-
-Sitemap: https://signalcraft.atelier/sitemap.xml
