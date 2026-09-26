@@ -1,0 +1,123 @@
+import { describe, it, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  startServer, stopServer, launchBrowser, freshPage, gotoApp
+} from '../helpers/browser.mjs';
+
+let browser;
+
+describe('step27 hardening e2e', { timeout: 180_000 }, () => {
+  before(async () => {
+    await startServer();
+    browser = await launchBrowser();
+  });
+  after(async () => {
+    if (browser) await browser.close();
+    stopServer();
+  });
+
+  it('lead honeypot is discarded; duplicate is rejected; valid email is stored', async () => {
+    const page = await freshPage(browser);
+    await gotoApp(page, { lang: 'en' });
+    assert.ok(await page.$('#leadCaptureForm'));
+
+    await page.$eval('#leadHpField', (el) => { el.value = 'http://spam.example'; });
+    await page.click('#leadEmailInput', { clickCount: 3 });
+    await page.type('#leadEmailInput', 'bot@example.com');
+    await page.click('#leadCaptureForm button[type="submit"]');
+    await new Promise((r) => setTimeout(r, 200));
+    const afterHp = await page.evaluate(() => localStorage.getItem('signalcraft_leads'));
+    assert.equal(afterHp, null);
+
+    await page.$eval('#leadHpField', (el) => { el.value = ''; });
+    await page.click('#leadEmailInput', { clickCount: 3 });
+    await page.keyboard.press('Backspace');
+    await page.type('#leadEmailInput', 'trader@example.com');
+    await page.click('#leadCaptureForm button[type="submit"]');
+    await new Promise((r) => setTimeout(r, 250));
+    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_leads') || '[]'));
+    assert.equal(stored.length, 1);
+    assert.equal(stored[0].email, 'trader@example.com');
+
+    await page.type('#leadEmailInput', 'trader@example.com');
+    await page.click('#leadCaptureForm button[type="submit"]');
+    await new Promise((r) => setTimeout(r, 250));
+    const toast = await page.$eval('#toastMessage', (el) => el.textContent);
+    assert.match(toast, /already on the list/i);
+    const stored2 = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_leads') || '[]'));
+    assert.equal(stored2.length, 1);
+    assert.deepEqual(page._pageErrors, []);
+    await page.close();
+  });
+
+  it('page-size change resets to page 1; DEMO badge; ES pagin uses de 58', async () => {
+    const page = await freshPage(browser);
+    await gotoApp(page, { lang: 'de' });
+    const badge = await page.$eval('#meBadge', (el) => el.textContent);
+    assert.match(badge, /DEMO/);
+
+    await page.click('#btnNextPage');
+    await new Promise((r) => setTimeout(r, 200));
+    const p2 = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
+    assert.match(p2, /Seite 2 von 3/);
+
+    await page.click('[data-size="20"]');
+    await new Promise((r) => setTimeout(r, 200));
+    const p1 = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
+    assert.match(p1, /Seite 1 von/);
+    assert.equal(/Seite 2 von/.test(p1), false);
+    const n20 = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
+    assert.equal(n20, 20);
+    assert.deepEqual(page._pageErrors, []);
+    await page.close();
+
+    const pageEs = await freshPage(browser);
+    await gotoApp(pageEs, { lang: 'es' });
+    const es = await pageEs.$eval('#paginationInfoLabel', (el) => el.textContent);
+    assert.match(es, /de 58/);
+    assert.match(es, /página 1 de 3/i);
+    assert.deepEqual(pageEs._pageErrors, []);
+    await pageEs.close();
+  });
+
+  it('dossier on-chain, share canvas, sentiment, donation copy — no page errors', async () => {
+    const page = await freshPage(browser);
+    await gotoApp(page, { lang: 'de' });
+
+    await page.click('[data-toggle-sentiment]');
+    await page.waitForSelector('.sentiment-drawer-panel.is-open');
+    const sent = await page.$eval('.sentiment-drawer-panel.is-open', (el) => el.textContent);
+    assert.ok(sent.trim().length > 20);
+
+    await page.click('[data-inspect-sig]');
+    await page.waitForSelector('#dossierModalBackdrop.is-visible', { timeout: 5000 });
+    const dos = await page.$eval('#dossierBody', (el) => el.textContent);
+    assert.match(dos, /24h-Volumen/);
+    assert.match(dos, /Taker-Kaufanteil/);
+    assert.match(dos, /23:59:59 UTC/);
+    assert.equal(dos.includes('<img'), false);
+    await page.click('#btnCloseDossierModal');
+    await new Promise((r) => setTimeout(r, 150));
+
+    await page.click('[data-share-sig]');
+    await page.waitForSelector('#shareCardModalBackdrop.is-visible', { timeout: 5000 });
+    const share = await page.$eval('#shareCardCanvas', (el) => ({ w: el.width, h: el.height }));
+    assert.equal(share.w, 1200);
+    assert.equal(share.h, 675);
+    await page.click('#btnCloseShareCardModal');
+    await new Promise((r) => setTimeout(r, 150));
+
+    await page.evaluate(() => {
+      window.__copied = '';
+      navigator.clipboard.writeText = async (t) => { window.__copied = t; };
+    });
+    await page.click('#btnOpenDonation');
+    await page.waitForSelector('#donationModalBackdrop.is-visible');
+    await page.click('#btnDonSol');
+    const copied = await page.evaluate(() => window.__copied);
+    assert.equal(copied, '79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8');
+
+    assert.deepEqual(page._pageErrors, []);
+    await page.close();
+  });
+});

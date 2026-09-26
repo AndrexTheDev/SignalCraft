@@ -54,17 +54,16 @@ describe('step24 / copyLevelsText', () => {
     assert.match(txt, /\(Signalcraft\)$/);
   });
 
-  it('falls back to +5% TP when targets are missing', () => {
+  it('falls back to +5% / +8% TP when targets are missing', () => {
     const txt = copyLevelsText({
       pair: 'AAA / USD', entryPrice: 100, stopLoss: 90, riskRewardRatio: '1:2.0'
     });
-    assert.ok(txt.includes('TP: $' + fmtP(105)));
-    assert.equal(txt.includes(' / $'), false);
+    assert.ok(txt.includes('TP: $' + fmtP(105) + ' / $' + fmtP(108)));
   });
 
   it('terminal helper stays in sync with the unit mirror', () => {
     assert.match(appJs, /function copyLevelsText\s*\(/);
-    assert.match(appJs, /sig\.pair \+ ' Setup \| Entry: \$'/);
+    assert.match(appJs, /pair \+ ' Setup \| Entry: \$'/);
     assert.match(appJs, /function fmtUtcTime\s*\(/);
     assert.match(appJs, /function sortSignalsList\s*\(/);
   });

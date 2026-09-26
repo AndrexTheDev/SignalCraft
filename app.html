@@ -1663,10 +1663,10 @@ html[dir="rtl"] body {
       return Number(v).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
     }
     function copyLevelsText(sig) {
-      const tp1 = (sig.targets && sig.targets[0]) || (sig.entryPrice * 1.05);
-      const tp2 = (sig.targets && sig.targets[1]);
-      const tpPart = tp2 != null ? ('$' + fmtP(tp1) + ' / $' + fmtP(tp2)) : ('$' + fmtP(tp1));
-      return sig.pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
+      const { tp1, tp2 } = takeProfitLevels(sig);
+      const tpPart = '$' + fmtP(tp1) + ' / $' + fmtP(tp2);
+      const pair = String((sig && sig.pair) || '—');
+      return pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
     }
     function fmtUtcTime(ts) {
       const d = new Date(ts);
@@ -2304,7 +2304,7 @@ html[dir="rtl"] body {
       const T = ME_TEXTS[currentLang] || ME_TEXTS.en;
       const lab = SENT_LABELS[currentLang] || {};
       const s2 = Object.assign({}, sig);
-      const sym = sig.pair.split(' / ')[0];
+      const sym = pairSymbol(sig.pair);
       s2.notes = T.notes(sym, m);
       s2.indicatorsUsed = T.ind(m);
       if (s2.sentiment) {
@@ -2454,7 +2454,7 @@ html[dir="rtl"] body {
         };
       },
       toSignal(b, rank) {
-        const sym = b.pair.split(' / ')[0];
+        const sym = pairSymbol(b && b.pair);
         return {
           id: 'SIG-' + sym + '-' + String(rank).padStart(3, '0'), pair: b.pair, type: 'LONG', venue: (b.src && b.src !== 'binance') ? (b.src.toUpperCase() + ' SPOT') : 'BINANCE SPOT', timeframe: '1d',
           sector: b.sector, confluenceScore: b.score, riskLevel: b.risk, riskRewardRatio: b.rrStr,
@@ -2471,7 +2471,7 @@ html[dir="rtl"] body {
         if (!Array.isArray(list) || !list.length) list = SEED_SIGNALS;
         this.status = { mode: mode === 'live' ? 'live' : 'demo', when: when || ME_STAMP };
         signalsData = list.map(enrichSignal);
-        GATE_FILTERED = signalsData.filter(sg => sg.quantScore < QUAL_MIN).length;
+        GATE_FILTERED = signalsData.filter(sg => !passesQualityGate(sg)).length;
         currentPage = 1;
         try { renderSignals(); } catch (e) {}
         try { updateSectorPillCounts(); } catch (e) {}
@@ -2487,7 +2487,7 @@ html[dir="rtl"] body {
             const cached = localStorage.getItem(this.CACHE_KEY);
             if (cached) { try { const ca = JSON.parse(cached); if (isLiveCache(ca)) this.apply(ca.signals, 'live', ca.t); } catch (e) {} }
           }
-          const universe = {}; SEED_SIGNALS.forEach(sg => { universe[sg.pair.split(' / ')[0]] = sg.sector; });
+          const universe = {}; SEED_SIGNALS.forEach(sg => { universe[pairSymbol(sg.pair)] = sg.sector; });
           const syms = Object.keys(universe), out = [];
           let idx = 0;
           const worker = async () => { while (idx < syms.length) { const sym = syms[idx++]; let r = null; try { r = await this.kGet(sym); } catch (e) {} if (r && r.k && r.k.length > 60) out.push(this.build(sym, universe[sym], r.k, r.src)); } };
@@ -2620,13 +2620,13 @@ html[dir="rtl"] body {
       if (_venueBusy) { _venuePending = true; return; }
       _venueBusy = true;
       try {
-        const syms = signalsData.map(sg => sg.pair.split(' / ')[0]);
+        const syms = signalsData.map(sg => pairSymbol(sg.pair));
         await CexEngine.fetchAll(syms);
         attachVenueData();
         try { renderSignals(); } catch (e) {}
         try { ME.badge(); } catch (e) {}
-        const gated = signalsData.filter(sg => sg.quantScore >= QUAL_MIN);
-        const top = (gated.length ? gated : signalsData).slice(0, 18).map(sg => sg.pair.split(' / ')[0]);
+        const gated = signalsData.filter(passesQualityGate);
+        const top = (gated.length ? gated : signalsData).slice(0, 18).map(sg => pairSymbol(sg.pair));
         await DexEngine.fetchAll(top);
         attachVenueData();
         try { renderSignals(); } catch (e) {}
@@ -2638,7 +2638,7 @@ html[dir="rtl"] body {
     }
     function attachVenueData() {
       signalsData.forEach(sg => {
-        const sym = sg.pair.split(' / ')[0];
+        const sym = pairSymbol(sg.pair);
         const c = CexEngine.data[sym];
         if (c) {
           sg.cexN = c.n;
@@ -2652,7 +2652,7 @@ html[dir="rtl"] body {
     }
 
     function updateSectorPillCounts() {
-      const gated = signalsData.filter(sg => sg.quantScore >= QUAL_MIN);
+      const gated = signalsData.filter(passesQualityGate);
       const counts = { all: gated.length };
       gated.forEach(sg => { counts[sg.sector] = (counts[sg.sector] || 0) + 1; });
       document.querySelectorAll('.sector-pill').forEach(b => {
@@ -2673,17 +2673,43 @@ html[dir="rtl"] body {
     function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
     const QUAL_MIN = 78; // only grade B+ reaches the board
+    function qualityScore(sig) {
+      const n = Number(sig && sig.quantScore);
+      return Number.isFinite(n) ? n : 0;
+    }
+    function passesQualityGate(sig) {
+      return qualityScore(sig) >= QUAL_MIN;
+    }
+    function pairSymbol(pair) {
+      const s = String(pair || '').split(' / ')[0].trim();
+      return s || '—';
+    }
+    function takeProfitLevels(sig) {
+      const entry = Number(sig && sig.entryPrice);
+      const t = sig && sig.targets;
+      const tp1 = (t && t[0] != null) ? t[0] : (Number.isFinite(entry) ? entry * 1.05 : NaN);
+      const tp2 = (t && t[1] != null) ? t[1] : (Number.isFinite(entry) ? entry * 1.08 : NaN);
+      return { tp1: tp1, tp2: tp2 };
+    }
+    function capLeads(leads, max) {
+      max = max == null ? 500 : max;
+      const arr = Array.isArray(leads) ? leads.slice() : [];
+      while (arr.length >= max) arr.shift();
+      return arr;
+    }
     function gradeFromQuant(quantScore) {
       return quantScore >= 93 ? 'A+' : quantScore >= 86 ? 'A' : quantScore >= QUAL_MIN ? 'B+' : quantScore >= 70 ? 'B' : 'C';
     }
     function enrichSignal(sig) {
       if (sig.onchain) {
         if (sig.quantScore == null && sig.confluenceScore != null) sig.quantScore = sig.confluenceScore;
+        const q = Number(sig.quantScore);
+        sig.quantScore = Number.isFinite(q) ? q : 0;
         sig.grade = gradeFromQuant(sig.quantScore);
         return sig;
       }
       const rnd = mulberry32(hashStr(sig.id));
-      const base = sig.confluenceScore;
+      const base = Number(sig.confluenceScore) || 0;
       const sent = sig.sentiment ? sig.sentiment.score : 70;
       const smart = Math.min(99, Math.max(35, Math.round(base * 0.72 + sent * 0.18 + (rnd() * 22 - 6))));
       const netflowM = -Math.round(6 + base * 0.55 + rnd() * 26 - (base > 90 ? 0 : 14));
@@ -2707,7 +2733,7 @@ html[dir="rtl"] body {
     }
 
     let signalsData = SEED_SIGNALS.map(enrichSignal);
-    let GATE_FILTERED = signalsData.filter(sg => sg.quantScore < QUAL_MIN).length;
+    let GATE_FILTERED = signalsData.filter(sg => !passesQualityGate(sg)).length;
     let activeFilter = 'all';
     let activeSector = 'all';
     let searchQuery = '';
@@ -2830,7 +2856,7 @@ html[dir="rtl"] body {
 
     function getFilteredSignals() {
       return signalsData.filter(sig => {
-        if (sig.quantScore < QUAL_MIN) return false; // quality gate: only B+
+        if (!passesQualityGate(sig)) return false; // quality gate: only B+
         if (activeFilter === 'risk-low' && sig.riskLevel !== 'LOW') return false;
         if (activeFilter === 'risk-medium' && sig.riskLevel !== 'MEDIUM') return false;
         if (activeFilter === 'risk-high' && sig.riskLevel !== 'HIGH') return false;
@@ -2875,7 +2901,7 @@ html[dir="rtl"] body {
       const d = I18N[currentLang] || I18N.de;
       const qgn = document.getElementById('qualityGateNote');
       if (qgn) qgn.textContent = '⛨ ' + d.gateNote.replace('{n}', GATE_FILTERED);
-      const gatedList = signalsData.filter(sg => sg.quantScore >= QUAL_MIN);
+      const gatedList = signalsData.filter(passesQualityGate);
       const nEl = document.getElementById('statActiveCount');
       if (nEl) nEl.textContent = adBlockActive ? '—' : String(gatedList.length);
       const cEl = document.getElementById('statAvgConf');
@@ -2941,15 +2967,18 @@ html[dir="rtl"] body {
         const dotColorClass = sent.score >= 85 ? 'sentiment-bull' : (sent.score >= 70 ? 'sentiment-neutral' : 'sentiment-bear');
 
         const indPills = (sig.indicatorsUsed || []).map(ind => {
-          const isOnchain = ind.toLowerCase().includes('whale') || ind.toLowerCase().includes('pump.fun') || ind.toLowerCase().includes('tvl') || ind.toLowerCase().includes('on-chain') || ind.toLowerCase().includes('burn') || ind.toLowerCase().includes('staking');
-          return `<span class="indicator-mini-pill ${isOnchain ? 'is-onchain' : ''}">✔ ${escapeHtml(ind)}</span>`;
+          const label = String(ind == null ? '' : ind);
+          const low = label.toLowerCase();
+          const isOnchain = low.includes('whale') || low.includes('pump.fun') || low.includes('tvl') || low.includes('on-chain') || low.includes('burn') || low.includes('staking');
+          return `<span class="indicator-mini-pill ${isOnchain ? 'is-onchain' : ''}">✔ ${escapeHtml(label)}</span>`;
         }).join('');
 
         const oc = sig.onchain || null;
         const ocPills = oc ? `<span class="indicator-mini-pill is-onchain">⛓ ${escapeHtml(String(oc.netflowM))}M NETFLOW</span><span class="indicator-mini-pill is-onchain">🐋 +${escapeHtml(String(oc.whalePct))}% WHALE</span><span class="indicator-mini-pill is-onchain">⛽ ${escapeHtml(String(oc.funding))}% FUNDING</span><span class="indicator-mini-pill is-onchain">⛏ ${escapeHtml(oc.dex)}</span>` : '';
 
-        const tp1 = sig.targets[0] || (sig.entryPrice * 1.05);
-        const tp2 = sig.targets[1] || (sig.entryPrice * 1.08);
+        const tps = takeProfitLevels(sig);
+        const tp1 = tps.tp1;
+        const tp2 = tps.tp2;
 
         article.innerHTML = `
           <div class="corner-mark top-left">┌</div>
@@ -2972,7 +3001,7 @@ html[dir="rtl"] body {
                 <span class="confidence-tag">${sig.confluenceScore}%</span>
                 
                 <!-- EXPANDABLE SENTIMENT SCORE PILL -->
-                <button class="sentiment-pill-btn" data-toggle-sentiment="sentiment-${escapeHtml(sig.id)}" title="${d.sentPillTitle}">
+                <button class="sentiment-pill-btn" data-toggle-sentiment="sentiment-${escapeHtml(sig.id)}" title="${escapeHtml(d.sentPillTitle)}">
                   <span class="sentiment-pulse-dot ${dotColorClass}"></span>
                   <span style="font-weight:700;">💬 ${sent.score}/100</span>
                   <span style="color:var(--text-muted);">${escapeHtml(sent.label)}</span>
@@ -3179,8 +3208,7 @@ html[dir="rtl"] body {
               return;
             }
 
-            // Cap at 500
-            while (leads.length >= 500) leads.shift();
+            leads = capLeads(leads);
             leads.push({ email, date: new Date().toISOString() });
             localStorage.setItem('signalcraft_leads', JSON.stringify(leads));
 
@@ -3264,7 +3292,8 @@ html[dir="rtl"] body {
       if (!candles.length) return;
       const numCandles = candles.length;
       const candleW = (w - 120) / numCandles;
-      let domLo = sig.stopLoss * 0.98, domHi = Math.max(sig.targets[0] * 1.05, sig.entryPrice * 1.02);
+      const chartTps = takeProfitLevels(sig);
+      let domLo = (Number(sig.stopLoss) || 0) * 0.98, domHi = Math.max((Number(chartTps.tp1) || 0) * 1.05, (Number(sig.entryPrice) || 0) * 1.02);
       candles.forEach(function (cd) { domLo = Math.min(domLo, cd.low); domHi = Math.max(domHi, cd.high); });
       const domSpan = (domHi - domLo) || 1;
 
@@ -3325,13 +3354,13 @@ html[dir="rtl"] body {
 
       // 3. Take Profit Line
       ctx.strokeStyle = '#4E876A';
-      const tpY = scaleY(sig.targets[0]);
+      const tpY = scaleY(chartTps.tp1);
       ctx.beginPath();
       ctx.moveTo(0, tpY);
       ctx.lineTo(w, tpY);
       ctx.stroke();
       ctx.fillStyle = '#4E876A';
-      ctx.fillText(`TP1: $${fmtP(sig.targets[0])}`, w - 110, tpY - 4);
+      ctx.fillText(`TP1: $${fmtP(chartTps.tp1)}`, w - 110, tpY - 4);
 
       ctx.setLineDash([]);
     }
@@ -3353,8 +3382,10 @@ html[dir="rtl"] body {
       if (!modal || !title || !body) return;
 
       title.textContent = `${sig.pair} // ${dd.dossierBtn}`;
-      const tp1 = sig.targets[0] || (sig.entryPrice * 1.05);
-      const tp2 = sig.targets[1] || (sig.entryPrice * 1.08);
+      const tps = takeProfitLevels(sig);
+      const tp1 = tps.tp1;
+      const tp2 = tps.tp2;
+      const oc = sig.onchain || {};
 
       const riskClass = sig.riskLevel === 'LOW' ? '#4E876A' : (sig.riskLevel === 'MEDIUM' ? '#D4A359' : '#C85A32');
 
@@ -3394,13 +3425,13 @@ html[dir="rtl"] body {
         <div style="background:var(--bg-main); border:1px solid var(--border); padding:12px; margin-bottom:16px;">
           <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent);">[ ${dd.olTitle} ]</span>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-top:8px; font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted);">
-            <div>${dd.olNet}: <strong style="color:var(--text-main);">$${sig.onchain.netflowM}M</strong></div>
-            <div>${dd.olWhale}: <strong style="color:var(--gain);">+${sig.onchain.whalePct}%</strong></div>
-            <div>${dd.olAddr}: <strong style="color:var(--gain);">${sig.onchain.addrPct}x</strong></div>
-            <div>${dd.olFund}: <strong>${sig.onchain.funding}%</strong></div>
-            <div>${dd.olOi}: <strong style="color:var(--gain);">+${sig.onchain.oiPct}%</strong></div>
-            <div>${dd.olDepth}: <strong>${sig.onchain.depthM}%</strong></div>
-            <div>${dd.olSmart}: <strong style="color:var(--accent);">${sig.onchain.smart}%</strong></div>
+            <div>${dd.olNet}: <strong style="color:var(--text-main);">$${escapeHtml(String(oc.netflowM ?? '—'))}M</strong></div>
+            <div>${dd.olWhale}: <strong style="color:var(--gain);">+${escapeHtml(String(oc.whalePct ?? '—'))}%</strong></div>
+            <div>${dd.olAddr}: <strong style="color:var(--gain);">${escapeHtml(String(oc.addrPct ?? '—'))}x</strong></div>
+            <div>${dd.olFund}: <strong>${escapeHtml(String(oc.funding ?? '—'))}%</strong></div>
+            <div>${dd.olOi}: <strong style="color:var(--gain);">+${escapeHtml(String(oc.oiPct ?? '—'))}%</strong></div>
+            <div>${dd.olDepth}: <strong>${escapeHtml(String(oc.depthM ?? '—'))}%</strong></div>
+            <div>${dd.olSmart}: <strong style="color:var(--accent);">${escapeHtml(String(oc.smart ?? '—'))}%</strong></div>
           </div>
         </div>
 
@@ -3413,7 +3444,7 @@ html[dir="rtl"] body {
             <div>${dd.dosAtr}: <strong>${sig.metrics ? fmtP(sig.metrics.atr) : '-'} (${sig.metrics ? sig.metrics.atrPct : '-'}%)</strong></div>
             <div>${dd.dosSma}: <strong>${sig.metrics ? sig.metrics.sma50 : '-'} / ${sig.metrics ? sig.metrics.sma200 : '-'}</strong></div>
             <div>${dd.dosPerf}: <strong>${sig.metrics ? sig.metrics.perf7 : '-'}% / ${sig.metrics ? sig.metrics.perf30 : '-'}%</strong></div>
-            <div>${dd.dosVol}: <strong>$${sig.onchain.netflowM}M</strong></div>
+            <div>${dd.dosVol}: <strong>$${escapeHtml(String(oc.netflowM ?? '—'))}M</strong></div>
           </div>
         </div>
         ${sig.dexInfo ? `<div style="background:var(--bg-main); border:1px solid var(--border); padding:12px; margin-bottom:16px;">
@@ -3427,7 +3458,7 @@ html[dir="rtl"] body {
         </div>` : ''}
         <div style="background:var(--bg-main); border:1px solid var(--border); padding:12px; margin-bottom:16px;">
           <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent);">[ ${dd.dosComp} ]</span>
-          ${(sig.metrics ? ['tr','mo','vo','pr','st'] : []).map(function (kk) {
+          ${(sig.metrics && sig.metrics.comp ? ['tr','mo','vo','pr','st'] : []).map(function (kk) {
             const lbls = { tr: dd.dosC_tr, mo: dd.dosC_mo, vo: dd.dosC_vo, pr: dd.dosC_pr, st: dd.dosC_st };
             const maxs = { tr: 25, mo: 25, vo: 20, pr: 15, st: 15 };
             const wdt = Math.min(100, Math.round(sig.metrics.comp[kk] / maxs[kk] * 100));
@@ -3589,7 +3620,7 @@ html[dir="rtl"] body {
       const levels = [
         { label: ((I18N[currentLang] || I18N.de).entry), val: `$${fmtP(sig.entryPrice)}` },
         { label: ((I18N[currentLang] || I18N.de).sl), val: `$${fmtP(sig.stopLoss)}` },
-        { label: ((I18N[currentLang] || I18N.de).tp12), val: `$${fmtP(sig.targets[0])}` },
+        { label: ((I18N[currentLang] || I18N.de).tp12), val: `$${fmtP(takeProfitLevels(sig).tp1)}` },
         { label: ((I18N[currentLang] || I18N.de).rr), val: sig.riskRewardRatio }
       ];
 

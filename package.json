@@ -5,7 +5,7 @@
   "description": "Signalcraft Atelier – static terminal + landing. Modular test suite.",
   "scripts": {
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "node --test tests/step1-static.test.mjs tests/step2-unit.test.mjs tests/step6-seo-a11y-security.test.mjs tests/step6-logic.test.mjs tests/step8-a11y-pwa.test.mjs tests/step9-url-a11y.test.mjs tests/step10-ads-inventory.test.mjs tests/step11-ads-logic.test.mjs tests/step15-ads-security.test.mjs tests/step16-seo.test.mjs tests/step18-integrity.test.mjs tests/step20-track-record.test.mjs tests/step22-launch.test.mjs tests/step24-runtime.test.mjs",
+    "test:unit": "node --test tests/step1-static.test.mjs tests/step2-unit.test.mjs tests/step6-seo-a11y-security.test.mjs tests/step6-logic.test.mjs tests/step8-a11y-pwa.test.mjs tests/step9-url-a11y.test.mjs tests/step10-ads-inventory.test.mjs tests/step11-ads-logic.test.mjs tests/step15-ads-security.test.mjs tests/step16-seo.test.mjs tests/step18-integrity.test.mjs tests/step20-track-record.test.mjs tests/step22-launch.test.mjs tests/step24-runtime.test.mjs tests/step26-hardening.test.mjs",
     "test:step1": "node --test tests/step1-static.test.mjs",
     "test:step2": "node --test tests/step2-unit.test.mjs",
     "test:step6": "node --test tests/step6-seo-a11y-security.test.mjs tests/step6-logic.test.mjs && node --test --test-concurrency=1 tests/e2e/step6-systematic.test.mjs",
@@ -32,6 +32,8 @@
     "test:step23": "node --test --test-concurrency=1 tests/e2e/step23-launch.test.mjs",
     "test:step24": "node --test tests/step24-runtime.test.mjs",
     "test:step25": "node --test --test-concurrency=1 tests/e2e/step25-runtime.test.mjs",
+    "test:step26": "node --test tests/step26-hardening.test.mjs",
+    "test:step27": "node --test --test-concurrency=1 tests/e2e/step27-hardening.test.mjs",
     "serve": "python3 -m http.server 4173 --bind 0.0.0.0"
   },
   "devDependencies": {

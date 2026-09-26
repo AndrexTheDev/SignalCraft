@@ -87,11 +87,38 @@ export function emailLooksValid(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
 }
 
+export function qualityScore(sig) {
+  const n = Number(sig && sig.quantScore);
+  return Number.isFinite(n) ? n : 0;
+}
+
+export function passesQualityGate(sig, minScore = QUAL_MIN) {
+  return qualityScore(sig) >= minScore;
+}
+
+export function pairSymbol(pair) {
+  const s = String(pair || '').split(' / ')[0].trim();
+  return s || '—';
+}
+
+export function takeProfitLevels(sig) {
+  const entry = Number(sig && sig.entryPrice);
+  const t = sig && sig.targets;
+  const tp1 = (t && t[0] != null) ? t[0] : (Number.isFinite(entry) ? entry * 1.05 : NaN);
+  const tp2 = (t && t[1] != null) ? t[1] : (Number.isFinite(entry) ? entry * 1.08 : NaN);
+  return { tp1, tp2 };
+}
+
+export function capLeads(leads, max = 500) {
+  const arr = Array.isArray(leads) ? leads.slice() : [];
+  while (arr.length >= max) arr.shift();
+  return arr;
+}
+
 export function filterSignals(list, { filter = 'all', sector = 'all', q = '', minScore = QUAL_MIN } = {}) {
   const query = String(q || '').trim().toLowerCase();
   return list.filter((sig) => {
-    const score = sig.quantScore ?? sig.confluenceScore ?? 0;
-    if (score < minScore) return false;
+    if (qualityScore(sig) < minScore) return false;
     if (filter === 'risk-low' && sig.riskLevel !== 'LOW') return false;
     if (filter === 'risk-medium' && sig.riskLevel !== 'MEDIUM') return false;
     if (filter === 'risk-high' && sig.riskLevel !== 'HIGH') return false;
@@ -285,10 +312,10 @@ function bucketPct(b) {
 
 /** Rolling R:R geometry on each close except the last bar. */
 export function copyLevelsText(sig) {
-  const tp1 = (sig.targets && sig.targets[0]) || (sig.entryPrice * 1.05);
-  const tp2 = (sig.targets && sig.targets[1]);
-  const tpPart = tp2 != null ? ('$' + fmtP(tp1) + ' / $' + fmtP(tp2)) : ('$' + fmtP(tp1));
-  return sig.pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
+  const { tp1, tp2 } = takeProfitLevels(sig);
+  const tpPart = '$' + fmtP(tp1) + ' / $' + fmtP(tp2);
+  const pair = String((sig && sig.pair) || '—');
+  return pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
 }
 
 export function sortSignalsList(list, sortMode) {
@@ -323,7 +350,7 @@ export function fmtUtcTime(ts) {
 
 export function sectorCounts(list, minScore) {
   minScore = minScore == null ? QUAL_MIN : minScore;
-  const gated = (list || []).filter((s) => (s.quantScore ?? 0) >= minScore);
+  const gated = (list || []).filter((s) => qualityScore(s) >= minScore);
   const counts = { all: gated.length };
   gated.forEach((s) => { counts[s.sector] = (counts[s.sector] || 0) + 1; });
   return counts;
