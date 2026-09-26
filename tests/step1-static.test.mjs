@@ -24,6 +24,7 @@ describe('step1 / inventory', () => {
     assert.ok(exists('robots.txt'));
     assert.ok(exists('sitemap.xml'));
     assert.ok(exists('og-preview.png'));
+    assert.ok(exists('site.webmanifest'));
   });
 
   it('robots.txt allows the site and points at the sitemap', () => {

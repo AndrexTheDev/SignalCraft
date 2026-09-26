@@ -19,6 +19,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" href="logo.png">
+  <link rel="manifest" href="site.webmanifest">
   <link rel="canonical" href="https://signalcraft.atelier/index.html">
 
   <!-- HREFLANG MULTILINGUAL SEO (served live via ?lang= parameter) -->
@@ -489,8 +490,18 @@ body {
   .seo-faq-grid { grid-template-columns: 1fr; }
   .hero-title { font-size: 2.4rem; }
 }
-@media (max-width: 640px) {
+  @media (max-width: 640px) {
   .features-grid { grid-template-columns: 1fr; }
+}
+.skip-to-content {
+  position: absolute; inset-inline-start: -9999px; top: 8px; z-index: 2000;
+  background: var(--accent); color: var(--on-accent);
+  padding: 8px 14px; font-family: var(--font-mono); font-size: 0.75rem;
+  text-decoration: none; border-radius: 6px;
+}
+.skip-to-content:focus { inset-inline-start: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay { display: none; }
 }
   .proof-band { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; border: 1px solid var(--border); background: var(--bg-card); border-radius: 16px; padding: 34px; margin: 56px 0; }
   .proof-num { font-family: var(--font-serif); font-size: 4.2rem; line-height: 1; color: var(--gain); margin: 10px 0 4px; }
@@ -524,6 +535,7 @@ body {
   </style>
 </head>
 <body>
+  <a class="skip-to-content" id="skipToContent" href="#warum" data-i18n="skipTo">Weiter zum Inhalt</a>
   <div class="grain-overlay" aria-hidden="true"></div>
 
   <!-- Top slot intentionally free: reserved for future ad banner / social bar -->
@@ -651,7 +663,7 @@ body {
       </div>
     </section>
 
-    <section class="features-grid" id="warum">
+    <section class="features-grid" id="warum" tabindex="-1">
       <div class="feature-box">
         <span class="f-emoji">🎯</span>
         <h3 data-i18n="b1t">Fertige Trade-Pläne statt Rätselraten</h3>
@@ -820,8 +832,9 @@ body {
   (function () {
     'use strict';
     var L = {
-      de: { title: "Signalcraft – Krypto-Signale mit Live-Sentiment & Quality-Gate | Kostenlos" },
+      de: { title: "Signalcraft – Krypto-Signale mit Live-Sentiment & Quality-Gate | Kostenlos", skipTo: "Weiter zum Inhalt" },
       en: {
+        skipTo: "Skip to content",
         disc_badge: "RISK NOTICE", disc: "No investment advice. Crypto trading carries high risk of loss. Signals are for educational and analytical purposes only.",
         contact: "Contact: AndrexTheDev (hippie.highho@gmail.com)",
         head_sub: "Crypto signals with live sentiment // 120+ pairs // 11 CEX + 12 DEX // 5 languages",
@@ -864,6 +877,7 @@ body {
         title: "Signalcraft – Crypto Signals with Live Sentiment & Quality Gate | Free"
       },
       es: {
+        skipTo: "Ir al contenido",
         disc_badge: "AVISO DE RIESGO", disc: "Sin asesoramiento financiero. El trading de cripto implica alto riesgo de pérdida. Las señales son solo educativas y analíticas.",
         contact: "Contacto: AndrexTheDev (hippie.highho@gmail.com)",
         head_sub: "Señales cripto con sentimiento en vivo // 120+ pares // 11 CEX + 12 DEX // 5 idiomas",
@@ -906,6 +920,7 @@ body {
         title: "Signalcraft – Señales Cripto con Sentimiento en Vivo y Quality Gate | Gratis"
       },
       ar: {
+        skipTo: "إلى المحتوى",
         disc_badge: "تنبيه المخاطر", disc: "ليست نصيحة استثمارية. تداول العملات الرقمية ينطوي على مخاطر خسارة عالية. الإشارات لأغراض تعليمية وتحليلية فقط.",
         contact: "التواصل: AndrexTheDev (hippie.highho@gmail.com)",
         head_sub: "إشارات كريبتو مع معنويات مباشرة // 120+ زوجاً // 11 CEX + 12 DEX // 5 لغات",
@@ -948,6 +963,7 @@ body {
         title: "Signalcraft – إشارات كريبتو بمعنويات مباشرة وبوابة جودة | مجاناً"
       },
       zh: {
+        skipTo: "跳到正文",
         disc_badge: "风险提示", disc: "非投资建议。加密货币交易存在高亏损风险。信号仅用于教育与量化分析目的。",
         contact: "联系：AndrexTheDev (hippie.highho@gmail.com)",
         head_sub: "带实时情绪的加密信号 // 120+ 交易对 // 11 CEX + 12 DEX // 5 种语言",

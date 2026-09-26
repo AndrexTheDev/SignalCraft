@@ -18,6 +18,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" href="logo.png">
+  <link rel="manifest" href="site.webmanifest">
   <link rel="canonical" href="https://signalcraft.atelier/app.html">
 
   <!-- HREFLANG MULTILINGUAL SEO -->
@@ -1134,9 +1135,20 @@ html[dir="rtl"] body {
     .ad-sticky-m iframe { width:300px; height:250px; border:0; display:block; }
     .ad-sticky-m .ad-x { position:absolute; top:6px; inset-inline-end:6px; z-index:2; background:rgba(0,0,0,0.65); color:#fff; border:1px solid rgba(255,255,255,0.3); border-radius:8px; width:26px; height:26px; line-height:1; font-size:13px; cursor:pointer; padding:0; }
     @media (max-width:899px) { body.has-sticky-ad { padding-bottom:264px; } }
+    .skip-to-content {
+      position: absolute; inset-inline-start: -9999px; top: 8px; z-index: 2000;
+      background: var(--accent); color: var(--on-accent);
+      padding: 8px 14px; font-family: var(--font-mono); font-size: 0.75rem;
+      text-decoration: none; border-radius: 6px;
+    }
+    .skip-to-content:focus { inset-inline-start: 8px; }
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-scroll-content, .sentiment-pulse-dot { animation: none !important; }
+    }
   </style>
 </head>
 <body>
+  <a class="skip-to-content" id="skipToSignals" href="#signalsGrid">Skip to signals</a>
   <div class="grain-overlay" aria-hidden="true"></div>
 
   <!-- Top slot intentionally free: reserved for future ad banner / social bar -->
@@ -1333,7 +1345,7 @@ html[dir="rtl"] body {
     <!-- MAIN SIGNALS GRID -->
     <div class="quality-gate-note" id="qualityGateNote"></div>
 
-    <main class="signals-grid" id="signalsGrid">
+    <main class="signals-grid" id="signalsGrid" tabindex="-1">
       <!-- Generated via JavaScript -->
     </main>
 
@@ -1419,7 +1431,7 @@ html[dir="rtl"] body {
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="color:var(--accent);">✦</span>
           <span id="ftDon" style="font-weight:700; color:var(--text-main);">KRYPTO RESEARCH SPENDEN:</span>
-          <span style="color:var(--text-muted);">SOL: 79Ksqt...3mxWi8 • BTC: bc1qeq...hkc7f • ETH: 0xBC3f...42F7</span>
+          <span style="color:var(--text-muted);">SOL / BTC / ETH — hippie.highho@gmail.com</span>
         </div>
         <div id="ftNodes" style="color:var(--gain);">
           ● 11 CEX Orderbook-Nodes Online | Latency: 11.2ms
@@ -1595,6 +1607,19 @@ html[dir="rtl"] body {
       if (abs >= 1) return Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 });
       const dec = Math.min(12, Math.max(2, 2 - Math.floor(Math.log10(abs))));
       return Number(v).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+    function copyLevelsText(sig) {
+      const tp1 = (sig.targets && sig.targets[0]) || (sig.entryPrice * 1.05);
+      const tp2 = (sig.targets && sig.targets[1]);
+      const tpPart = tp2 != null ? ('$' + fmtP(tp1) + ' / $' + fmtP(tp2)) : ('$' + fmtP(tp1));
+      return sig.pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
+    }
+    function copySignalLevels(sig) {
+      const txt = copyLevelsText(sig);
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt);
+      } catch (e) {}
+      showToast((I18N[currentLang] || I18N.de).copiedToast);
     }
     function escapeHtml(str) {
       if (str === null || str === undefined) return '';
@@ -1856,12 +1881,66 @@ html[dir="rtl"] body {
       }
     };
 
+    const EXTRA_I18N = {
+      de: {
+        longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (Freigeschaltet)', unlockedPaper: '● Paper Light (Freigeschaltet)',
+        vaultOpen: '[ADMIN VAULT]: Zugriff autorisiert ✦', vaultEmpty: 'Keine gespeicherten Leads vorhanden.',
+        vaultExport: '[ADMIN VAULT]: {n} Leads exportiert ✦', vaultClearAsk: 'Alle Leads löschen?',
+        sentLoading: 'Lade globale Marktdaten…', leadQueued: 'Erfolgreich vorgemerkt!',
+        shareFoot: 'AndrexTheDev • Keine Anlageberatung • signalcraft.atelier', skipTo: 'Weiter zu den Signalen'
+      },
+      en: {
+        longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (Unlocked)', unlockedPaper: '● Paper Light (Unlocked)',
+        vaultOpen: '[ADMIN VAULT]: access authorised ✦', vaultEmpty: 'No stored leads.',
+        vaultExport: '[ADMIN VAULT]: {n} leads exported ✦', vaultClearAsk: 'Delete all leads?',
+        sentLoading: 'Loading live market data…', leadQueued: 'Noted!',
+        shareFoot: 'AndrexTheDev • Not investment advice • signalcraft.atelier', skipTo: 'Skip to signals'
+      },
+      es: {
+        longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (Desbloqueado)', unlockedPaper: '● Paper Light (Desbloqueado)',
+        vaultOpen: '[ADMIN VAULT]: acceso autorizado ✦', vaultEmpty: 'No hay leads.',
+        vaultExport: '[ADMIN VAULT]: {n} leads exportados ✦', vaultClearAsk: '¿Borrar todos los leads?',
+        sentLoading: 'Cargando datos en vivo…', leadQueued: '¡Anotado!',
+        shareFoot: 'AndrexTheDev • No es consejo de inversión • signalcraft.atelier', skipTo: 'Ir a las señales'
+      },
+      ar: {
+        longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (مفتوح)', unlockedPaper: '● Paper Light (مفتوح)',
+        vaultOpen: '[ADMIN VAULT]: تم التصريح ✦', vaultEmpty: 'لا توجد بيانات.',
+        vaultExport: '[ADMIN VAULT]: تم تصدير {n} ✦', vaultClearAsk: 'حذف الكل؟',
+        sentLoading: 'جاري التحميل…', leadQueued: 'تم!',
+        shareFoot: 'AndrexTheDev • ليست نصيحة استثمارية • signalcraft.atelier', skipTo: 'إلى الإشارات'
+      },
+      zh: {
+        longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber（已解锁）', unlockedPaper: '● Paper Light（已解锁）',
+        vaultOpen: '[ADMIN VAULT]: 已授权 ✦', vaultEmpty: '暂无线索。',
+        vaultExport: '[ADMIN VAULT]: 已导出 {n} ✦', vaultClearAsk: '清空全部线索？',
+        sentLoading: '正在加载实时数据…', leadQueued: '已记录！',
+        shareFoot: 'AndrexTheDev • 非投资建议 • signalcraft.atelier', skipTo: '跳到信号'
+      }
+    };
+    function tx(key, vars) {
+      const pack = EXTRA_I18N[currentLang] || EXTRA_I18N.en;
+      let s = pack[key] || (EXTRA_I18N.en[key] || key);
+      if (vars) Object.keys(vars).forEach(function (k) { s = s.replace('{' + k + '}', vars[k]); });
+      return s;
+    }
+    function fngClassLabel(cls) {
+      const map = {
+        de: { 'Extreme Greed': 'Extreme Gier', Greed: 'Gier', Neutral: 'Neutral', Fear: 'Angst', 'Extreme Fear': 'Extreme Angst' },
+        es: { 'Extreme Greed': 'Codicia extrema', Greed: 'Codicia', Neutral: 'Neutral', Fear: 'Miedo', 'Extreme Fear': 'Miedo extremo' },
+        ar: { 'Extreme Greed': 'طمع شديد', Greed: 'طمع', Neutral: 'محايد', Fear: 'خوف', 'Extreme Fear': 'خوف شديد' },
+        zh: { 'Extreme Greed': '极度贪婪', Greed: '贪婪', Neutral: '中性', Fear: '恐惧', 'Extreme Fear': '极度恐惧' }
+      };
+      const table = map[currentLang] || {};
+      return table[cls] || cls;
+    }
+
     // 1b. STATIC CONTROL TRANSLATIONS (full 5-language coverage)
     const STATIC_I18N = {
       de: {
         searchPlaceholder: "Suche Währungspaar (z.B. BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE)...",
         sectors: "SEKTOREN:", sort: "SORTIERUNG:", perPage: "Anzeige pro Seite:",
-        prev: "‹ Zurück", next: "Weiter ›", sizeAll: "Alle", clearAria: "Suche löschen",
+        prev: "‹ Zurück", next: "Weiter ›", sizeAll: "Alle", clearAria: "Suche löschen", skipTo: "Weiter zu den Signalen",
         pills: ["Alle (120)", "Majors (24)", "Layer 1/2 (24)", "DeFi Bluechips (24)", "AI & Compute (24)", "Memes & On-Chain (24)"],
         filters: ["Alle Signale", "🟢 Niedriges Risiko", "🟡 Mittleres Risiko", "🔴 Hohes Risiko"],
         sortOptions: ["Beste Konfluenz zuerst (99% → 79%)", "Höchster Sentiment-Score zuerst", "Risikolevel (Niedrig zuerst)", "Neueste Signale zuerst"],
@@ -1894,7 +1973,7 @@ html[dir="rtl"] body {
       en: {
         searchPlaceholder: "Search pair (e.g. BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE)...",
         sectors: "SECTORS:", sort: "SORTING:", perPage: "Per page:",
-        prev: "‹ Back", next: "Next ›", sizeAll: "All", clearAria: "Clear search",
+        prev: "‹ Back", next: "Next ›", sizeAll: "All", clearAria: "Clear search", skipTo: "Skip to signals",
         pills: ["All (120)", "Majors (24)", "Layer 1/2 (24)", "DeFi Bluechips (24)", "AI & Compute (24)", "Memes & On-Chain (24)"],
         filters: ["All Signals", "🟢 Low Risk", "🟡 Medium Risk", "🔴 High Risk"],
         sortOptions: ["Best confluence first (99% → 79%)", "Highest sentiment score first", "Risk level (low first)", "Newest signals first"],
@@ -1927,7 +2006,7 @@ html[dir="rtl"] body {
       es: {
         searchPlaceholder: "Buscar par (p.ej. BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE)...",
         sectors: "SECTORES:", sort: "ORDEN:", perPage: "Por página:",
-        prev: "‹ Atrás", next: "Sig. ›", sizeAll: "Todas", clearAria: "Borrar búsqueda",
+        prev: "‹ Atrás", next: "Sig. ›", sizeAll: "Todas", clearAria: "Borrar búsqueda", skipTo: "Ir a las señales",
         pills: ["Todos (120)", "Majors (24)", "Layer 1/2 (24)", "Bluechips DeFi (24)", "AI y Computación (24)", "Memes y On-Chain (24)"],
         filters: ["Todas las Señales", "🟢 Riesgo Bajo", "🟡 Riesgo Medio", "🔴 Riesgo Alto"],
         sortOptions: ["Mejor confluencia primero (99% → 79%)", "Mayor sentimiento primero", "Nivel de riesgo (bajo primero)", "Señales más recientes primero"],
@@ -1960,7 +2039,7 @@ html[dir="rtl"] body {
       ar: {
         searchPlaceholder: "ابحث عن الزوج (مثل BTC, SOL, PEPE, SUI)...",
         sectors: "القطاعات:", sort: "الترتيب:", perPage: "لكل صفحة:",
-        prev: "› السابق", next: "‹ التالي", sizeAll: "الكل", clearAria: "مسح البحث",
+        prev: "› السابق", next: "‹ التالي", sizeAll: "الكل", clearAria: "مسح البحث", skipTo: "إلى الإشارات",
         pills: ["الكل (120)", "الرئيسية (24)", "Layer 1/2 (24)", "عملات DeFi (24)", "الذكاء الاصطناعي (24)", "ميمز وأون-تشين (24)"],
         filters: ["كل الإشارات", "🟢 مخاطر منخفضة", "🟡 مخاطر متوسطة", "🔴 مخاطر عالية"],
         sortOptions: ["أفضل توافق أولاً (99% → 79%)", "أعلى معنويات أولاً", "مستوى المخاطرة (الأدنى أولاً)", "الأحدث أولاً"],
@@ -1993,7 +2072,7 @@ html[dir="rtl"] body {
       zh: {
         searchPlaceholder: "搜索交易对（如 BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE）...",
         sectors: "板块：", sort: "排序：", perPage: "每页显示：",
-        prev: "‹ 上一页", next: "下一页 ›", sizeAll: "全部", clearAria: "清除搜索",
+        prev: "‹ 上一页", next: "下一页 ›", sizeAll: "全部", clearAria: "清除搜索", skipTo: "跳到信号",
         pills: ["全部 (120)", "主流币 (24)", "Layer 1/2 (24)", "DeFi 蓝筹 (24)", "AI 与计算 (24)", "Meme 与链上 (24)"],
         filters: ["全部信号", "🟢 低风险", "🟡 中风险", "🔴 高风险"],
         sortOptions: ["最佳共振优先 (99% → 79%)", "情绪得分最高优先", "风险等级（从低到高）", "最新信号优先"],
@@ -2032,6 +2111,7 @@ html[dir="rtl"] body {
       if (inp) inp.placeholder = s.searchPlaceholder;
       const clr = document.getElementById('clearSearchBtn');
       if (clr) clr.setAttribute('aria-label', s.clearAria);
+      set('#skipToSignals', s.skipTo);
       set('#sectorLabel', s.sectors);
       set('#sortLabel', s.sort);
       set('#perPageLabel', s.perPage);
@@ -2142,7 +2222,8 @@ html[dir="rtl"] body {
       updateGlobalBadge() {
         const badge = document.getElementById('globalFngBadge');
         if (badge) {
-          badge.textContent = `● Index ${this.fngValue} (${this.fngClassification})`;
+          const label = fngClassLabel(this.fngClassification);
+          badge.textContent = `● Index ${this.fngValue} (${label})`;
           badge.style.color = this.fngValue >= 55 ? 'var(--gain)' : (this.fngValue >= 45 ? 'var(--warning)' : 'var(--loss)');
         }
       }
@@ -2658,7 +2739,7 @@ html[dir="rtl"] body {
 
             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
               <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                <span class="direction-badge badge-long">▲ LONG</span>
+                <span class="direction-badge badge-long">${tx('longBadge')}</span>
                 <span class="confidence-tag">${sig.confluenceScore}%</span>
                 
                 <!-- EXPANDABLE SENTIMENT SCORE PILL -->
@@ -2706,7 +2787,7 @@ html[dir="rtl"] body {
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-family:var(--font-mono); font-size:0.65rem;">
-              <span style="color:var(--text-muted);">Alternative.me Index: <strong>${SentimentEngine.fngValue} (${SentimentEngine.fngClassification})</strong></span>
+              <span style="color:var(--text-muted);">Alternative.me Index: <strong>${SentimentEngine.fngValue} (${fngClassLabel(SentimentEngine.fngClassification)})</strong></span>
               <button class="tactile-btn" data-refresh-sentiment="${escapeHtml(sig.id)}" style="padding:2px 6px; font-size:0.62rem;">${d.refreshBtn}</button>
             </div>
           </div>
@@ -2749,6 +2830,9 @@ html[dir="rtl"] body {
               </button>
               <button class="tactile-btn" data-inspect-sig="${escapeHtml(sig.id)}">
                 <span>${d.dossierBtn}</span>
+              </button>
+              <button class="tactile-btn" data-copy-levels="${escapeHtml(sig.id)}">
+                <span>${d.copyLevels}</span>
               </button>
             </div>
           </div>
@@ -2876,7 +2960,7 @@ html[dir="rtl"] body {
             form.reset();
           } catch (err) {
             console.error('LocalStorage storage error:', err);
-            showToast('Erfolgreich vorgemerkt!');
+            showToast(tx('leadQueued'));
             form.reset();
           }
         };
@@ -3133,11 +3217,7 @@ html[dir="rtl"] body {
 
       const copyBtn = document.getElementById('btnCopyDossierData');
       if (copyBtn) {
-        copyBtn.onclick = () => {
-          const txt = `${sig.pair} Setup | Entry: $${fmtP(sig.entryPrice)} | SL: $${fmtP(sig.stopLoss)} | TP: $${fmtP(tp1)} | R:R: ${sig.riskRewardRatio} (Signalcraft)`;
-          navigator.clipboard.writeText(txt);
-          showToast((I18N[currentLang] || I18N.de).copiedToast);
-        };
+        copyBtn.onclick = () => copySignalLevels(sig);
       }
     }
 
@@ -3205,6 +3285,15 @@ html[dir="rtl"] body {
           const sigId = btn.getAttribute('data-share-sig');
           const sig = signalsData.find(s => s.id === sigId);
           if (sig) { renderShareCardCanvas(sig); bumpStat('sc_shares'); }
+        };
+      });
+
+      document.querySelectorAll('[data-copy-levels]').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const sigId = btn.getAttribute('data-copy-levels');
+          const sig = signalsData.find(s => s.id === sigId);
+          if (sig) copySignalLevels(sig);
         };
       });
     }
@@ -3292,7 +3381,7 @@ html[dir="rtl"] body {
       // Footer
       ctx.fillStyle = '#686661';
       ctx.font = '15px JetBrains Mono, monospace';
-      ctx.fillText('Entwickler: AndrexTheDev (hippie.highho@gmail.com) • Keine Anlageberatung • signalcraft.atelier', 60, 600);
+      ctx.fillText(tx('shareFoot'), 60, 600);
 
       modal.classList.add('is-visible');
 
@@ -3330,7 +3419,7 @@ html[dir="rtl"] body {
       modal.classList.add('is-visible');
       const secretBtn = document.getElementById('btnSecretVault');
       if (secretBtn) secretBtn.style.display = 'inline-flex';
-      showToast('[ADMIN VAULT]: Zugriff autorisiert für AndrexTheDev ✦');
+      showToast(tx('vaultOpen'));
     }
 
     function exportLeadsCsvDirect() {
@@ -3338,7 +3427,7 @@ html[dir="rtl"] body {
         const raw = localStorage.getItem('signalcraft_leads');
         const leads = raw ? JSON.parse(raw) : [];
         if (leads.length === 0) {
-          showToast('Keine gespeicherten Leads vorhanden.');
+          showToast(tx('vaultEmpty'));
           return;
         }
 
@@ -3352,7 +3441,7 @@ html[dir="rtl"] body {
         link.href = URL.createObjectURL(blob);
         link.download = `signalcraft-leads-${new Date().toISOString().slice(0, 10)}.csv`;
         link.click();
-        showToast(`[ADMIN VAULT]: ${leads.length} Leads sicher exportiert ✦`);
+        showToast(tx('vaultExport', { n: leads.length }));
       } catch (err) {
         console.error('Export error:', err);
         showToast((I18N[currentLang] || I18N.de).toastCsvErr);
@@ -3371,6 +3460,16 @@ html[dir="rtl"] body {
         document.querySelectorAll('.modal-backdrop.is-visible').forEach(function (b) {
           b.classList.remove('is-visible');
         });
+        return;
+      }
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable);
+        if (!typing) {
+          e.preventDefault();
+          const inp = document.getElementById('pairSearchInput');
+          if (inp) { inp.focus(); if (inp.select) inp.select(); }
+        }
       }
     });
     document.querySelectorAll('.modal-backdrop').forEach(function (b) {
@@ -3408,7 +3507,7 @@ html[dir="rtl"] body {
       exportLeadsCsvDirect();
     };
     document.getElementById('btnVaultClearLeads').onclick = () => {
-      if (confirm('Sicher, dass alle Leads gelöscht werden sollen?')) {
+      if (confirm(tx('vaultClearAsk'))) {
         localStorage.removeItem('signalcraft_leads');
         document.getElementById('vaultLeadCount').textContent = '0';
         showToast((I18N[currentLang] || I18N.de).toastVaultClear);
@@ -3493,7 +3592,7 @@ html[dir="rtl"] body {
 
     // Global Sentiment Refresh
     document.getElementById('btnRefreshSentimentGlobal').onclick = async () => {
-      showToast('Lade globale Sentiment-Daten von Alternative.me...');
+      showToast(tx('sentLoading'));
       await SentimentEngine.fetchLiveFearAndGreed();
       await ME.refresh(true);
     };
@@ -3513,13 +3612,21 @@ html[dir="rtl"] body {
     };
 
     // Share to unlock
+    function themesAreUnlocked() {
+      try {
+        return localStorage.getItem('unlocked_themes') === 'true' || localStorage.getItem('signalcraft_supporter') === 'true';
+      } catch (e) { return false; }
+    }
+    function relabelUnlockedThemes() {
+      const select = document.getElementById('themeSelect');
+      if (!select || select.options.length < 3) return;
+      if (!themesAreUnlocked()) return;
+      select.options[1].text = tx('unlockedAmber');
+      select.options[2].text = tx('unlockedPaper');
+    }
     function unlockThemes() {
       try { localStorage.setItem('unlocked_themes', 'true'); } catch(e) {}
-      const select = document.getElementById('themeSelect');
-      if (select) {
-        select.options[1].text = '● Terminal Amber (Freigeschaltet)';
-        select.options[2].text = '● Paper Light (Freigeschaltet)';
-      }
+      relabelUnlockedThemes();
       document.getElementById('unlockStatusMsg').textContent = (I18N[currentLang] || I18N.de).unlockOk;
       showToast((I18N[currentLang] || I18N.de).unlockToast);
     }
@@ -3592,11 +3699,7 @@ html[dir="rtl"] body {
     }
 
     function applySupporter() {
-      const select = document.getElementById('themeSelect');
-      if (select) {
-        select.options[1].text = '● Terminal Amber (Freigeschaltet)';
-        select.options[2].text = '● Paper Light (Freigeschaltet)';
-      }
+      relabelUnlockedThemes();
       updateDonationTexts();
     }
 
@@ -3692,6 +3795,8 @@ html[dir="rtl"] body {
       const sel = document.getElementById('langSelect');
       if (sel) sel.value = currentLang;
       applyStaticTranslations();
+      relabelUnlockedThemes();
+      if (typeof SentimentEngine !== 'undefined' && SentimentEngine.updateGlobalBadge) SentimentEngine.updateGlobalBadge();
       renderSignals();
       if (manual && sel) showToast('✦ ' + sel.options[sel.selectedIndex].text);
     }

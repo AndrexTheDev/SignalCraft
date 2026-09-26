@@ -2,8 +2,9 @@
   "date": "2026-09-26",
   "branch": "arena/01a0dcc1-signalcraft",
   "totals": {
-    "unit": { "tests": 73, "pass": 73, "fail": 0 },
+    "unit": { "tests": 84, "pass": 84, "fail": 0 },
     "e2e_functional_beta_systematic": { "tests": 21 + 12 + 17, "pass": 50, "fail": 0 },
+    "e2e_step8": { "tests": 8, "pass": 8, "fail": 0 },
     "screenshot_suites": { "step5": 5, "step7": 1, "shots_total": 49 }
   },
   "steps": {
@@ -14,25 +15,19 @@
     "5_screenshots": { "command": "npm run test:step5", "tests": 5, "pass": 5, "shots": 40 },
     "6_seo_a11y_security_logic": { "command": "node --test tests/step6-*.test.mjs", "status": "pass" },
     "6_systematic_e2e": { "command": "npm run test:step6", "tests": 17, "pass": 17 },
-    "7_extra_shots": { "command": "npm run test:step7", "tests": 1, "pass": 1, "shots": 9 }
+    "7_extra_shots": { "command": "npm run test:step7", "tests": 1, "pass": 1, "shots": 9 },
+    "8_a11y_pwa": { "command": "node --test tests/step8-a11y-pwa.test.mjs", "status": "pass", "tests": 11, "pass": 11 },
+    "8_polish_e2e": { "command": "npm run test:step8", "tests": 8, "pass": 8 }
   },
-  "wave2_coverage": [
-    "?q= search deep-link",
-    "lang persistence landing → terminal",
-    "theme persistence across reload",
-    "Escape closes modals",
-    "backdrop click closes modals",
-    "combined sector + risk filters",
-    "pagination disabled states",
-    "lead honeypot + duplicate",
-    "admin vault + 5-click crest",
-    "share-card canvas paint",
-    "dialog aria",
-    "touch target min-height",
-    "SEO/OG/hreflang/JSON-LD SearchAction",
-    "WCAG contrast tokens",
-    "XSS escape + no eval + CSV sanitize",
-    "filter/pagination/ATR unit matrix",
-    "extra shots: majors, ZH mobile, paper mobile, AR RTL, ES dossier, SOL deeplink"
+  "wave3_coverage": [
+    "PWA site.webmanifest + rel=manifest on both pages",
+    "skip-to-content on landing and terminal, 5-language labels",
+    "prefers-reduced-motion",
+    "copy-levels button on every card + clipboard helper",
+    "/ focuses pair search unless already typing",
+    "leftover DE toasts/unlock/share-foot/vault confirm via EXTRA_I18N",
+    "FNG classification localized",
+    "footer wallets no longer truncated",
+    "unlocked theme option labels follow language"
   ]
 }
