@@ -8,7 +8,7 @@
        SEO METADATA & GROWTH OPTIMIZATION (HIGH TRAFFIC / INSTITUTIONAL GRADE)
        ======================================================================== -->
   <title>Signalcraft™ – 120+ Krypto-Signale mit Live-Sentiment, On-Chain-Score & 12 DEXs</title>
-  <meta name="description" content="120+ Krypto-Signale mit Live-Sentiment (0–100), On-Chain-Score, Quant-Grade A+–C & 12-DEX-Wire. 3-Level-Risiko, mind. 1:2 R:R. Kostenlos & ohne Konto – von AndrexTheDev.">
+  <meta name="description" content="120+ Krypto-Signale mit Live-Sentiment (0–100), On-Chain-Score, Quant-Grade A+–C (nur B+ aufs Board) & 12-DEX-Wire. 3-Level-Risiko, mind. 1:2 R:R. Kostenlos & ohne Konto – von AndrexTheDev."
   <meta name="keywords" content="krypto signale, trading signale, crypto trading signals, sentiment score, crypto news sentiment, fear and greed index, bitcoin signale, altcoin alpha, on-chain trading, rsi konfluenz, take profit stop loss calculator, andrexthedev, solana signale, meme coin alpha, binance kraken arbitrage">
   <meta name="author" content="AndrexTheDev (hippie.highho@gmail.com)">
   <meta name="publisher" content="Signalcraft Atelier">
@@ -1485,7 +1485,7 @@ html[dir="rtl"] body {
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="color:var(--accent);">✦</span>
           <span id="ftDon" style="font-weight:700; color:var(--text-main);">KRYPTO RESEARCH SPENDEN:</span>
-          <span style="color:var(--text-muted);">SOL / BTC / ETH — hippie.highho@gmail.com</span>
+          <span id="ftWallets" style="color:var(--text-muted); font-size:0.68rem; word-break:break-all;">SOL: 79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8 • BTC: bc1qeqzrlfg3edrydk4s0hecakc82gp26n5p7hkc7f • ETH: 0xBC3fab34f69bc9f6661608C3FB36dDdC313C42F7</span>
         </div>
         <div id="ftNodes" style="color:var(--gain);">
           ● 11 CEX Orderbook-Nodes Online | Latency: 11.2ms
@@ -1494,7 +1494,7 @@ html[dir="rtl"] body {
 
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <span>Signalcraft Terminal v3.2 &bull; Entwickler: <strong>AndrexTheDev</strong> (<a href="mailto:hippie.highho@gmail.com" style="color:inherit;">hippie.highho@gmail.com</a>)</span>
+          <span><span id="ftVersion">Signalcraft Terminal v3.4</span> &bull; Entwickler: <strong>AndrexTheDev</strong> (<a href="mailto:hippie.highho@gmail.com" style="color:inherit;">hippie.highho@gmail.com</a>)</span>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <a href="#faq" class="tactile-btn" style="padding:4px 8px; font-size:0.68rem;">FAQ & Guide ↗</a>
@@ -1626,9 +1626,9 @@ html[dir="rtl"] body {
       <div id="donImpact" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--gain); margin-bottom:14px; min-height:1.2em;"></div>
       <div id="donAddrLbl" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-subtle); margin-bottom:8px;"></div>
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-        <button class="tactile-btn" data-doncopy="hippie.highho@gmail.com">SOL 📋</button>
-        <button class="tactile-btn" data-doncopy="hippie.highho@gmail.com">BTC 📋</button>
-        <button class="tactile-btn" data-doncopy="hippie.highho@gmail.com">ETH 📋</button>
+        <button class="tactile-btn" id="btnDonSol" data-doncopy="79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8">SOL 📋</button>
+        <button class="tactile-btn" id="btnDonBtc" data-doncopy="bc1qeqzrlfg3edrydk4s0hecakc82gp26n5p7hkc7f">BTC 📋</button>
+        <button class="tactile-btn" id="btnDonEth" data-doncopy="0xBC3fab34f69bc9f6661608C3FB36dDdC313C42F7">ETH 📋</button>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
         <button class="tactile-btn btn-accent" id="btnDonated"></button>
@@ -2011,7 +2011,7 @@ html[dir="rtl"] body {
         sectors: "SEKTOREN:", sort: "SORTIERUNG:", perPage: "Anzeige pro Seite:",
         prev: "‹ Zurück", next: "Weiter ›", sizeAll: "Alle", clearAria: "Suche löschen", searchAria: "Währungspaar suchen", sortAria: "Sortierung", closeAria: "Schließen", skipTo: "Weiter zu den Signalen",
         seoTitle: "Signalcraft™ – 120+ Krypto-Signale mit Live-Sentiment, On-Chain-Score & 12 DEXs",
-        seoDesc: "120+ Krypto-Signale mit Live-Sentiment (0–100), On-Chain-Score, Quant-Grade A+–C & 12-DEX-Wire. 3-Level-Risiko, mind. 1:2 R:R. Kostenlos & ohne Konto – von AndrexTheDev.",
+        seoDesc: "120+ Krypto-Signale mit Live-Sentiment (0–100), On-Chain-Score, Quant-Grade A+–C (nur B+ aufs Board) & 12-DEX-Wire. 3-Level-Risiko, mind. 1:2 R:R. Kostenlos & ohne Konto – von AndrexTheDev.",
         pills: ["Alle (120)", "Majors (24)", "Layer 1/2 (24)", "DeFi Bluechips (24)", "AI & Compute (24)", "Memes & On-Chain (24)"],
         filters: ["Alle Signale", "🟢 Niedriges Risiko", "🟡 Mittleres Risiko", "🔴 Hohes Risiko"],
         sortOptions: ["Beste Konfluenz zuerst (99% → 79%)", "Höchster Sentiment-Score zuerst", "Risikolevel (Niedrig zuerst)", "Neueste Signale zuerst"],
@@ -3884,8 +3884,7 @@ html[dir="rtl"] body {
     // 9b. DONATION ENGINE & AD-BLOCK GATE
     // =======================================================================
     const DON_GOAL_EUR = 220;
-    // DEMO-SEED: Vor Launch durch echten Backend-/Zahlungswert ersetzen (TODO)
-    const DON_SEED_PCT = 68;
+    const DON_SEED_PCT = 68; // local community bar seed (not a live payment API)
     let adBlockActive = false;
     let selectedDonAmt = 9;
 
@@ -3962,8 +3961,8 @@ html[dir="rtl"] body {
     });
     document.querySelectorAll('[data-doncopy]').forEach(function (b) {
       b.onclick = function () {
-        try { navigator.clipboard.writeText(b.getAttribute('data-doncopy')); } catch (e) {}
-        showToast('✓ ' + b.getAttribute('data-doncopy').split(':')[0]);
+        try { navigator.clipboard.writeText(b.getAttribute('data-doncopy') || ''); } catch (e) {}
+        showToast('✓ ' + (b.textContent || '').replace(/📋/g, '').trim());
       };
     });
     document.getElementById('btnOpenDonation').onclick = openDonationModal;

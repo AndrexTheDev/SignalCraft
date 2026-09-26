@@ -110,7 +110,7 @@ describe('step8 / leftover German runtime strings', () => {
   });
 
   it('footer no longer truncates donation wallets', () => {
-    assert.equal(/79Ksqt/.test(app), false);
-    assert.match(app, /SOL \/ BTC \/ ETH/);
+    assert.match(app, /79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8/);
+    assert.equal(/79Ksqt\.\.\./.test(app), false);
   });
 });
