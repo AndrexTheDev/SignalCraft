@@ -2,10 +2,14 @@
 User-agent: *
 Allow: /
 Disallow: /ads/
+Disallow: /tests/
+Disallow: /uploads/
 
 User-agent: Googlebot
 Allow: /
 Disallow: /ads/
+Disallow: /tests/
+Disallow: /uploads/
 
 # --- AI-Training-Crawler ausgeschlossen (Cloudflare Security Insight) ---
 User-agent: GPTBot

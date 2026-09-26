@@ -1,0 +1,16 @@
+# Tooling and private trees — never serve as public assets.
+node_modules
+.git
+.browsers
+tests
+ads
+uploads
+package.json
+package-lock.json
+playwright.config.js
+.gitignore
+.assetsignore
+wrangler.toml
+README.md
+*.log
+.DS_Store

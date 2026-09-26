@@ -36,6 +36,7 @@
     "test:step27": "node --test --test-concurrency=1 tests/e2e/step27-hardening.test.mjs",
     "test:step28": "node --test tests/step28-storage.test.mjs",
     "test:step29": "node --test --test-concurrency=1 tests/e2e/step29-storage.test.mjs",
+    "build": "node -e \"process.stdout.write('signalcraft static v3.4\\n')\"",
     "serve": "python3 -m http.server 4173 --bind 0.0.0.0"
   },
   "devDependencies": {

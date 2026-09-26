@@ -27,6 +27,17 @@ describe('step1 / inventory', () => {
     assert.ok(exists('site.webmanifest'));
   });
 
+  it('ships an assets-only Worker config that ignores tests and ads', () => {
+    assert.ok(exists('wrangler.toml'));
+    const wr = read('wrangler.toml');
+    assert.match(wr, /name\s*=\s*"signalcraft"/);
+    assert.match(wr, /\[assets\]/);
+    const ignore = read('.assetsignore');
+    assert.match(ignore, /^tests$/m);
+    assert.match(ignore, /^ads$/m);
+    assert.match(ignore, /^node_modules$/m);
+  });
+
   it('robots.txt allows the site and points at the sitemap', () => {
     const robots = read('robots.txt');
     assert.match(robots, /Allow:\s*\//);
