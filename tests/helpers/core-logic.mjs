@@ -250,3 +250,74 @@ export function isLiveCache(ca) {
   return !!(ca && Array.isArray(ca.signals) && ca.signals.length === 120
     && ca.signals.every((s) => s && typeof s === 'object' && typeof s.pair === 'string' && typeof s.id === 'string'));
 }
+
+export function candleHL(c) {
+  if (Array.isArray(c)) return { h: +c[1], l: +c[2], c: +c[3] };
+  return { h: +(c && c.h), l: +(c && c.l), c: +(c && c.c) };
+}
+
+/** Conservative long path: same-bar SL+TP counts as stop. start = first index to inspect. */
+export function simulateLongTp1(entry, sl, tp1, candles, start) {
+  entry = +entry; sl = +sl; tp1 = +tp1;
+  if (!(entry > 0 && sl > 0 && sl < entry && tp1 > entry) || !Array.isArray(candles)) return 'none';
+  let filled = false;
+  for (let i = start || 0; i < candles.length; i++) {
+    const b = candleHL(candles[i]);
+    if (!Number.isFinite(b.h) || !Number.isFinite(b.l)) continue;
+    if (!filled) {
+      if (b.h >= entry && b.l <= entry) {
+        filled = true;
+        if (b.l <= sl) return 'stop';
+        if (b.h >= tp1) return 'hit';
+      }
+      continue;
+    }
+    if (b.l <= sl) return 'stop';
+    if (b.h >= tp1) return 'hit';
+  }
+  return filled ? 'open' : 'none';
+}
+
+function bucketPct(b) {
+  const d = (b.hit || 0) + (b.stop || 0);
+  return d ? Math.round((100 * b.hit) / d) : null;
+}
+
+/** Rolling R:R geometry on each close except the last bar. */
+export function rollingTrackRecord(setups) {
+  const tot = { hit: 0, stop: 0, open: 0, none: 0, n: 0 };
+  const byGrade = {};
+  const list = Array.isArray(setups) ? setups : [];
+  for (let s = 0; s < list.length; s++) {
+    const row = list[s] || {};
+    const k = row.k || row.k24 || [];
+    const entry = +(row.e != null ? row.e : row.entryPrice);
+    const sl = +(row.sl != null ? row.sl : row.stopLoss);
+    const tp1 = +(row.tp != null ? row.tp : (row.targets && row.targets[0]));
+    if (!(entry > 0 && sl > 0 && tp1 > entry && k.length > 1)) continue;
+    const risk = (entry - sl) / entry;
+    const rew = (tp1 - entry) / entry;
+    if (!(risk > 0 && rew > 0)) continue;
+    const g = row.g || row.grade || 'B+';
+    if (!byGrade[g]) byGrade[g] = { hit: 0, stop: 0, open: 0, none: 0 };
+    tot.n++;
+    for (let i = 0; i < k.length - 1; i++) {
+      const e = candleHL(k[i]).c;
+      if (!Number.isFinite(e) || e <= 0) continue;
+      const r = simulateLongTp1(e, e * (1 - risk), e * (1 + rew), k, i + 1);
+      tot[r]++;
+      byGrade[g][r]++;
+    }
+  }
+  const grades = {};
+  Object.keys(byGrade).forEach((g) => {
+    grades[g] = Object.assign({}, byGrade[g], { pct: bucketPct(byGrade[g]) });
+  });
+  return {
+    total: tot,
+    byGrade: grades,
+    pct: bucketPct(tot),
+    resolved: tot.hit + tot.stop,
+    setups: tot.n
+  };
+}
