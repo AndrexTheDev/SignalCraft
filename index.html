@@ -43,10 +43,11 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="675">
   <meta property="og:image:alt" content="Signalcraft: Krypto-Signale mit Live-Sentiment-Score">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:locale" content="de_DE">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:locale:alternate" content="es_ES">
-  <meta property="og:locale:alternate" content="ar_AR">
+  <meta property="og:locale:alternate" content="ar_SA">
   <meta property="og:locale:alternate" content="zh_CN">
 
   <!-- TWITTER / X CARDS -->
@@ -56,6 +57,7 @@
   <meta name="twitter:title" content="Signalcraft – Krypto-Signale mit Live-Sentiment">
   <meta name="twitter:description" content="Fertige Trade-Pläne für 120+ Paare: Einstieg, Stop & Ziele + Marktstimmung aus News & Social Media. Kostenlos & ohne Konto.">
   <meta name="twitter:image" content="https://signalcraft.atelier/og-preview.png">
+  <meta name="twitter:image:alt" content="Signalcraft: Krypto-Signale mit Live-Sentiment-Score">
 
   <!-- ========================================================================
        JSON-LD STRUCTURED DATA SCHEMA MARKUP
@@ -71,6 +73,10 @@
       "operatingSystem": "Any (Web)",
       "applicationCategory": "FinanceApplication",
       "url": "https://signalcraft.atelier/app.html",
+      "image": "https://signalcraft.atelier/og-preview.png",
+      "isAccessibleForFree": true,
+      "softwareVersion": "3.4",
+      "availableLanguage": ["de", "en", "es", "ar", "zh"],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -93,6 +99,8 @@
       "@id": "https://signalcraft.atelier/#website",
       "url": "https://signalcraft.atelier",
       "name": "Signalcraft",
+      "inLanguage": ["de", "en", "es", "ar", "zh"],
+      "publisher": { "@id": "https://signalcraft.atelier/#organization" },
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://signalcraft.atelier/app.html?q={search_term_string}",
@@ -104,7 +112,17 @@
       "@id": "https://signalcraft.atelier/#organization",
       "name": "Signalcraft Atelier",
       "url": "https://signalcraft.atelier",
-      "logo": "https://signalcraft.atelier/logo.png",
+      "email": "hippie.highho@gmail.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://signalcraft.atelier/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "sameAs": [
+        "https://x.com/SignalcraftDesk",
+        "https://x.com/AndrexTheDev"
+      ],
       "founder": {
         "@type": "Person",
         "name": "AndrexTheDev",
@@ -151,6 +169,30 @@
             "@type": "Answer",
             "text": "Signalcraft wird unabhängig von AndrexTheDev (hippie.highho@gmail.com) entwickelt und betrieben."
           }
+        }
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://signalcraft.atelier/index.html#webpage",
+      "url": "https://signalcraft.atelier/index.html",
+      "name": "Signalcraft – Krypto-Signale mit Live-Sentiment & Quality-Gate",
+      "isPartOf": { "@id": "https://signalcraft.atelier/#website" },
+      "about": { "@id": "https://signalcraft.atelier/#app" },
+      "primaryImageOfPage": "https://signalcraft.atelier/og-preview.png",
+      "dateModified": "2026-09-26",
+      "inLanguage": "de",
+      "breadcrumb": { "@id": "https://signalcraft.atelier/index.html#breadcrumb" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://signalcraft.atelier/index.html#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Signalcraft",
+          "item": "https://signalcraft.atelier/index.html"
         }
       ]
     }
@@ -542,7 +584,7 @@ body {
   <div class="grain-overlay" aria-hidden="true"></div>
 
   <!-- Top slot intentionally free: reserved for future ad banner / social bar -->
-  <div class="editorial-shell">
+  <main class="editorial-shell">
 
     <!-- HEADER -->
     <header class="landing-header">
@@ -826,7 +868,7 @@ body {
       <div id="container-8a466ff3d4c93e29bba42607317f6266"></div>
     </section>
 
-  </div>
+  </main>
 
   <!-- ========================================================================
        LANDING I18N ENGINE (5 LANGUAGES, ?lang= DEEP LINKS, RTL FOR ARABIC)
@@ -835,7 +877,7 @@ body {
   (function () {
     'use strict';
     var L = {
-      de: { title: "Signalcraft – Krypto-Signale mit Live-Sentiment & Quality-Gate | Kostenlos", skipTo: "Weiter zum Inhalt" },
+      de: { title: "Signalcraft – Krypto-Signale mit Live-Sentiment & Quality-Gate | Kostenlos", desc: "120+ Krypto-Signale mit Live-Sentiment, On-Chain-Score & Quant-Grade: nur B+ kommt aufs Board. Einstieg, Stop & Ziele, 11 CEX + 12 DEX live. Kostenlos, ohne Konto.", skipTo: "Weiter zum Inhalt" },
       en: {
         skipTo: "Skip to content",
         disc_badge: "RISK NOTICE", disc: "No investment advice. Crypto trading carries high risk of loss. Signals are for educational and analytical purposes only.",
@@ -877,7 +919,8 @@ body {
         fc_sub: "120+ signals, live sentiment, quality gate & on-chain score – 11 CEX + 12 DEX. Free, no account.",
         fc_cta: "✦ Enter the terminal – start free →",
         ft_don: "VOLUNTARY RESEARCH DONATION:", ft_sys: "All systems live", ft_dev: "Developer:", ft_term: "Open the trading terminal →",
-        title: "Signalcraft – Crypto Signals with Live Sentiment & Quality Gate | Free"
+        title: "Signalcraft – Crypto Signals with Live Sentiment & Quality Gate | Free",
+        desc: "120+ crypto signals with live sentiment, on-chain score and Quant-Grade: only B+ reaches the board. Entry, stop and targets, 11 CEX + 12 DEX live. Free, no account."
       },
       es: {
         skipTo: "Ir al contenido",
@@ -920,7 +963,8 @@ body {
         fc_sub: "120+ señales, sentimiento en vivo, quality gate y score on-chain – 11 CEX + 12 DEX. Gratis y sin cuenta.",
         fc_cta: "✦ Entrar al terminal – gratis →",
         ft_don: "DONACIÓN VOLUNTARIA DE RESEARCH:", ft_sys: "Todos los sistemas en vivo", ft_dev: "Desarrollador:", ft_term: "Abrir el terminal de trading →",
-        title: "Signalcraft – Señales Cripto con Sentimiento en Vivo y Quality Gate | Gratis"
+        title: "Signalcraft – Señales Cripto con Sentimiento en Vivo y Quality Gate | Gratis",
+        desc: "120+ señales cripto con sentimiento en vivo, score on-chain y Quant-Grade: solo B+ llega al tablero. Entrada, stop y objetivos, 11 CEX + 12 DEX en vivo. Gratis, sin cuenta."
       },
       ar: {
         skipTo: "إلى المحتوى",
@@ -963,7 +1007,8 @@ body {
         fc_sub: "120+ إشارة، معنويات مباشرة، بوابة جودة ودرجة أون-تشين – 11 CEX + 12 DEX. مجاناً وبدون حساب.",
         fc_cta: "✦ ادخل المنصة – ابدأ مجاناً ←",
         ft_don: "تبرع طوعي للبحث:", ft_sys: "كل الأنظمة تعمل", ft_dev: "المطور:", ft_term: "افتح منصة التداول ←",
-        title: "Signalcraft – إشارات كريبتو بمعنويات مباشرة وبوابة جودة | مجاناً"
+        title: "Signalcraft – إشارات كريبتو بمعنويات مباشرة وبوابة جودة | مجاناً",
+        desc: "أكثر من 120 إشارة كريبتو مع معنويات مباشرة ودرجة أون-تشين: فقط B+ يظهر على اللوحة. دخول ووقف وأهداف، 11 CEX و12 DEX مباشرة. مجاناً بدون حساب."
       },
       zh: {
         skipTo: "跳到正文",
@@ -1006,7 +1051,8 @@ body {
         fc_sub: "120+ 信号、实时情绪、质量门槛与链上评分——11 CEX + 12 DEX。免费、无需账户。",
         fc_cta: "✦ 进入终端 – 免费开始 →",
         ft_don: "自愿研究捐赠：", ft_sys: "全部系统在线", ft_dev: "开发者：", ft_term: "打开交易终端 →",
-        title: "Signalcraft – 带实时情绪与质量门槛的加密信号 | 免费"
+        title: "Signalcraft – 带实时情绪与质量门槛的加密信号 | 免费",
+        desc: "120+ 加密信号，实时情绪、链上评分与 Quant-Grade：仅 B+ 上板。含入场、止损与目标，11 家 CEX + 12 个 DEX 实时行情。免费、无需账户。"
       }
     };
 
@@ -1018,6 +1064,30 @@ body {
       L.de[el.getAttribute('data-i18n-html')] = el.innerHTML;
     });
 
+    var SEO_LOCALE = { de: 'de_DE', en: 'en_US', es: 'es_ES', ar: 'ar_SA', zh: 'zh_CN' };
+    function applySeoHead(code) {
+      var d = L[code] || L.en || L.de;
+      var canonical = 'https://signalcraft.atelier/index.html' + (code && code !== 'de' ? '?lang=' + code : '');
+      try {
+        if (d.title) document.title = d.title;
+        var descEl = document.querySelector('meta[name="description"]');
+        if (descEl && d.desc) descEl.setAttribute('content', d.desc);
+        var canonEl = document.querySelector('link[rel="canonical"]');
+        if (canonEl) canonEl.setAttribute('href', canonical);
+        var ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.setAttribute('content', canonical);
+        var ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle && d.title) ogTitle.setAttribute('content', d.title);
+        var ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc && d.desc) ogDesc.setAttribute('content', d.desc);
+        var ogLoc = document.querySelector('meta[property="og:locale"]');
+        if (ogLoc) ogLoc.setAttribute('content', SEO_LOCALE[code] || 'en_US');
+        var twTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twTitle && d.title) twTitle.setAttribute('content', d.title);
+        var twDesc = document.querySelector('meta[name="twitter:description"]');
+        if (twDesc && d.desc) twDesc.setAttribute('content', d.desc);
+      } catch (e) {}
+    }
     function apply(code) {
       var d = L[code] || L.de;
       document.documentElement.setAttribute('lang', code);
@@ -1030,7 +1100,7 @@ body {
         var k = el.getAttribute('data-i18n-html');
         if (d[k] != null) el.innerHTML = d[k];
       });
-      if (d.title) document.title = d.title;
+      applySeoHead(code);
       var sel = document.getElementById('langSelect');
       if (sel) sel.value = code;
     }

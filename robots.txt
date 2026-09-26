@@ -3,6 +3,10 @@ User-agent: *
 Allow: /
 Disallow: /ads/
 
+User-agent: Googlebot
+Allow: /
+Disallow: /ads/
+
 # --- AI-Training-Crawler ausgeschlossen (Cloudflare Security Insight) ---
 User-agent: GPTBot
 Disallow: /

@@ -42,10 +42,11 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="675">
   <meta property="og:image:alt" content="Signalcraft Quantitative Trading Terminal mit 120+ Krypto-Signalen">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:locale" content="de_DE">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:locale:alternate" content="es_ES">
-  <meta property="og:locale:alternate" content="ar_AR">
+  <meta property="og:locale:alternate" content="ar_SA">
   <meta property="og:locale:alternate" content="zh_CN">
 
   <!-- TWITTER / X CARDS -->
@@ -55,6 +56,7 @@
   <meta name="twitter:title" content="Signalcraft™ — 120+ Krypto-Signale mit News/Social Sentiment">
   <meta name="twitter:description" content="120+ Paare, Live Sentiment-Score, 11 CEXs Live, 3-Level Risikosystem & mathematische Konfluenz. Entwickler: AndrexTheDev.">
   <meta name="twitter:image" content="https://signalcraft.atelier/og-preview.png">
+  <meta name="twitter:image:alt" content="Signalcraft Quantitative Trading Terminal mit 120+ Krypto-Signalen">
 
   <!-- JSON-LD STRUCTURED DATA SCHEMA MARKUP -->
   <script type="application/ld+json">
@@ -67,10 +69,15 @@
       "name": "Signalcraft Quantitative Terminal",
       "operatingSystem": "All Web Browsers (Chrome, Firefox, Safari, Edge)",
       "applicationCategory": "FinanceApplication",
+      "url": "https://signalcraft.atelier/app.html",
+      "image": "https://signalcraft.atelier/og-preview.png",
+      "isAccessibleForFree": true,
+      "softwareVersion": "3.4",
+      "availableLanguage": ["de", "en", "es", "ar", "zh"],
       "offers": {
         "@type": "Offer",
-        "price": "0.00",
-        "priceCurrency": "USD"
+        "price": "0",
+        "priceCurrency": "EUR"
       },
       "featureList": [
         "120+ Curated Cryptocurrency Pairs across 5 Sectors",
@@ -95,6 +102,17 @@
       "@id": "https://signalcraft.atelier/#organization",
       "name": "Signalcraft Atelier",
       "url": "https://signalcraft.atelier",
+      "email": "hippie.highho@gmail.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://signalcraft.atelier/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "sameAs": [
+        "https://x.com/SignalcraftDesk",
+        "https://x.com/AndrexTheDev"
+      ],
       "founder": {
         "@type": "Person",
         "name": "AndrexTheDev",
@@ -103,7 +121,7 @@
       "contactPoint": {
         "@type": "ContactPoint",
         "email": "hippie.highho@gmail.com",
-        "contactType": "lead developer"
+        "contactType": "customer support"
       }
     },
     {
@@ -111,6 +129,8 @@
       "@id": "https://signalcraft.atelier/#website",
       "url": "https://signalcraft.atelier",
       "name": "Signalcraft Quantitative Intelligence",
+      "inLanguage": ["de", "en", "es", "ar", "zh"],
+      "publisher": { "@id": "https://signalcraft.atelier/#organization" },
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://signalcraft.atelier/app.html?q={search_term_string}",
@@ -119,38 +139,38 @@
     },
     {
       "@type": "FAQPage",
-      "@id": "https://signalcraft.atelier/#faq",
+      "@id": "https://signalcraft.atelier/app.html#faq",
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Was bedeutet der News- und Social-Media-Sentiment-Score?",
+          "name": "Wie funktioniert der Live-Sentiment-Score?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Der Sentiment-Score kombiniert den globalen Fear-&-Greed-Index (Aggregat aus Social-Media- und News-Daten), echte Taker-Kauf-/Verkaufsstroeme der letzten 7 Tage und Volumen-Momentum zu einem Wert von 0 bis 100. Werte ueber 75 stehen fuer starken Kaufdruck, Werte unter 40 fuer Verkaufsdruck."
+            "text": "Der Sentiment-Score kombiniert drei echte Quellen: den globalen Fear-&-Greed-Index, die Taker-Kauf-/Verkaufsstroeme der letzten 7 Tage und das Volumen-Momentum. Daraus entsteht pro Signal ein Wert von 0 bis 100."
           }
         },
         {
           "@type": "Question",
-          "name": "Wie sind die 120+ Krypto-Signale sortiert und dargestellt?",
+          "name": "Wie nutze ich das 3-Level-Risikomanagementsystem?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Die Signale sind standardmäßig streng nach mathematischer Konfluenz absteigend sortiert (beste Signale mit bis zu 99% Konfluenz zuerst). Für maximale Übersichtlichkeit werden stets 20 bis 30 Signale pro Seite mit schneller Paginierung angezeigt."
+            "text": "Jedes Signal wird transparent in Niedriges, Mittleres oder Hohes Risiko eingestuft: Majors und Bluechips, Layer-1/2 und AI, sowie Memes und On-Chain Gems."
           }
         },
         {
           "@type": "Question",
-          "name": "Wie hilft das 3-Level Risikosystem Krypto-Tradern?",
+          "name": "Warum ist ein Risk:Reward von mindestens 1:2 so entscheidend?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Jedes Signal wird transparent in 🟢 Niedriges Risiko (Spot/Majors), 🟡 Mittleres Risiko (Swing/L1) oder 🔴 Hohes Risiko (Memes/On-Chain Gems) eingestuft, damit Trader ihr Portfolio-Risiko diszipliniert steuern können."
+            "text": "Ein Mindest-R:R von 1:2 bedeutet, dass der potenzielle Gewinn mindestens doppelt so hoch ist wie der maximal tolerierte Verlust. Dadurch bleibt ein Haendler selbst bei einer Trefferquote von 40% mathematisch profitabel."
           }
         },
         {
           "@type": "Question",
-          "name": "Wer ist der Entwickler von Signalcraft?",
+          "name": "Wer betreibt Signalcraft und wie kann ich Kontakt aufnehmen?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Signalcraft wurde von AndrexTheDev entwickelt. Kontakt: hippie.highho@gmail.com."
+            "text": "Signalcraft wird von AndrexTheDev konzipiert und betreut. Offizielle E-Mail: hippie.highho@gmail.com."
           }
         },
         {
@@ -158,8 +178,38 @@
           "name": "Was bedeutet der Quant-Grade (A+ bis C) und das Quality-Gate?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Jedes Signal kombiniert Indikator-Konfluenz, On-Chain-Daten (Exchange-Netflows, Whale-Flows, Funding, Smart-Money-Score) und Sentiment zu einem Quant-Score. Nur Setups ab Grade B+ erscheinen im Board – der Rest wird transparent als gefiltert ausgewiesen."
+            "text": "Jedes Signal kombiniert Indikator-Konfluenz, On-Chain-Daten und Sentiment zu einem Quant-Score. Nur Setups ab Grade B+ erscheinen im Board – der Rest wird transparent als gefiltert ausgewiesen."
           }
+        }
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://signalcraft.atelier/app.html#webpage",
+      "url": "https://signalcraft.atelier/app.html",
+      "name": "Signalcraft Terminal – 120+ Krypto-Signale",
+      "isPartOf": { "@id": "https://signalcraft.atelier/#website" },
+      "about": { "@id": "https://signalcraft.atelier/#software" },
+      "primaryImageOfPage": "https://signalcraft.atelier/og-preview.png",
+      "dateModified": "2026-09-26",
+      "inLanguage": "de",
+      "breadcrumb": { "@id": "https://signalcraft.atelier/app.html#breadcrumb" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://signalcraft.atelier/app.html#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Signalcraft",
+          "item": "https://signalcraft.atelier/index.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Terminal",
+          "item": "https://signalcraft.atelier/app.html"
         }
       ]
     }
@@ -1155,7 +1205,7 @@ html[dir="rtl"] body {
   <div class="grain-overlay" aria-hidden="true"></div>
 
   <!-- Top slot intentionally free: reserved for future ad banner / social bar -->
-  <div class="editorial-shell">
+  <main class="editorial-shell">
 
     <!-- TICKER BAR (11 CEXs) -->
     <div class="editorial-ticker-bar">
@@ -1462,7 +1512,7 @@ html[dir="rtl"] body {
       <div id="container-8a466ff3d4c93e29bba42607317f6266"></div>
     </section>
 
-  </div>
+  </main>
 
   <!-- THEME UNLOCK MODAL -->
   <div class="modal-backdrop" id="themeModalBackdrop">
@@ -1944,6 +1994,8 @@ html[dir="rtl"] body {
         searchPlaceholder: "Suche Währungspaar (z.B. BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE)...",
         sectors: "SEKTOREN:", sort: "SORTIERUNG:", perPage: "Anzeige pro Seite:",
         prev: "‹ Zurück", next: "Weiter ›", sizeAll: "Alle", clearAria: "Suche löschen", searchAria: "Währungspaar suchen", sortAria: "Sortierung", closeAria: "Schließen", skipTo: "Weiter zu den Signalen",
+        seoTitle: "Signalcraft™ – 120+ Krypto-Signale mit Live-Sentiment, On-Chain-Score & 12 DEXs",
+        seoDesc: "120+ Krypto-Signale mit Live-Sentiment (0–100), On-Chain-Score, Quant-Grade A+–C & 12-DEX-Wire. 3-Level-Risiko, mind. 1:2 R:R. Kostenlos & ohne Konto – von AndrexTheDev.",
         pills: ["Alle (120)", "Majors (24)", "Layer 1/2 (24)", "DeFi Bluechips (24)", "AI & Compute (24)", "Memes & On-Chain (24)"],
         filters: ["Alle Signale", "🟢 Niedriges Risiko", "🟡 Mittleres Risiko", "🔴 Hohes Risiko"],
         sortOptions: ["Beste Konfluenz zuerst (99% → 79%)", "Höchster Sentiment-Score zuerst", "Risikolevel (Niedrig zuerst)", "Neueste Signale zuerst"],
@@ -1977,6 +2029,8 @@ html[dir="rtl"] body {
         searchPlaceholder: "Search pair (e.g. BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE)...",
         sectors: "SECTORS:", sort: "SORTING:", perPage: "Per page:",
         prev: "‹ Back", next: "Next ›", sizeAll: "All", clearAria: "Clear search", searchAria: "Search trading pair", sortAria: "Sort signals", closeAria: "Close", skipTo: "Skip to signals",
+        seoTitle: "Signalcraft™ – 120+ Crypto Signals with Live Sentiment, On-Chain Score & 12 DEXs",
+        seoDesc: "120+ crypto signals with live sentiment (0–100), on-chain score and Quant-Grade: only B+ reaches the board. 12-DEX wire, 3-level risk, min 1:2 R:R. Free, no account – by AndrexTheDev.",
         pills: ["All (120)", "Majors (24)", "Layer 1/2 (24)", "DeFi Bluechips (24)", "AI & Compute (24)", "Memes & On-Chain (24)"],
         filters: ["All Signals", "🟢 Low Risk", "🟡 Medium Risk", "🔴 High Risk"],
         sortOptions: ["Best confluence first (99% → 79%)", "Highest sentiment score first", "Risk level (low first)", "Newest signals first"],
@@ -2010,6 +2064,8 @@ html[dir="rtl"] body {
         searchPlaceholder: "Buscar par (p.ej. BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE)...",
         sectors: "SECTORES:", sort: "ORDEN:", perPage: "Por página:",
         prev: "‹ Atrás", next: "Sig. ›", sizeAll: "Todas", clearAria: "Borrar búsqueda", searchAria: "Buscar par", sortAria: "Ordenar", closeAria: "Cerrar", skipTo: "Ir a las señales",
+        seoTitle: "Signalcraft™ – 120+ señales cripto con sentimiento en vivo, on-chain y 12 DEX",
+        seoDesc: "120+ señales cripto con sentimiento en vivo (0–100), score on-chain y Quant-Grade: solo B+ llega al tablero. 12 DEX, riesgo de 3 niveles, R:R mín. 1:2. Gratis, sin cuenta – AndrexTheDev.",
         pills: ["Todos (120)", "Majors (24)", "Layer 1/2 (24)", "Bluechips DeFi (24)", "AI y Computación (24)", "Memes y On-Chain (24)"],
         filters: ["Todas las Señales", "🟢 Riesgo Bajo", "🟡 Riesgo Medio", "🔴 Riesgo Alto"],
         sortOptions: ["Mejor confluencia primero (99% → 79%)", "Mayor sentimiento primero", "Nivel de riesgo (bajo primero)", "Señales más recientes primero"],
@@ -2043,6 +2099,8 @@ html[dir="rtl"] body {
         searchPlaceholder: "ابحث عن الزوج (مثل BTC, SOL, PEPE, SUI)...",
         sectors: "القطاعات:", sort: "الترتيب:", perPage: "لكل صفحة:",
         prev: "› السابق", next: "‹ التالي", sizeAll: "الكل", clearAria: "مسح البحث", searchAria: "ابحث عن زوج", sortAria: "الترتيب", closeAria: "إغلاق", skipTo: "إلى الإشارات",
+        seoTitle: "Signalcraft™ – أكثر من 120 إشارة كريبتو بمعنويات مباشرة ودرجة أون-تشين و12 DEX",
+        seoDesc: "أكثر من 120 إشارة كريبتو مع معنويات مباشرة (0–100) ودرجة أون-تشين وتقييم كمي A+–C و12 DEX. مخاطر بثلاثة مستويات وR:R 1:2. مجاناً بدون حساب.",
         pills: ["الكل (120)", "الرئيسية (24)", "Layer 1/2 (24)", "عملات DeFi (24)", "الذكاء الاصطناعي (24)", "ميمز وأون-تشين (24)"],
         filters: ["كل الإشارات", "🟢 مخاطر منخفضة", "🟡 مخاطر متوسطة", "🔴 مخاطر عالية"],
         sortOptions: ["أفضل توافق أولاً (99% → 79%)", "أعلى معنويات أولاً", "مستوى المخاطرة (الأدنى أولاً)", "الأحدث أولاً"],
@@ -2076,6 +2134,8 @@ html[dir="rtl"] body {
         searchPlaceholder: "搜索交易对（如 BTC, SOL, PEPE, SUI, NEAR, TAO, AAVE）...",
         sectors: "板块：", sort: "排序：", perPage: "每页显示：",
         prev: "‹ 上一页", next: "下一页 ›", sizeAll: "全部", clearAria: "清除搜索", searchAria: "搜索交易对", sortAria: "排序", closeAria: "关闭", skipTo: "跳到信号",
+        seoTitle: "Signalcraft™ – 120+ 加密信号：实时情绪、链上评分与 12 个 DEX",
+        seoDesc: "120+ 加密信号，实时情绪（0–100）、链上评分与 Quant-Grade：仅 B+ 上板。12 个 DEX，三级风险，最低 1:2 盈亏比。免费、无需账户。",
         pills: ["全部 (120)", "主流币 (24)", "Layer 1/2 (24)", "DeFi 蓝筹 (24)", "AI 与计算 (24)", "Meme 与链上 (24)"],
         filters: ["全部信号", "🟢 低风险", "🟡 中风险", "🔴 高风险"],
         sortOptions: ["最佳共振优先 (99% → 79%)", "情绪得分最高优先", "风险等级（从低到高）", "最新信号优先"],
@@ -2107,6 +2167,30 @@ html[dir="rtl"] body {
       }
     };
 
+    const SEO_LOCALE = { de: 'de_DE', en: 'en_US', es: 'es_ES', ar: 'ar_SA', zh: 'zh_CN' };
+    function applySeoHead() {
+      const s = STATIC_I18N[currentLang] || STATIC_I18N.en;
+      const canonical = 'https://signalcraft.atelier/app.html' + (currentLang && currentLang !== 'de' ? '?lang=' + currentLang : '');
+      try {
+        if (s.seoTitle) document.title = s.seoTitle;
+        const descEl = document.querySelector('meta[name="description"]');
+        if (descEl && s.seoDesc) descEl.setAttribute('content', s.seoDesc);
+        const canonEl = document.querySelector('link[rel="canonical"]');
+        if (canonEl) canonEl.setAttribute('href', canonical);
+        const ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.setAttribute('content', canonical);
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle && s.seoTitle) ogTitle.setAttribute('content', s.seoTitle);
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc && s.seoDesc) ogDesc.setAttribute('content', s.seoDesc);
+        const ogLoc = document.querySelector('meta[property="og:locale"]');
+        if (ogLoc) ogLoc.setAttribute('content', SEO_LOCALE[currentLang] || 'en_US');
+        const twTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twTitle && s.seoTitle) twTitle.setAttribute('content', s.seoTitle);
+        const twDesc = document.querySelector('meta[name="twitter:description"]');
+        if (twDesc && s.seoDesc) twDesc.setAttribute('content', s.seoDesc);
+      } catch (e) {}
+    }
     function applyStaticTranslations() {
       const s = STATIC_I18N[currentLang] || STATIC_I18N.de;
       const set = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };
@@ -2150,6 +2234,7 @@ html[dir="rtl"] body {
       document.querySelectorAll('#faq .faq-header-toggle span:first-child').forEach((el, i) => { if (s['q' + (i + 1)]) el.textContent = s['q' + (i + 1)]; });
       document.querySelectorAll('#faq .faq-body-content').forEach((el, i) => { if (s['a' + (i + 1)]) el.innerHTML = s['a' + (i + 1)]; });
       set('#ftDon', s.ftDon); set('#ftNodes', s.ftNodes); set('#ftBack', s.ftBack);
+      applySeoHead();
       updateDonationTexts();
     }
 
