@@ -284,6 +284,51 @@ function bucketPct(b) {
 }
 
 /** Rolling R:R geometry on each close except the last bar. */
+export function copyLevelsText(sig) {
+  const tp1 = (sig.targets && sig.targets[0]) || (sig.entryPrice * 1.05);
+  const tp2 = (sig.targets && sig.targets[1]);
+  const tpPart = tp2 != null ? ('$' + fmtP(tp1) + ' / $' + fmtP(tp2)) : ('$' + fmtP(tp1));
+  return sig.pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
+}
+
+export function sortSignalsList(list, sortMode) {
+  const arr = Array.isArray(list) ? list.slice() : [];
+  if (sortMode === 'confluence') {
+    arr.sort((a, b) => b.confluenceScore - a.confluenceScore);
+  } else if (sortMode === 'sentiment') {
+    arr.sort((a, b) => (b.sentiment ? b.sentiment.score : 0) - (a.sentiment ? a.sentiment.score : 0));
+  } else if (sortMode === 'risk') {
+    const order = { LOW: 1, MEDIUM: 2, HIGH: 3 };
+    arr.sort((a, b) => order[a.riskLevel] - order[b.riskLevel]);
+  } else if (sortMode === 'time') {
+    arr.sort((a, b) => b.timestamp - a.timestamp);
+  }
+  return arr;
+}
+
+export function fillPaginTpl(tpl, start, end, total, page, totalPages) {
+  return String(tpl)
+    .replace('{s}', String(total === 0 ? 0 : start + 1))
+    .replace('{e}', String(end))
+    .replace('{t}', String(total))
+    .replace('{p}', String(page))
+    .replace('{tp}', String(totalPages));
+}
+
+export function fmtUtcTime(ts) {
+  const d = new Date(ts);
+  if (!Number.isFinite(d.getTime())) return '—';
+  return d.toISOString().slice(11, 19) + ' UTC';
+}
+
+export function sectorCounts(list, minScore) {
+  minScore = minScore == null ? QUAL_MIN : minScore;
+  const gated = (list || []).filter((s) => (s.quantScore ?? 0) >= minScore);
+  const counts = { all: gated.length };
+  gated.forEach((s) => { counts[s.sector] = (counts[s.sector] || 0) + 1; });
+  return counts;
+}
+
 export function rollingTrackRecord(setups) {
   const tot = { hit: 0, stop: 0, open: 0, none: 0, n: 0 };
   const byGrade = {};

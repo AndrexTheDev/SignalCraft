@@ -1668,6 +1668,11 @@ html[dir="rtl"] body {
       const tpPart = tp2 != null ? ('$' + fmtP(tp1) + ' / $' + fmtP(tp2)) : ('$' + fmtP(tp1));
       return sig.pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
     }
+    function fmtUtcTime(ts) {
+      const d = new Date(ts);
+      if (!Number.isFinite(d.getTime())) return '—';
+      return d.toISOString().slice(11, 19) + ' UTC';
+    }
     function copySignalLevels(sig) {
       const txt = copyLevelsText(sig);
       try {
@@ -1956,35 +1961,40 @@ html[dir="rtl"] body {
         vaultOpen: '[ADMIN VAULT]: Zugriff autorisiert ✦', vaultEmpty: 'Keine gespeicherten Leads vorhanden.',
         vaultExport: '[ADMIN VAULT]: {n} Leads exportiert ✦', vaultClearAsk: 'Alle Leads löschen?',
         sentLoading: 'Lade globale Marktdaten…', leadQueued: 'Erfolgreich vorgemerkt!',
-        shareFoot: 'AndrexTheDev • Keine Anlageberatung • signalcraft.atelier', skipTo: 'Weiter zu den Signalen'
+        shareFoot: 'AndrexTheDev • Keine Anlageberatung • signalcraft.atelier', skipTo: 'Weiter zu den Signalen',
+        sortToast: 'Sortierung: {v}'
       },
       en: {
         longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (Unlocked)', unlockedPaper: '● Paper Light (Unlocked)',
         vaultOpen: '[ADMIN VAULT]: access authorised ✦', vaultEmpty: 'No stored leads.',
         vaultExport: '[ADMIN VAULT]: {n} leads exported ✦', vaultClearAsk: 'Delete all leads?',
         sentLoading: 'Loading live market data…', leadQueued: 'Noted!',
-        shareFoot: 'AndrexTheDev • Not investment advice • signalcraft.atelier', skipTo: 'Skip to signals'
+        shareFoot: 'AndrexTheDev • Not investment advice • signalcraft.atelier', skipTo: 'Skip to signals',
+        sortToast: 'Sort: {v}'
       },
       es: {
         longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (Desbloqueado)', unlockedPaper: '● Paper Light (Desbloqueado)',
         vaultOpen: '[ADMIN VAULT]: acceso autorizado ✦', vaultEmpty: 'No hay leads.',
         vaultExport: '[ADMIN VAULT]: {n} leads exportados ✦', vaultClearAsk: '¿Borrar todos los leads?',
         sentLoading: 'Cargando datos en vivo…', leadQueued: '¡Anotado!',
-        shareFoot: 'AndrexTheDev • No es consejo de inversión • signalcraft.atelier', skipTo: 'Ir a las señales'
+        shareFoot: 'AndrexTheDev • No es consejo de inversión • signalcraft.atelier', skipTo: 'Ir a las señales',
+        sortToast: 'Orden: {v}'
       },
       ar: {
         longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber (مفتوح)', unlockedPaper: '● Paper Light (مفتوح)',
         vaultOpen: '[ADMIN VAULT]: تم التصريح ✦', vaultEmpty: 'لا توجد بيانات.',
         vaultExport: '[ADMIN VAULT]: تم تصدير {n} ✦', vaultClearAsk: 'حذف الكل؟',
         sentLoading: 'جاري التحميل…', leadQueued: 'تم!',
-        shareFoot: 'AndrexTheDev • ليست نصيحة استثمارية • signalcraft.atelier', skipTo: 'إلى الإشارات'
+        shareFoot: 'AndrexTheDev • ليست نصيحة استثمارية • signalcraft.atelier', skipTo: 'إلى الإشارات',
+        sortToast: 'الترتيب: {v}'
       },
       zh: {
         longBadge: '▲ LONG', unlockedAmber: '● Terminal Amber（已解锁）', unlockedPaper: '● Paper Light（已解锁）',
         vaultOpen: '[ADMIN VAULT]: 已授权 ✦', vaultEmpty: '暂无线索。',
         vaultExport: '[ADMIN VAULT]: 已导出 {n} ✦', vaultClearAsk: '清空全部线索？',
         sentLoading: '正在加载实时数据…', leadQueued: '已记录！',
-        shareFoot: 'AndrexTheDev • 非投资建议 • signalcraft.atelier', skipTo: '跳到信号'
+        shareFoot: 'AndrexTheDev • 非投资建议 • signalcraft.atelier', skipTo: '跳到信号',
+        sortToast: '排序：{v}'
       }
     };
     function tx(key, vars) {
@@ -2509,7 +2519,7 @@ html[dir="rtl"] body {
           const live = this.status.mode === 'live';
           el.textContent = live ? '\u25cf LIVE' : '\u25cf DEMO';
           el.style.color = live ? 'var(--gain)' : 'var(--warning)';
-          el.title = (live ? ((this.srcLabel && this.srcLabel !== 'BINANCE') ? ('Live-Quelle: ' + this.srcLabel + ' \u00b7 ') : 'Binance Spot API \u00b7 ') : 'Build-Daten \u00b7 ') + new Date(this.status.when).toLocaleString();
+          el.title = (live ? 'LIVE' : 'DEMO') + ' \u00b7 ' + ((this.srcLabel && this.srcLabel !== 'BINANCE') ? this.srcLabel : 'Binance Spot API') + ' \u00b7 ' + new Date(this.status.when).toISOString();
         }
         const ft = document.getElementById('ftNodes');
         if (ft) {
@@ -3039,7 +3049,7 @@ html[dir="rtl"] body {
 
           <!-- ACTIONS -->
           <div class="sc-action-row">
-            <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-subtle);">${new Date(sig.timestamp).toLocaleTimeString()} UTC</span>
+            <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-subtle);">${fmtUtcTime(sig.timestamp)}</span>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button class="tactile-btn" data-toggle-chart="chart-panel-${escapeHtml(sig.id)}" data-pair="${escapeHtml(sig.pair)}">
                 <span>${d.chartBtn}</span>
@@ -3334,6 +3344,9 @@ html[dir="rtl"] body {
       maybeAskSupport();
       const dd = I18N[currentLang] || I18N.de;
       sig = localizeSignal(sig);
+      const sentChg = (sig.sentiment && sig.sentiment.socialChange != null)
+        ? String(sig.sentiment.socialChange)
+        : '—';
       const modal = document.getElementById('dossierModalBackdrop');
       const title = document.getElementById('dossierTitle');
       const body = document.getElementById('dossierBody');
@@ -3395,7 +3408,7 @@ html[dir="rtl"] body {
         <div style="background:var(--bg-main); border:1px solid var(--border); padding:12px; margin-bottom:16px;">
           <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent);">[ ${dd.dosMkt} ]</span>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-top:8px; font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted);">
-            <div>${dd.dosChg}: <strong>${sig.sentiment.socialChange}</strong></div>
+            <div>${dd.dosChg}: <strong>${escapeHtml(sentChg)}</strong></div>
             <div>${dd.dosHi90}: <strong>${sig.metrics ? sig.metrics.hi90d : '-'}%</strong></div>
             <div>${dd.dosAtr}: <strong>${sig.metrics ? fmtP(sig.metrics.atr) : '-'} (${sig.metrics ? sig.metrics.atrPct : '-'}%)</strong></div>
             <div>${dd.dosSma}: <strong>${sig.metrics ? sig.metrics.sma50 : '-'} / ${sig.metrics ? sig.metrics.sma200 : '-'}</strong></div>
@@ -3420,7 +3433,7 @@ html[dir="rtl"] body {
             const wdt = Math.min(100, Math.round(sig.metrics.comp[kk] / maxs[kk] * 100));
             return '<div style="display:flex; align-items:center; gap:8px; margin-top:6px; font-family:var(--font-mono); font-size:0.66rem; color:var(--text-muted);"><span style="width:120px;">' + lbls[kk] + '</span><span style="flex:1; height:6px; background:var(--bg-surface); border:1px solid var(--border); border-radius:4px;"><span style="display:block; height:100%; width:' + wdt + '%; background:var(--accent); border-radius:4px;"></span></span><span>' + sig.metrics.comp[kk] + '/' + maxs[kk] + '</span></div>';
           }).join('')}
-          <p style="font-family:var(--font-mono); font-size:0.64rem; color:var(--text-subtle); margin-top:10px; line-height:1.5;">${dd.dosMeth} ${new Date(sig.timestamp).toLocaleString()}</p>
+          <p style="font-family:var(--font-mono); font-size:0.64rem; color:var(--text-subtle); margin-top:10px; line-height:1.5;">${dd.dosMeth} ${fmtUtcTime(sig.timestamp)}</p>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -3574,8 +3587,8 @@ html[dir="rtl"] body {
 
       const colW = (w - 120) / 4;
       const levels = [
-        { label: ((I18N[currentLang] || I18N.de).entry), val: `$${Number(sig.entryPrice).toLocaleString()}` },
-        { label: ((I18N[currentLang] || I18N.de).sl), val: `$${Number(sig.stopLoss).toLocaleString()}` },
+        { label: ((I18N[currentLang] || I18N.de).entry), val: `$${fmtP(sig.entryPrice)}` },
+        { label: ((I18N[currentLang] || I18N.de).sl), val: `$${fmtP(sig.stopLoss)}` },
         { label: ((I18N[currentLang] || I18N.de).tp12), val: `$${fmtP(sig.targets[0])}` },
         { label: ((I18N[currentLang] || I18N.de).rr), val: sig.riskRewardRatio }
       ];
@@ -3809,7 +3822,7 @@ html[dir="rtl"] body {
         sortMode = sortSelect.value;
         renderSignals();
         syncBoardQuery();
-        showToast((I18N[currentLang] || I18N.de).thChanged.replace('{v}', sortMode));
+        showToast(tx('sortToast', { v: sortMode }));
       };
     }
 
