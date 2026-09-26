@@ -1673,11 +1673,17 @@ html[dir="rtl"] body {
       if (!Number.isFinite(d.getTime())) return '—';
       return d.toISOString().slice(11, 19) + ' UTC';
     }
+    function copyText(txt) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          const p = navigator.clipboard.writeText(String(txt == null ? '' : txt));
+          if (p && typeof p.catch === 'function') p.catch(function () {});
+        }
+      } catch (e) {}
+    }
     function copySignalLevels(sig) {
       const txt = copyLevelsText(sig);
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt);
-      } catch (e) {}
+      copyText(txt);
       showToast((I18N[currentLang] || I18N.de).copiedToast);
     }
     function escapeHtml(str) {
@@ -1713,6 +1719,9 @@ html[dir="rtl"] body {
       return !!(ca && Array.isArray(ca.signals) && ca.signals.length === 120
         && ca.signals.every(function (s) { return s && typeof s === 'object' && typeof s.pair === 'string' && typeof s.id === 'string'; }));
     }
+    function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
     // =======================================================================
     // 1. I18N DICTIONARY (5 LANGUAGES: DE, EN, ES, AR, ZH)
@@ -2333,8 +2342,10 @@ html[dir="rtl"] body {
           if (res.ok) {
             const data = await res.json();
             if (data && data.data && data.data[0]) {
-              this.fngValue = parseInt(data.data[0].value, 10);
-              this.fngClassification = data.data[0].value_classification;
+              const n = parseInt(data.data[0].value, 10);
+              if (!Number.isFinite(n)) return;
+              this.fngValue = n;
+              this.fngClassification = data.data[0].value_classification || this.fngClassification;
               this.updateGlobalBadge();
             }
           }
@@ -2415,7 +2426,7 @@ html[dir="rtl"] body {
       atrK(h, l, c, p) { p = p || 14; const tr = []; for (let i = 1; i < c.length; i++) tr.push(Math.max(h[i] - l[i], Math.abs(h[i] - c[i - 1]), Math.abs(l[i] - c[i - 1])));
         let a = tr.slice(0, p).reduce((x, y) => x + y, 0) / p; for (let i = p; i < tr.length; i++) a = (a * (p - 1) + tr[i]) / p; return a; },
       sma(x, p) { if (x.length < p) return null; return x.slice(-p).reduce((a, b) => a + b, 0) / p; },
-      r5(x) { return +x.toPrecision(5); },
+      r5(x) { const n = Number(x); return Number.isFinite(n) ? +n.toPrecision(5) : 0; },
       build(sym, sec, k, src) {
         const h = k.map(r => +r[2]), l = k.map(r => +r[3]), c = k.map(r => +r[4]), qv = k.map(r => +r[7]), tq = k.map(r => +r[10]);
         const last = c[c.length - 1], r = this.rsi(c), a = this.atrK(h, l, c), atrp = a / last;
@@ -2455,15 +2466,16 @@ html[dir="rtl"] body {
       },
       toSignal(b, rank) {
         const sym = pairSymbol(b && b.pair);
+        const m = (b && b.metrics) || {};
         return {
-          id: 'SIG-' + sym + '-' + String(rank).padStart(3, '0'), pair: b.pair, type: 'LONG', venue: (b.src && b.src !== 'binance') ? (b.src.toUpperCase() + ' SPOT') : 'BINANCE SPOT', timeframe: '1d',
+          id: 'SIG-' + sym + '-' + String(rank).padStart(3, '0'), pair: (b && b.pair) || (sym + ' / USD'), type: 'LONG', venue: (b.src && b.src !== 'binance') ? (b.src.toUpperCase() + ' SPOT') : 'BINANCE SPOT', timeframe: '1d',
           sector: b.sector, confluenceScore: b.score, riskLevel: b.risk, riskRewardRatio: b.rrStr,
           entryPrice: b.entry, stopLoss: b.sl, targets: [b.tp1, b.tp2],
-          notes: sym + ': RSI(14) ' + b.metrics.rsi + ' \u00b7 ' + b.chg24s + ' in 24h \u00b7 Volumen ' + b.metrics.volX + 'x des 30T-Durchschnitts \u00b7 Taker-Kaufanteil 7T ' + b.metrics.tb7 + '% \u00b7 ' + b.metrics.hi90d + '% unter 90T-Hoch.',
-          indicatorsUsed: ['RSI(14) ' + b.metrics.rsi, 'Vol ' + b.metrics.volX + 'x 30T', 'Taker-Buy ' + b.metrics.tb7 + '%', '7T ' + (b.metrics.perf7 >= 0 ? '+' : '') + b.metrics.perf7 + '%', '30T ' + (b.metrics.perf30 >= 0 ? '+' : '') + b.metrics.perf30 + '%'],
+          notes: sym + ': RSI(14) ' + m.rsi + ' \u00b7 ' + b.chg24s + ' in 24h \u00b7 Volumen ' + m.volX + 'x des 30T-Durchschnitts \u00b7 Taker-Kaufanteil 7T ' + m.tb7 + '% \u00b7 ' + m.hi90d + '% unter 90T-Hoch.',
+          indicatorsUsed: ['RSI(14) ' + m.rsi, 'Vol ' + m.volX + 'x 30T', 'Taker-Buy ' + m.tb7 + '%', '7T ' + (m.perf7 >= 0 ? '+' : '') + m.perf7 + '%', '30T ' + (m.perf30 >= 0 ? '+' : '') + m.perf30 + '%'],
           sentiment: { score: b.ss, label: b.lab, socialChange: b.chg24s, bullPct: Math.max(8, Math.min(93, Math.round(b.tb * 100))), bearPct: 100 - Math.max(8, Math.min(93, Math.round(b.tb * 100))), xMentions: b.volMio, headline: sym + ': ' + b.chg24s + ' in 24h bei ' + b.volMio + ' Mio$ Volumen', catalyst: 'Staerkste Komponente: ' + b.top, fng: null },
-          timestamp: Date.now(), status: 'ACTIVE', metrics: b.metrics, live: true,
-          onchain: { netflowM: b.volMio, whalePct: b.metrics.tb7, addrPct: b.metrics.volX, funding: b.metrics.rsi, oiPct: b.metrics.perf7, depthM: b.metrics.perf30, smart: b.metrics.atrPct, onchainScore: b.score, dex: '' },
+          timestamp: Date.now(), status: 'ACTIVE', metrics: m, live: true,
+          onchain: { netflowM: b.volMio, whalePct: m.tb7, addrPct: m.volX, funding: m.rsi, oiPct: m.perf7, depthM: m.perf30, smart: m.atrPct, onchainScore: b.score, dex: '' },
           quantScore: b.score, grade: b.grade, k24: b.k24
         };
       },
@@ -2484,7 +2496,7 @@ html[dir="rtl"] body {
         const dd = I18N[currentLang] || I18N.de;
         try {
           if (!manual) {
-            const cached = localStorage.getItem(this.CACHE_KEY);
+            const cached = lsGet(this.CACHE_KEY);
             if (cached) { try { const ca = JSON.parse(cached); if (isLiveCache(ca)) this.apply(ca.signals, 'live', ca.t); } catch (e) {} }
           }
           const universe = {}; SEED_SIGNALS.forEach(sg => { universe[pairSymbol(sg.pair)] = sg.sector; });
@@ -2497,7 +2509,7 @@ html[dir="rtl"] body {
           const srcs = {}; out.forEach(b => { srcs[b.src || 'binance'] = (srcs[b.src || 'binance'] || 0) + 1; });
           this.srcLabel = Object.keys(srcs).sort((a, b) => srcs[b] - srcs[a]).map(x => x.toUpperCase()).join('/');
           const signals = out.map((b, i) => this.toSignal(b, i + 1));
-          try { localStorage.setItem(this.CACHE_KEY, JSON.stringify({ t: Date.now(), signals: signals })); } catch (e) {}
+          lsSet(this.CACHE_KEY, JSON.stringify({ t: Date.now(), signals: signals }));
           this._last = Date.now();
           this.apply(signals, 'live', Date.now());
           if (manual) showToast(dd.meLiveToast);
@@ -3198,7 +3210,7 @@ html[dir="rtl"] body {
           }
 
           try {
-            const raw = localStorage.getItem('signalcraft_leads');
+            const raw = lsGet('signalcraft_leads');
             let leads = safeJsonArray(raw);
             
             // Check duplicate
@@ -3210,7 +3222,7 @@ html[dir="rtl"] body {
 
             leads = capLeads(leads);
             leads.push({ email, date: new Date().toISOString() });
-            localStorage.setItem('signalcraft_leads', JSON.stringify(leads));
+            lsSet('signalcraft_leads', JSON.stringify(leads));
 
             showToast((I18N[currentLang] || I18N.de).toastOk);
             form.reset();
@@ -3651,7 +3663,7 @@ html[dir="rtl"] body {
 
       document.getElementById('btnDownloadCardPng').onclick = () => {
         const link = document.createElement('a');
-        link.download = `Signalcraft-${sig.pair.replace('/', '-')}.png`;
+        link.download = 'Signalcraft-' + pairSymbol(sig && sig.pair) + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
         showToast((I18N[currentLang] || I18N.de).copiedToast);
@@ -3673,7 +3685,7 @@ html[dir="rtl"] body {
       if (!modal) return;
       
       try {
-        const raw = localStorage.getItem('signalcraft_leads');
+        const raw = lsGet('signalcraft_leads');
         const leads = safeJsonArray(raw);
         document.getElementById('vaultLeadCount').textContent = leads.length;
       } catch (e) {
@@ -3688,7 +3700,7 @@ html[dir="rtl"] body {
 
     function exportLeadsCsvDirect() {
       try {
-        const raw = localStorage.getItem('signalcraft_leads');
+        const raw = lsGet('signalcraft_leads');
         const leads = safeJsonArray(raw);
         if (leads.length === 0) {
           showToast(tx('vaultEmpty'));
@@ -3772,7 +3784,7 @@ html[dir="rtl"] body {
     };
     document.getElementById('btnVaultClearLeads').onclick = () => {
       if (confirm(tx('vaultClearAsk'))) {
-        localStorage.removeItem('signalcraft_leads');
+        lsDel('signalcraft_leads');
         document.getElementById('vaultLeadCount').textContent = '0';
         showToast((I18N[currentLang] || I18N.de).toastVaultClear);
       }
@@ -3880,9 +3892,7 @@ html[dir="rtl"] body {
 
     // Share to unlock
     function themesAreUnlocked() {
-      try {
-        return localStorage.getItem('unlocked_themes') === 'true' || localStorage.getItem('signalcraft_supporter') === 'true';
-      } catch (e) { return false; }
+      return lsGet('unlocked_themes') === 'true' || lsGet('signalcraft_supporter') === 'true';
     }
     function relabelUnlockedThemes() {
       const select = document.getElementById('themeSelect');
@@ -3892,7 +3902,7 @@ html[dir="rtl"] body {
       select.options[2].text = tx('unlockedPaper');
     }
     function unlockThemes() {
-      try { localStorage.setItem('unlocked_themes', 'true'); } catch(e) {}
+      lsSet('unlocked_themes', 'true');
       relabelUnlockedThemes();
       document.getElementById('unlockStatusMsg').textContent = (I18N[currentLang] || I18N.de).unlockOk;
       showToast((I18N[currentLang] || I18N.de).unlockToast);
@@ -3902,7 +3912,7 @@ html[dir="rtl"] body {
       unlockThemes();
     };
     document.getElementById('btnShareUnlockCopy').onclick = () => {
-      navigator.clipboard.writeText('https://signalcraft.atelier/app.html');
+      copyText('https://signalcraft.atelier/app.html');
       unlockThemes();
     };
 
@@ -3911,14 +3921,14 @@ html[dir="rtl"] body {
     if (themeSelect) {
       themeSelect.onchange = () => {
         const val = themeSelect.value;
-        const isUnlocked = localStorage.getItem('unlocked_themes') === 'true' || isSupporter();
+        const isUnlocked = lsGet('unlocked_themes') === 'true' || isSupporter();
         if ((val === 'terminal-amber' || val === 'paper-light') && !isUnlocked) {
           setModalVisible(document.getElementById('themeModalBackdrop'), true);
           themeSelect.value = 'gallery-dark';
           return;
         }
         document.documentElement.setAttribute('data-theme', val);
-        try { localStorage.setItem('signalcraft_theme', val); } catch (e) {}
+        lsSet('signalcraft_theme', val);
         syncThemeColor();
         showToast((I18N[currentLang] || I18N.de).thChanged.replace('{v}', val));
       };
@@ -3932,8 +3942,6 @@ html[dir="rtl"] body {
     let adBlockActive = false;
     let selectedDonAmt = 9;
 
-    function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
     function isSupporter() { return lsGet('signalcraft_supporter') === 'true'; }
     function donExtra() { return parseInt(lsGet('signalcraft_don_extra') || '0', 10) || 0; }
     function donPct() { return Math.min(100, DON_SEED_PCT + Math.round(donExtra() / DON_GOAL_EUR * 100)); }
@@ -4070,7 +4078,7 @@ html[dir="rtl"] body {
     }
     const langSelectEl = document.getElementById('langSelect');
     if (langSelectEl) langSelectEl.onchange = () => {
-      try { localStorage.setItem('signalcraft_lang', langSelectEl.value); } catch (e) {}
+      lsSet('signalcraft_lang', langSelectEl.value);
       setLanguage(langSelectEl.value, true);
     };
 
@@ -4111,7 +4119,7 @@ html[dir="rtl"] body {
     let initialLang = 'en';
     try {
       const urlLang = new URLSearchParams(window.location.search).get('lang');
-      const savedLang = localStorage.getItem('signalcraft_lang');
+      const savedLang = lsGet('signalcraft_lang');
       if (urlLang && I18N[urlLang]) initialLang = urlLang;
       else if (savedLang && I18N[savedLang]) initialLang = savedLang;
       else initialLang = detectSystemLang();
@@ -4165,7 +4173,7 @@ html[dir="rtl"] body {
         .slice(0, 12)
         .map(function (sg) {
           const mm = sg.metrics || {};
-          return sg.pair.replace(' / USD', '') + ' ' + (mm.chg24 >= 0 ? '+' : '') + mm.chg24 + '% · ' + mm.volMio + 'M$';
+          return pairSymbol(sg.pair) + ' ' + (mm.chg24 >= 0 ? '+' : '') + mm.chg24 + '% · ' + mm.volMio + 'M$';
         });
       feed.textContent = parts.join('   |   ');
     }

@@ -1192,9 +1192,11 @@ function rollingTrackRecord(setups) {
       if (note && d.pr_note) note.textContent = fillTpl(d.pr_note, map);
     }
 
+    function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
     var langSel = document.getElementById('langSelect');
     if (langSel) langSel.onchange = function () {
-      try { localStorage.setItem('signalcraft_lang', langSel.value); } catch (e) {}
+      lsSet('signalcraft_lang', langSel.value);
       apply(langSel.value);
     };
 
@@ -1212,7 +1214,7 @@ function rollingTrackRecord(setups) {
     var initialLang = 'en';
     try {
       var q = new URLSearchParams(window.location.search).get('lang');
-      var savedLang = localStorage.getItem('signalcraft_lang');
+      var savedLang = lsGet('signalcraft_lang');
       if (q && L[q]) initialLang = q;
       else if (savedLang && L[savedLang]) initialLang = savedLang;
       else initialLang = detectSystemLang();

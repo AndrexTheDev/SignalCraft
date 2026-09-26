@@ -8,6 +8,11 @@ export function fmtP(v) {
   return Number(v).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
 }
 
+export function r5(x) {
+  const n = Number(x);
+  return Number.isFinite(n) ? +n.toPrecision(5) : 0;
+}
+
 export function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str)
