@@ -15,6 +15,7 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="theme-color" content="#121316">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Signalcraft">
@@ -1692,6 +1693,21 @@ html[dir="rtl"] body {
       }
       return '"' + str.replace(/"/g, '""') + '"';
     }
+    function safeJsonArray(raw) {
+      try {
+        const v = JSON.parse(String(raw == null ? '[]' : raw));
+        return Array.isArray(v) ? v : [];
+      } catch (e) { return []; }
+    }
+    function clampPct(n) {
+      const x = Number(n);
+      if (!Number.isFinite(x)) return 0;
+      return Math.max(0, Math.min(100, x));
+    }
+    function isLiveCache(ca) {
+      return !!(ca && Array.isArray(ca.signals) && ca.signals.length === 120
+        && ca.signals.every(function (s) { return s && typeof s === 'object' && typeof s.pair === 'string' && typeof s.id === 'string'; }));
+    }
 
     // =======================================================================
     // 1. I18N DICTIONARY (5 LANGUAGES: DE, EN, ES, AR, ZH)
@@ -2442,6 +2458,7 @@ html[dir="rtl"] body {
         };
       },
       apply(list, mode, when) {
+        if (!Array.isArray(list) || !list.length) list = SEED_SIGNALS;
         this.status = { mode: mode === 'live' ? 'live' : 'demo', when: when || ME_STAMP };
         signalsData = list.map(enrichSignal);
         GATE_FILTERED = signalsData.filter(sg => sg.quantScore < QUAL_MIN).length;
@@ -2458,7 +2475,7 @@ html[dir="rtl"] body {
         try {
           if (!manual) {
             const cached = localStorage.getItem(this.CACHE_KEY);
-            if (cached) { try { const ca = JSON.parse(cached); if (ca.signals && ca.signals.length === 120) this.apply(ca.signals, 'live', ca.t); } catch (e) {} }
+            if (cached) { try { const ca = JSON.parse(cached); if (isLiveCache(ca)) this.apply(ca.signals, 'live', ca.t); } catch (e) {} }
           }
           const universe = {}; SEED_SIGNALS.forEach(sg => { universe[sg.pair.split(' / ')[0]] = sg.sector; });
           const syms = Object.keys(universe), out = [];
@@ -2812,9 +2829,9 @@ html[dir="rtl"] body {
 
         if (searchQuery) {
           const q = searchQuery.toLowerCase();
-          const matchPair = sig.pair.toLowerCase().includes(q);
-          const matchSector = (sig.sector || '').toLowerCase().includes(q);
-          const matchNotes = sig.notes.toLowerCase().includes(q);
+          const matchPair = String(sig.pair || '').toLowerCase().includes(q);
+          const matchSector = String(sig.sector || '').toLowerCase().includes(q);
+          const matchNotes = String(sig.notes || '').toLowerCase().includes(q);
           if (!matchPair && !matchSector && !matchNotes) return false;
         }
 
@@ -2918,7 +2935,8 @@ html[dir="rtl"] body {
           return `<span class="indicator-mini-pill ${isOnchain ? 'is-onchain' : ''}">✔ ${escapeHtml(ind)}</span>`;
         }).join('');
 
-        const ocPills = sig.onchain ? `<span class="indicator-mini-pill is-onchain">⛓ ${sig.onchain.netflowM}M NETFLOW</span><span class="indicator-mini-pill is-onchain">🐋 +${sig.onchain.whalePct}% WHALE</span><span class="indicator-mini-pill is-onchain">⛽ ${sig.onchain.funding}% FUNDING</span><span class="indicator-mini-pill is-onchain">⛏ ${sig.onchain.dex}</span>` : '';
+        const oc = sig.onchain || null;
+        const ocPills = oc ? `<span class="indicator-mini-pill is-onchain">⛓ ${escapeHtml(String(oc.netflowM))}M NETFLOW</span><span class="indicator-mini-pill is-onchain">🐋 +${escapeHtml(String(oc.whalePct))}% WHALE</span><span class="indicator-mini-pill is-onchain">⛽ ${escapeHtml(String(oc.funding))}% FUNDING</span><span class="indicator-mini-pill is-onchain">⛏ ${escapeHtml(oc.dex)}</span>` : '';
 
         const tp1 = sig.targets[0] || (sig.entryPrice * 1.05);
         const tp2 = sig.targets[1] || (sig.entryPrice * 1.08);
@@ -2967,7 +2985,7 @@ html[dir="rtl"] body {
                 <span class="sentiment-metric-num" style="color:var(--gain);">${sent.score} / 100</span>
                 <span class="sentiment-metric-label">${d.sentimentScore}</span>
                 <div class="sentiment-meter-bar">
-                  <div class="sentiment-meter-fill" style="width: ${sent.score}%;"></div>
+                  <div class="sentiment-meter-fill" style="width: ${clampPct(sent.score)}%;"></div>
                 </div>
               </div>
 
@@ -3142,11 +3160,10 @@ html[dir="rtl"] body {
 
           try {
             const raw = localStorage.getItem('signalcraft_leads');
-            let leads = raw ? JSON.parse(raw) : [];
-            if (!Array.isArray(leads)) leads = [];
+            let leads = safeJsonArray(raw);
             
             // Check duplicate
-            if (leads.some(l => l.email.toLowerCase() === email.toLowerCase())) {
+            if (leads.some(l => l && String(l.email || '').toLowerCase() === email.toLowerCase())) {
               showToast((I18N[currentLang] || I18N.de).toastDup);
               form.reset();
               return;
@@ -3389,7 +3406,7 @@ html[dir="rtl"] body {
         ${sig.dexInfo ? `<div style="background:var(--bg-main); border:1px solid var(--border); padding:12px; margin-bottom:16px;">
           <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent);">[ ${dd.dosDexT} ]</span>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-top:8px; font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted);">
-            <div>${dd.dosDexVenue}: <strong style="color:var(--accent);">${sig.dexInfo.dex}</strong></div>
+            <div>${dd.dosDexVenue}: <strong style="color:var(--accent);">${escapeHtml(String(sig.dexInfo.dex))}</strong></div>
             <div>${dd.dosDexPrice}: <strong>$${sig.dexInfo.price >= 1 ? sig.dexInfo.price.toFixed(2) : sig.dexInfo.price.toPrecision(4)}</strong></div>
             <div>${dd.dosDexLiq}: <strong style="color:var(--gain);">${sig.dexInfo.liqM != null ? '$' + sig.dexInfo.liqM + 'M' : '–'}</strong></div>
             <div>${dd.dosDexSpr}: <strong>${(function(){ if (sig.dexInfo.price == null || !sig.entryPrice) return '–'; const dv = (sig.entryPrice - sig.dexInfo.price) / sig.dexInfo.price * 100; return (dv >= 0 ? '+' : '') + dv.toFixed(2) + '%'; })()}</strong></div>
@@ -3613,7 +3630,7 @@ html[dir="rtl"] body {
       
       try {
         const raw = localStorage.getItem('signalcraft_leads');
-        const leads = raw ? JSON.parse(raw) : [];
+        const leads = safeJsonArray(raw);
         document.getElementById('vaultLeadCount').textContent = leads.length;
       } catch (e) {
         document.getElementById('vaultLeadCount').textContent = '0';
@@ -3628,7 +3645,7 @@ html[dir="rtl"] body {
     function exportLeadsCsvDirect() {
       try {
         const raw = localStorage.getItem('signalcraft_leads');
-        const leads = raw ? JSON.parse(raw) : [];
+        const leads = safeJsonArray(raw);
         if (leads.length === 0) {
           showToast(tx('vaultEmpty'));
           return;

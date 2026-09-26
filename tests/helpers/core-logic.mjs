@@ -221,3 +221,32 @@ export function isPinnedAdUrl(url) {
     return false;
   }
 }
+
+export function safeJsonArray(raw) {
+  try {
+    const v = JSON.parse(String(raw == null ? '[]' : raw));
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+export function clampPct(n) {
+  const x = Number(n);
+  if (!Number.isFinite(x)) return 0;
+  return Math.max(0, Math.min(100, x));
+}
+
+export function longPlanValid(sig) {
+  const entry = Number(sig && sig.entryPrice);
+  const sl = Number(sig && sig.stopLoss);
+  const tp1 = Number(sig && sig.targets && sig.targets[0]);
+  const tp2 = Number(sig && sig.targets && sig.targets[1]);
+  return Number.isFinite(entry) && Number.isFinite(sl) && Number.isFinite(tp1) && Number.isFinite(tp2)
+    && sl < entry && entry < tp1 && tp1 <= tp2;
+}
+
+export function isLiveCache(ca) {
+  return !!(ca && Array.isArray(ca.signals) && ca.signals.length === 120
+    && ca.signals.every((s) => s && typeof s === 'object' && typeof s.pair === 'string' && typeof s.id === 'string'));
+}
