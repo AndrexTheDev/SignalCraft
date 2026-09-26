@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Signalcraft Atelier">
+  <rect width="512" height="512" fill="#121316"/>
+  <path d="M256 48 L464 256 L256 464 L48 256 Z" fill="none" stroke="#D06A3E" stroke-width="28"/>
+  <path d="M256 208 L304 256 L256 304 L208 256 Z" fill="#E8E6E3"/>
+  <text x="256" y="500" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#9E9B95">SIGNALCRAFT</text>
+</svg>

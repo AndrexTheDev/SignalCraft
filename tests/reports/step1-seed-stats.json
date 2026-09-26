@@ -1,0 +1,23 @@
+{
+  "count": 120,
+  "belowGate": 62,
+  "onBoard": 58,
+  "sectors": {
+    "memes": 16,
+    "layer1-2": 34,
+    "defi": 32,
+    "majors": 22,
+    "ai": 16
+  },
+  "risks": {
+    "HIGH": 89,
+    "MEDIUM": 29,
+    "LOW": 2
+  },
+  "grades": {
+    "A+": 3,
+    "A": 20,
+    "B": 35,
+    "C": 62
+  }
+}

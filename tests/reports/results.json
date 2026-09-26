@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-26",
+  "branch": "arena/01a0dcc1-signalcraft",
+  "steps": {
+    "1_static": { "command": "npm run test:step1", "status": "pass" },
+    "2_unit": { "command": "npm run test:step2", "status": "pass" },
+    "1_and_2_combined": { "tests": 43, "pass": 43, "fail": 0 },
+    "3_functional": { "command": "npm run test:step3", "tests": 21, "pass": 21, "fail": 0 },
+    "4_beta": { "command": "npm run test:step4", "tests": 12, "pass": 12, "fail": 0 },
+    "5_screenshots": {
+      "command": "npm run test:step5",
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "shots": 40,
+      "dir": "tests/artifacts/shots",
+      "matrix": [
+        "landing × 5 langs × desktop/mobile",
+        "terminal × 5 langs × 3 themes × desktop",
+        "terminal DE/EN/AR × tablet/mobile",
+        "states: sentiment, chart, dossier, share, donation, theme unlock, FAQ, empty search"
+      ]
+    }
+  },
+  "fixes": [
+    "Added --bg-card token (donation bar, quality-gate, proof band)",
+    "Added favicon.svg/png, logo.svg/png, apple-touch-icon",
+    "Fixed GEFIILTERT typo",
+    "Quality-gate grades now use B+ at QUAL_MIN 78",
+    "Hero active-count and avg confluence follow the gated board",
+    "Sector pill counts use gated universe",
+    "Cards show TP1 and TP2",
+    "Share-direct button actually tweets",
+    "Donation copy no longer copies truncated ellipsis wallets",
+    "Live toSignal bearPct is 100-bull instead of 0",
+    "SENT_LABELS for Arabic and Chinese",
+    "Guide button scrolls to FAQ with headless fallback",
+    "Dossier labels follow the active language"
+  ]
+}

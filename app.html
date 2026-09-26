@@ -15,6 +15,9 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="theme-color" content="#121316">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <link rel="canonical" href="https://signalcraft.atelier/app.html">
 
   <!-- HREFLANG MULTILINGUAL SEO -->
@@ -173,6 +176,7 @@
   --bg-main: #121316;
   --bg-surface: #17191D;
   --bg-elevated: #1F2228;
+  --bg-card: #17191D;
   --text-main: #E8E6E3;
   --text-muted: #9E9B95;
   --text-subtle: #8B8983;
@@ -197,6 +201,7 @@
   --bg-main: #0E0C07;
   --bg-surface: #17140B;
   --bg-elevated: #221D11;
+  --bg-card: #17140B;
   --text-main: #F4D58D;
   --text-muted: #B89E5F;
   --text-subtle: #9A854E;
@@ -218,6 +223,7 @@
   --bg-main: #F4F1EA;
   --bg-surface: #EAE5D9;
   --bg-elevated: #DFD8C7;
+  --bg-card: #EAE5D9;
   --text-main: #1D1C1A;
   --text-muted: #5C5850;
   --text-subtle: #66625A;
@@ -1104,7 +1110,8 @@ html[dir="rtl"] body {
     .grade-chip{font-family:var(--font-mono);font-size:0.62rem;font-weight:700;padding:2px 7px;letter-spacing:0.06em;border:1px solid;background:var(--bg-main);margin-inline-start:6px;}
     .g-Ap{color:var(--gain);border-color:var(--gain);}
     .g-A{color:var(--gain);border-color:var(--gain);opacity:0.85;}
-    .g-B{color:var(--accent);border-color:var(--accent);}
+    .g-Bp{color:var(--accent);border-color:var(--accent);}
+    .g-B{color:var(--warning);border-color:var(--warning);}
     .quality-gate-note{font-family:var(--font-mono);font-size:0.66rem;color:var(--gain);border:1px solid var(--border);border-inline-start:3px solid var(--gain);background:var(--bg-card);padding:8px 12px;margin:10px 0;letter-spacing:0.06em;}
   
     /* ===== SIDE ADS (160x600, nur >=1800px Viewport - keine Ueberlappung) ===== */
@@ -1257,7 +1264,7 @@ html[dir="rtl"] body {
         </div>
         <div class="bento-stat-item" style="grid-column: span 3; border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 4px; display:flex; justify-content:space-between; align-items:center;">
           <span id="globalSentLbl" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted);">LIVE GLOBAL SENTIMENT:</span>
-          <span id="globalFngBadge" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--gain); font-weight:700;">● Index 68 (Gier / Greed)</span>
+          <span id="globalFngBadge" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--gain); font-weight:700;">● Index 68 (Greed)</span>
         </div>
       </div>
     </section>
@@ -1552,9 +1559,9 @@ html[dir="rtl"] body {
       <div id="donImpact" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--gain); margin-bottom:14px; min-height:1.2em;"></div>
       <div id="donAddrLbl" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-subtle); margin-bottom:8px;"></div>
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-        <button class="tactile-btn" data-doncopy="SOL: 79Ksqt...3mxWi8">SOL: 79Ksqt...3mxWi8 📋</button>
-        <button class="tactile-btn" data-doncopy="BTC: bc1qeq...hkc7f">BTC: bc1qeq...hkc7f 📋</button>
-        <button class="tactile-btn" data-doncopy="ETH: 0xBC3f...42F7">ETH: 0xBC3f...42F7 📋</button>
+        <button class="tactile-btn" data-doncopy="hippie.highho@gmail.com">SOL 📋</button>
+        <button class="tactile-btn" data-doncopy="hippie.highho@gmail.com">BTC 📋</button>
+        <button class="tactile-btn" data-doncopy="hippie.highho@gmail.com">ETH 📋</button>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
         <button class="tactile-btn btn-accent" id="btnDonated"></button>
@@ -1648,7 +1655,7 @@ html[dir="rtl"] body {
         donHonest: "Ehrenwort-System: Wir vertrauen dir. Als Dankeschön bekommst du sofort den Supporter-Status und alle Themes frei.",
         donRecap: "Deine Session heute:", recapDos: "Dossiers geöffnet", recapShr: "Share-Cards erstellt", recapDrw: "Sentiment-Drawer analysiert",
         supToast: "✦ Danke, Supporter! Alle Themes frei + Badge aktiv.",
-        gateNote: "QUALITY-GATE AKTIV • {n} VON 120 SETUPS HEUTE UNTER GRADE B+ GEFIILTERT – NUR QUALITÄT KOMMT AUFS BOARD",
+        gateNote: "QUALITY-GATE AKTIV • {n} VON 120 SETUPS HEUTE UNTER GRADE B+ GEFILTERT – NUR QUALITÄT KOMMT AUFS BOARD",
         olTitle: "[ LIVE MARKTSTRUKTUR ]", olNet: "24h-Volumen", olWhale: "Taker-Kaufanteil 7T",
         olAddr: "Volumen vs. 30T", olFund: "RSI (14)", olOi: "7T-Performance", olDepth: "30T-Performance",
         olSmart: "ATR-Volatilität", dosMkt: "MARKTDATEN (LIVE)", dosChg: "24h-Änderung", dosHi90: "Abstand 90T-Hoch", dosAtr: "ATR (14)", dosSma: "SMA 50 / 200", dosPerf: "Perf. 7T / 30T", dosVol: "24h-Volumen", dosComp: "SCORE-KOMPONENTEN", dosC_tr: "Trend", dosC_mo: "Momentum", dosC_vo: "Volumen", dosC_pr: "Kaufdruck", dosC_st: "Struktur", dosMeth: "Alle Werte werden automatisch aus echten Binance-Tagesdaten berechnet (RSI, ATR, SMA, Volumen, Taker-Flow). Keine Meinungen, keine erfundenen News – keine Gewinnzusicherung. Datenstand:", dosSrc: "Daten: Binance Spot API", meLiveToast: "Live-Marktdaten aktualisiert ✦", meDemoToast: "Live-Quelle nicht erreichbar – Build-Daten aktiv", dosDexT: "DEX-VERGLEICH (LIVE)", dosDexVenue: "DEX", dosDexPrice: "DEX-Preis", dosDexLiq: "DEX-Liquidität", dosDexSpr: "CEX↔DEX-Abstand",   venueWord: "Börsen", rrLong: "R:R Verhältnis:",
@@ -2055,7 +2062,9 @@ html[dir="rtl"] body {
     // 1c. SIGNAL CONTENT LOCALIZATION OVERLAY (data-level i18n)
     const SENT_LABELS = {
       en: { 'Extrem Bullish': 'Extremely Bullish', 'Sehr Bullish': 'Very Bullish', 'Bullish': 'Bullish', 'Neutral-Bullish': 'Neutral-Bullish' },
-      es: { 'Extrem Bullish': 'Extremadamente Alcista', 'Sehr Bullish': 'Muy Alcista', 'Bullish': 'Alcista', 'Neutral-Bullish': 'Neutral-Alcista' }
+      es: { 'Extrem Bullish': 'Extremadamente Alcista', 'Sehr Bullish': 'Muy Alcista', 'Bullish': 'Alcista', 'Neutral-Bullish': 'Neutral-Alcista' },
+      ar: { 'Extrem Bullish': 'صعودي للغاية', 'Sehr Bullish': 'صعودي جداً', 'Bullish': 'صعودي', 'Neutral-Bullish': 'محايد-صعودي' },
+      zh: { 'Extrem Bullish': '极度看涨', 'Sehr Bullish': '非常看涨', 'Bullish': '看涨', 'Neutral-Bullish': '中性偏多' }
     };
       const ME_TEXTS = {
         de: { volL: '30T', tb: 'Taker-Buy', d7: '7T', d30: '30T', tops: { Trend: 'Trend', Momentum: 'Momentum', Volumen: 'Volumen', Kaufdruck: 'Kaufdruck', Struktur: 'Struktur' },
@@ -2216,7 +2225,7 @@ html[dir="rtl"] body {
         const pr = tb7 >= 0.55 ? 14 : tb7 >= 0.52 ? 10 : tb7 >= 0.5 ? 7 : tb7 >= 0.47 ? 4 : 1;
         const st = (hi90d <= 0.05 ? 12 : hi90d <= 0.12 ? 9 : hi90d <= 0.25 ? 6 : 3) + (p30 > 0 ? 3 : 0);
         const score = Math.max(5, Math.min(98, Math.round((trs + mo + vo + pr + st) * 1.18 - 6)));
-        const grade = score >= 93 ? 'A+' : score >= 86 ? 'A' : score >= 78 ? 'B' : 'C';
+        const grade = score >= 93 ? 'A+' : score >= 86 ? 'A' : score >= 78 ? 'B+' : score >= 70 ? 'B' : 'C';
         let risk = atrp < 0.03 ? 'LOW' : atrp < 0.06 ? 'MEDIUM' : 'HIGH';
         if (sec === 'memes' && risk === 'LOW') risk = 'MEDIUM';
         const sl = last - 1.5 * a, tp1 = last + 1.5 * a;
@@ -2246,7 +2255,7 @@ html[dir="rtl"] body {
           entryPrice: b.entry, stopLoss: b.sl, targets: [b.tp1, b.tp2],
           notes: sym + ': RSI(14) ' + b.metrics.rsi + ' \u00b7 ' + b.chg24s + ' in 24h \u00b7 Volumen ' + b.metrics.volX + 'x des 30T-Durchschnitts \u00b7 Taker-Kaufanteil 7T ' + b.metrics.tb7 + '% \u00b7 ' + b.metrics.hi90d + '% unter 90T-Hoch.',
           indicatorsUsed: ['RSI(14) ' + b.metrics.rsi, 'Vol ' + b.metrics.volX + 'x 30T', 'Taker-Buy ' + b.metrics.tb7 + '%', '7T ' + (b.metrics.perf7 >= 0 ? '+' : '') + b.metrics.perf7 + '%', '30T ' + (b.metrics.perf30 >= 0 ? '+' : '') + b.metrics.perf30 + '%'],
-          sentiment: { score: b.ss, label: b.lab, socialChange: b.chg24s, bullPct: Math.max(8, Math.min(93, Math.round(b.tb * 100))), bearPct: 0, xMentions: b.volMio, headline: sym + ': ' + b.chg24s + ' in 24h bei ' + b.volMio + ' Mio$ Volumen', catalyst: 'Staerkste Komponente: ' + b.top, fng: null },
+          sentiment: { score: b.ss, label: b.lab, socialChange: b.chg24s, bullPct: Math.max(8, Math.min(93, Math.round(b.tb * 100))), bearPct: 100 - Math.max(8, Math.min(93, Math.round(b.tb * 100))), xMentions: b.volMio, headline: sym + ': ' + b.chg24s + ' in 24h bei ' + b.volMio + ' Mio$ Volumen', catalyst: 'Staerkste Komponente: ' + b.top, fng: null },
           timestamp: Date.now(), status: 'ACTIVE', metrics: b.metrics, live: true,
           onchain: { netflowM: b.volMio, whalePct: b.metrics.tb7, addrPct: b.metrics.volX, funding: b.metrics.rsi, oiPct: b.metrics.perf7, depthM: b.metrics.perf30, smart: b.metrics.atrPct, onchainScore: b.score, dex: '' },
           quantScore: b.score, grade: b.grade, k24: b.k24
@@ -2436,8 +2445,9 @@ html[dir="rtl"] body {
     }
 
     function updateSectorPillCounts() {
-      const counts = { all: signalsData.length };
-      signalsData.forEach(sg => { counts[sg.sector] = (counts[sg.sector] || 0) + 1; });
+      const gated = signalsData.filter(sg => sg.quantScore >= QUAL_MIN);
+      const counts = { all: gated.length };
+      gated.forEach(sg => { counts[sg.sector] = (counts[sg.sector] || 0) + 1; });
       document.querySelectorAll('.sector-pill').forEach(b => {
         const sec = b.getAttribute('data-sector');
         if (counts[sec] == null) return;
@@ -2456,8 +2466,15 @@ html[dir="rtl"] body {
     function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
     const QUAL_MIN = 78; // only grade B+ reaches the board
+    function gradeFromQuant(quantScore) {
+      return quantScore >= 93 ? 'A+' : quantScore >= 86 ? 'A' : quantScore >= QUAL_MIN ? 'B+' : quantScore >= 70 ? 'B' : 'C';
+    }
     function enrichSignal(sig) {
-      if (sig.onchain) return sig;
+      if (sig.onchain) {
+        if (sig.quantScore == null && sig.confluenceScore != null) sig.quantScore = sig.confluenceScore;
+        sig.grade = gradeFromQuant(sig.quantScore);
+        return sig;
+      }
       const rnd = mulberry32(hashStr(sig.id));
       const base = sig.confluenceScore;
       const sent = sig.sentiment ? sig.sentiment.score : 70;
@@ -2478,7 +2495,7 @@ html[dir="rtl"] body {
       const quantScore = Math.round(0.45 * base + 0.30 * onchainScore + 0.25 * sent);
       sig.onchain = { netflowM: netflowM, whalePct: whalePct, addrPct: addrPct, funding: funding, oiPct: oiPct, depthM: depthM, smart: smart, onchainScore: onchainScore, dex: DEX_VENUES[hashStr(sig.id + 'dex') % DEX_VENUES.length].n };
       sig.quantScore = quantScore;
-      sig.grade = quantScore >= 93 ? 'A+' : quantScore >= 86 ? 'A' : quantScore >= QUAL_MIN ? 'B' : 'C';
+      sig.grade = gradeFromQuant(quantScore);
       return sig;
     }
 
@@ -2548,6 +2565,14 @@ html[dir="rtl"] body {
       const d = I18N[currentLang] || I18N.de;
       const qgn = document.getElementById('qualityGateNote');
       if (qgn) qgn.textContent = '⛨ ' + d.gateNote.replace('{n}', GATE_FILTERED);
+      const gatedList = signalsData.filter(sg => sg.quantScore >= QUAL_MIN);
+      const nEl = document.getElementById('statActiveCount');
+      if (nEl) nEl.textContent = adBlockActive ? '—' : String(gatedList.length);
+      const cEl = document.getElementById('statAvgConf');
+      if (cEl && gatedList.length) {
+        const avg = gatedList.reduce((a, s) => a + (s.confluenceScore || 0), 0) / gatedList.length;
+        cEl.textContent = avg.toFixed(1) + '%';
+      }
 
       // Ad-block gate: signals only visible without a blocker
       if (adBlockActive) {
@@ -2613,6 +2638,7 @@ html[dir="rtl"] body {
         const ocPills = sig.onchain ? `<span class="indicator-mini-pill is-onchain">⛓ ${sig.onchain.netflowM}M NETFLOW</span><span class="indicator-mini-pill is-onchain">🐋 +${sig.onchain.whalePct}% WHALE</span><span class="indicator-mini-pill is-onchain">⛽ ${sig.onchain.funding}% FUNDING</span><span class="indicator-mini-pill is-onchain">⛏ ${sig.onchain.dex}</span>` : '';
 
         const tp1 = sig.targets[0] || (sig.entryPrice * 1.05);
+        const tp2 = sig.targets[1] || (sig.entryPrice * 1.08);
 
         article.innerHTML = `
           <div class="corner-mark top-left">┌</div>
@@ -2624,7 +2650,7 @@ html[dir="rtl"] body {
           <div class="signal-header-row">
             <div class="asset-identity-cluster">
               <span class="rank-badge">#${globalRank} SETUP • ${sig.confluenceScore}% ${d.confWord}</span>
-                <span class="grade-chip g-${sig.grade === 'A+' ? 'Ap' : sig.grade}">GRADE ${sig.grade}</span>
+                <span class="grade-chip g-${sig.grade === 'A+' ? 'Ap' : sig.grade === 'B+' ? 'Bp' : sig.grade}">GRADE ${sig.grade}</span>
               <h3 class="sc-asset-title">${escapeHtml(sig.pair)}</h3>
               <span class="sc-meta-sub">${escapeHtml(sig.venueLabel || sig.venue || 'MULTI-CEX VENUE')} // TF: ${escapeHtml(sig.timeframe)} // ${d.sekWord}: ${escapeHtml((sig.sector || 'majors').toUpperCase())}</span>
             </div>
@@ -2702,7 +2728,7 @@ html[dir="rtl"] body {
             </div>
             <div class="sc-level-box">
               <span class="sc-level-label">${d.tp12}</span>
-              <span class="sc-level-val gain">$${fmtP(tp1)}</span>
+              <span class="sc-level-val gain">$${fmtP(tp1)} · $${fmtP(tp2)}</span>
             </div>
             <div class="sc-level-box">
               <span class="sc-level-label">${d.rr}</span>
@@ -3010,7 +3036,7 @@ html[dir="rtl"] body {
       const body = document.getElementById('dossierBody');
       if (!modal || !title || !body) return;
 
-      title.textContent = `${sig.pair} // Quantitative Analyse`;
+      title.textContent = `${sig.pair} // ${dd.dossierBtn}`;
       const tp1 = sig.targets[0] || (sig.entryPrice * 1.05);
       const tp2 = sig.targets[1] || (sig.entryPrice * 1.08);
 
@@ -3020,21 +3046,21 @@ html[dir="rtl"] body {
         <div style="background:var(--bg-main); border:1px solid var(--border); padding:16px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-family:var(--font-mono); font-size:0.75rem;">
             <span>${(I18N[currentLang] || I18N.de).confScore} <strong>${sig.confluenceScore}%</strong></span>
-            <span style="color:${riskClass}; font-weight:700;">RISIKO: ${sig.riskLevel}</span>
+            <span style="color:${riskClass}; font-weight:700;">${dd.riskWord}: ${sig.riskLevel}</span>
           </div>
           <p style="color:var(--text-main); font-size:0.86rem; line-height:1.5;">${escapeHtml(sig.notes)}</p>
         </div>
 
         <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-bottom:16px;">
           <div style="background:var(--bg-main); border:1px solid var(--border); padding:12px;">
-            <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-subtle);">ORDERBUCH ENTRY & SL</span>
+            <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-subtle);">${dd.entry} & ${dd.sl}</span>
             <div style="font-family:var(--font-mono); font-size:0.85rem; margin-top:4px;">
-              <div>Einstieg: <strong>$${fmtP(sig.entryPrice)}</strong></div>
-              <div style="color:var(--loss);">Stop-Loss: <strong>$${fmtP(sig.stopLoss)}</strong></div>
+              <div>${dd.entry}: <strong>$${fmtP(sig.entryPrice)}</strong></div>
+              <div style="color:var(--loss);">${dd.sl}: <strong>$${fmtP(sig.stopLoss)}</strong></div>
             </div>
           </div>
           <div style="background:var(--bg-main); border:1px solid var(--border); padding:12px;">
-            <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-subtle);">GEWINNZIELE & R:R</span>
+            <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-subtle);">${dd.tp12} & ${dd.rr}</span>
             <div style="font-family:var(--font-mono); font-size:0.85rem; margin-top:4px;">
               <div style="color:var(--gain);">TP1 / TP2: <strong>$${fmtP(tp1)} / $${fmtP(tp2)}</strong></div>
               <div style="color:var(--accent);">${dd.rrLong} <strong>${escapeHtml(sig.riskRewardRatio)}</strong></div>
@@ -3274,8 +3300,15 @@ html[dir="rtl"] body {
         link.download = `Signalcraft-${sig.pair.replace('/', '-')}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-        showToast('Share Card (1200x675) erfolgreich heruntergeladen ✦');
+        showToast((I18N[currentLang] || I18N.de).copiedToast);
       };
+      const shareDirect = document.getElementById('btnShareCardDirect');
+      if (shareDirect) {
+        shareDirect.onclick = () => {
+          const url = 'https://signalcraft.atelier/app.html';
+          window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Signalcraft — 120+ quantitative crypto signals. ' + url), '_blank', 'noopener,noreferrer');
+        };
+      }
     }
 
     // =======================================================================
@@ -3441,7 +3474,7 @@ html[dir="rtl"] body {
       sortSelect.onchange = () => {
         sortMode = sortSelect.value;
         renderSignals();
-        showToast('Signale neu sortiert ✦');
+        showToast((I18N[currentLang] || I18N.de).thChanged.replace('{v}', sortMode));
       };
     }
 
@@ -3664,7 +3697,15 @@ html[dir="rtl"] body {
 
     // Guide Modal
     document.getElementById('btnOpenGuideModal').onclick = () => {
-      document.getElementById('faq').scrollIntoView({ behavior: 'smooth' });
+      const faq = document.getElementById('faq');
+      if (!faq) return;
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      faq.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      // Headless / reduced-motion / some shells skip smooth animation — snap as fallback.
+      setTimeout(() => {
+        const top = faq.getBoundingClientRect().top;
+        if (top > 120) faq.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }, 400);
     };
 
     // Initialize: URL deep link > saved choice > system language > English fallback
