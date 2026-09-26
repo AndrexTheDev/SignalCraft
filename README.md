@@ -1,7 +1,7 @@
 # Signalcraft Atelier
 
 Kostenlose Krypto-Signale mit Live-Sentiment, On-Chain-Score und **B+-Quality-Gate**.  
-Live: [signalcraft.atelier](https://signalcraft.atelier)
+Live: [signalcraft.click](https://signalcraft.click)
 
 Statische Site — kein Backend, kein Account. Landing (`index.html`) + Terminal (`app.html`).
 

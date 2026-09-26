@@ -55,8 +55,8 @@ describe('step28 / clipboard + pair + r5', () => {
   it('copyText swallows a missing clipboard; unlock and copy-levels use it', () => {
     assert.match(appJs, /function copyText\s*\(/);
     assert.match(appJs, /copyText\(txt\)/);
-    assert.match(appJs, /copyText\('https:\/\/signalcraft\.atelier\/app\.html'\)/);
-    assert.equal(/navigator\.clipboard\.writeText\('https:\/\/signalcraft\.atelier/.test(appJs), false);
+    assert.match(appJs, /copyText\('https:\/\/signalcraft\.click\/app\.html'\)/);
+    assert.equal(/navigator\.clipboard\.writeText\('https:\/\/signalcraft\.click/.test(appJs), false);
   });
 
   it('dex wire and share filename never call pair.replace', () => {

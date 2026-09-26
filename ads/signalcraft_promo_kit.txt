@@ -1,7 +1,7 @@
 ================================================================================
 SIGNALCRAFT™ — THE COMPLETE PROMOTION KIT (ENGLISH EDITION)
 A ready-to-publish advertising & press e-book.
-Product: https://signalcraft.atelier  •  Terminal: app.html  •  Landing: index.html
+Product: https://signalcraft.click  •  Terminal: app.html  •  Landing: index.html
 Maker: AndrexTheDev (hippie.highho@gmail.com)
 Companion files: ads/shots/*.png  (see Part 8 for the manifest)
 ================================================================================
@@ -245,7 +245,7 @@ target on every card. Risk tagged green/yellow/red. 11 exchanges in the
 ticker. No account, no paywall.
 
 Been building it in public for a while. It's live:
-https://signalcraft.atelier
+https://signalcraft.click
 
 (no advice, just analysis — crypto is risky, read the footer)
 
@@ -278,7 +278,7 @@ any device. Free. No account. The only "price" is two bonus themes that
 unlock if you share the project. [shots/08_mobile_app_en.png]
 
 8/ That's it. No group to join, no course to buy. Open it, look at the
-board, make your own call. https://signalcraft.atelier
+board, make your own call. https://signalcraft.click
 
 [STANDALONE TWEETS — 12]
 
@@ -287,7 +287,7 @@ board, make your own call. https://signalcraft.atelier
     dashboard feels like driving without mirrors.
  2. Free. No account. 120+ pairs with entry/stop/target. I keep waiting for
     the catch and it's just... a donations address in the footer.
-    https://signalcraft.atelier
+    https://signalcraft.click
  3. My favourite UI detail: meme coins get a red "high risk" badge and no
     amount of timeline screaming changes it.
  4. Fear & Greed at 71 with BTC sentiment at 94/100. Whether you trade it
@@ -336,7 +336,7 @@ What it is:
 • Candle charts with levels drawn in, dossiers to copy
 • 5 languages, works on any device, no account
 
-Link: https://signalcraft.atelier
+Link: https://signalcraft.click
 
 House rules: this is analysis, not financial advice. Size positions like
 the badge says. 🟢🟡🔴
@@ -358,7 +358,7 @@ entry, stop-loss, take-profit at 1:2+ R:R.
 Cool bits: live 11-exchange ticker, candlestick charts with levels drawn
 in, copy-paste dossiers, 5 languages incl. full RTL Arabic.
 
-🔗 https://signalcraft.atelier
+🔗 https://signalcraft.click
 Educational analysis only — not financial advice.
 
 3.4  INSTAGRAM
@@ -421,7 +421,7 @@ analysis, not advice."
 
 [DESCRIPTION BLOCK]
 Signalcraft — free crypto signal terminal with live sentiment.
-🔗 Terminal: https://signalcraft.atelier
+🔗 Terminal: https://signalcraft.click
 What's inside: 120+ pairs sorted best→worst · sentiment 0–100 per pair ·
 3-level risk badges · entry/SL/TP at ≥1:2 R:R · candlestick charts with
 levels · copy-paste dossiers · 11-CEX live ticker · 5 languages.
@@ -523,7 +523,7 @@ Independent developer project. Donations in the footer; two cosmetic themes
 unlock via sharing. That's the whole economy.
 
 This is educational analysis, not investment advice. Crypto is high risk.
-Link: https://signalcraft.atelier
+Link: https://signalcraft.click
 
 4.3  PRODUCT HUNT
 --------------------------------------------------------------------------------
@@ -547,7 +547,7 @@ FOR IMMEDIATE RELEASE
 Independent Developer Launches Signalcraft, a Free Crypto Terminal That
 Pairs Market Sentiment With Ready-Made Trade Plans
 
-Signalcraft (https://signalcraft.atelier) today opens its browser-based
+Signalcraft (https://signalcraft.click) today opens its browser-based
 trading terminal to the public: a free, registration-free analytics board
 covering more than 120 crypto pairs across 11 major exchanges.
 
@@ -731,7 +731,7 @@ Subject: the board is open
 Hey — thanks for joining the dispatch.
 
 Quick orientation: Signalcraft is a free terminal at
-https://signalcraft.atelier — 120+ crypto setups, sorted best to worst.
+https://signalcraft.click — 120+ crypto setups, sorted best to worst.
 
 Three things to look at first:
 1. The sentiment score (0–100) on any card — the crowd's mood, measured.
@@ -836,11 +836,11 @@ PART 7 — PROFILES & BIOS
 
 X BIO:
 Free crypto terminal · 120+ pairs · sentiment 0–100 · risk 🟡🔴 · no account
-→ signalcraft.atelier (analysis, not advice)
+→ signalcraft.click (analysis, not advice)
 
 TELEGRAM CHANNEL BIO:
 Signalcraft dispatch — free terminal with live sentiment & risk levels.
-Not advice. Link: signalcraft.atelier
+Not advice. Link: signalcraft.click
 
 INSTAGRAM BIO:
 crypto board w/ mood scores 0–100 🟢🟡🔴 risk badges · free, no app
@@ -848,7 +848,7 @@ not advice — link ↓
 
 YOUTUBE CHANNEL LINE:
 Home of the free Signalcraft terminal — sentiment-first crypto analysis.
-Link-in-bio text: The free terminal: signalcraft.atelier — 120+ pairs,
+Link-in-bio text: The free terminal: signalcraft.click — 120+ pairs,
 sentiment scores, risk badges, ready plans. No account needed.
 
 

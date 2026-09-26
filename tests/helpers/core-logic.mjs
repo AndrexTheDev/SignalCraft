@@ -247,7 +247,7 @@ export function shouldHideFailedAd(state, hasIframe) {
 
 export function isPinnedAdUrl(url) {
   try {
-    const u = new URL(String(url), 'https://signalcraft.atelier/');
+    const u = new URL(String(url), 'https://signalcraft.click/');
     return u.protocol === 'https:' && u.hostname === AD_HOST;
   } catch {
     return false;

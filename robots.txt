@@ -60,4 +60,4 @@ Disallow: /
 User-agent: omgili
 Disallow: /
 
-Sitemap: https://signalcraft.atelier/sitemap.xml
+Sitemap: https://signalcraft.click/sitemap.xml
