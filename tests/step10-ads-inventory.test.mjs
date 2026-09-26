@@ -35,7 +35,7 @@ function thirdPartyScriptHosts(html) {
   const hosts = new Set();
   for (const m of html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
     try {
-      const u = new URL(m[1], 'https://signalcraft.atelier/');
+      const u = new URL(m[1], 'https://signalcraft.click/');
       if (u.protocol === 'https:' || u.protocol === 'http:') hosts.add(u.host);
     } catch {}
   }

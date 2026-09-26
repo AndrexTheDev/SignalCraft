@@ -41,7 +41,7 @@ describe('step1 / inventory', () => {
   it('robots.txt allows the site and points at the sitemap', () => {
     const robots = read('robots.txt');
     assert.match(robots, /Allow:\s*\//);
-    assert.match(robots, /Sitemap:\s*https:\/\/signalcraft\.atelier\/sitemap\.xml/);
+    assert.match(robots, /Sitemap:\s*https:\/\/signalcraft\.click\/sitemap\.xml/);
   });
 
   it('sitemap lists landing + terminal for all 5 languages', () => {

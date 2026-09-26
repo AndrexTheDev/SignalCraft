@@ -148,7 +148,7 @@ describe('step16 / sitemap + robots', () => {
     const robots = read('robots.txt');
     assert.match(robots, /User-agent: Googlebot/);
     assert.match(robots, /Allow:\s*\//);
-    assert.match(robots, /Sitemap:\s*https:\/\/signalcraft\.atelier\/sitemap\.xml/);
+    assert.match(robots, /Sitemap:\s*https:\/\/signalcraft\.click\/sitemap\.xml/);
     assert.match(robots, /Disallow:\s*\/ads\//);
   });
 
