@@ -1,0 +1,59 @@
+{
+  "host": "globalimmaturelunatic.com",
+  "slots": {
+    "side": {
+      "key": "6372f131e3637d818f7cc8c102951da9",
+      "w": 160,
+      "h": 600,
+      "ids": [
+        "adSideL",
+        "adSideR"
+      ]
+    },
+    "sticky": {
+      "key": "13b82827e922917915d927184e84b454",
+      "w": 300,
+      "h": 250,
+      "id": "adStickyM"
+    },
+    "native": {
+      "key": "8a466ff3d4c93e29bba42607317f6266",
+      "id": "adNative"
+    },
+    "social": {
+      "key": "9d2f8187ee40c1bb86d4839820efab46"
+    },
+    "popunder": {
+      "key": "eacc536c1170ad59f25e5561dc85e037"
+    }
+  },
+  "pages": [
+    "index.html",
+    "app.html"
+  ],
+  "hooks": [
+    [
+      "adSideL",
+      "side-left"
+    ],
+    [
+      "adSideR",
+      "side-right"
+    ],
+    [
+      "adStickyM",
+      "sticky-mobile"
+    ],
+    [
+      "adNative",
+      "native-footer"
+    ]
+  ],
+  "notes": [
+    "side 160x600 @ min-width 1520px",
+    "sticky 300x250 @ max-width 899px, session dismiss 30min",
+    "native footer container id matches invoke key",
+    "social bar script self-positions",
+    "popunder interaction-gated, 4/day, 2h gap, skip webdriver"
+  ]
+}

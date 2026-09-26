@@ -2,32 +2,25 @@
   "date": "2026-09-26",
   "branch": "arena/01a0dcc1-signalcraft",
   "totals": {
-    "unit": { "tests": 84, "pass": 84, "fail": 0 },
-    "e2e_functional_beta_systematic": { "tests": 21 + 12 + 17, "pass": 50, "fail": 0 },
-    "e2e_step8": { "tests": 8, "pass": 8, "fail": 0 },
-    "screenshot_suites": { "step5": 5, "step7": 1, "shots_total": 49 }
+    "unit": { "tests": 133, "pass": 133, "fail": 0 },
+    "e2e_regression": { "step3": 21, "step4": 12, "step6": 17, "step8": 8, "step9": 8, "pass": 66, "fail": 0 },
+    "e2e_ads_wave": { "step12": 6, "step13": 6, "step14": 1, "step15": 5, "pass": 18, "fail": 0, "shots": 10 }
   },
   "steps": {
-    "1_static": { "command": "npm run test:step1", "status": "pass" },
-    "2_unit": { "command": "npm run test:step2", "status": "pass" },
-    "3_functional": { "command": "npm run test:step3", "tests": 21, "pass": 21 },
-    "4_beta": { "command": "npm run test:step4", "tests": 12, "pass": 12 },
-    "5_screenshots": { "command": "npm run test:step5", "tests": 5, "pass": 5, "shots": 40 },
-    "6_seo_a11y_security_logic": { "command": "node --test tests/step6-*.test.mjs", "status": "pass" },
-    "6_systematic_e2e": { "command": "npm run test:step6", "tests": 17, "pass": 17 },
-    "7_extra_shots": { "command": "npm run test:step7", "tests": 1, "pass": 1, "shots": 9 },
-    "8_a11y_pwa": { "command": "node --test tests/step8-a11y-pwa.test.mjs", "status": "pass", "tests": 11, "pass": 11 },
-    "8_polish_e2e": { "command": "npm run test:step8", "tests": 8, "pass": 8 }
+    "10_ads_inventory": { "command": "npm run test:step10", "status": "pass", "tests": 16 },
+    "11_ads_logic": { "command": "npm run test:step11", "status": "pass", "tests": 9 },
+    "12_ads_containers": { "command": "npm run test:step12", "tests": 6, "pass": 6 },
+    "13_ads_beta": { "command": "npm run test:step13", "tests": 6, "pass": 6 },
+    "14_ads_shots": { "command": "npm run test:step14", "tests": 1, "pass": 1, "shots": 10 },
+    "15_ads_security": { "command": "npm run test:step15", "unit": 10, "e2e": 5, "pass": 15 }
   },
-  "wave3_coverage": [
-    "PWA site.webmanifest + rel=manifest on both pages",
-    "skip-to-content on landing and terminal, 5-language labels",
-    "prefers-reduced-motion",
-    "copy-levels button on every card + clipboard helper",
-    "/ focuses pair search unless already typing",
-    "leftover DE toasts/unlock/share-foot/vault confirm via EXTRA_I18N",
-    "FNG classification localized",
-    "footer wallets no longer truncated",
-    "unlocked theme option labels follow language"
+  "wave4_coverage": [
+    "Four layout slots on landing + terminal: side-left, side-right, sticky-mobile, native-footer",
+    "Pinned ad host globalimmaturelunatic.com HTTPS only",
+    "Popunder cap 4/day 2h gap, skip WebDriver",
+    "Sticky 300x250 dismiss 30min; side 160x600 at min-width 1520 without overlapping the shell",
+    "forceAdBlock fair-use gate; landing radGateNote",
+    "Heal refill at 20s, hide failed at 45s",
+    "Deep security: no eval/Function, no javascript: URLs, XSS q= does not inject, proto pollution on leads, document.write isolated"
   ]
 }

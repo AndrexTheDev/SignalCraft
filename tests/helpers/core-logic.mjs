@@ -177,3 +177,47 @@ export function serializeBoardQuery(state, currentSearch) {
   if (state && state.sig) next.set('sig', state.sig);
   return next.toString();
 }
+
+export const AD_HOST = 'globalimmaturelunatic.com';
+export const AD_KEYS = {
+  side: '6372f131e3637d818f7cc8c102951da9',
+  sticky: '13b82827e922917915d927184e84b454',
+  native: '8a466ff3d4c93e29bba42607317f6266',
+  social: '9d2f8187ee40c1bb86d4839820efab46',
+  popunder: 'eacc536c1170ad59f25e5561dc85e037'
+};
+export const AD_POPUNDER_GAP_MS = 2 * 3600e3;
+export const AD_POPUNDER_DAY_MAX = 4;
+export const AD_STICKY_DISMISS_MS = 1_800_000;
+
+export function popunderCapOk(now, lastTs, dayCount, dayStamp, today, gapMs, dayMax) {
+  gapMs = gapMs == null ? AD_POPUNDER_GAP_MS : gapMs;
+  dayMax = dayMax == null ? AD_POPUNDER_DAY_MAX : dayMax;
+  const day = dayStamp !== today ? 0 : (dayCount || 0);
+  return (now - (lastTs || 0)) >= gapMs && day < dayMax;
+}
+
+export function stickyIsDismissed(now, storedTs, ttlMs) {
+  ttlMs = ttlMs == null ? AD_STICKY_DISMISS_MS : ttlMs;
+  const d = +storedTs || 0;
+  return !!(d && now - d < ttlMs);
+}
+
+export function shouldRefillAdSlot(state, hasIframe, display) {
+  if (hasIframe) return false;
+  if (display === 'none') return false;
+  return state === 'err' || state === 'ok';
+}
+
+export function shouldHideFailedAd(state, hasIframe) {
+  return !hasIframe && state === 'err';
+}
+
+export function isPinnedAdUrl(url) {
+  try {
+    const u = new URL(String(url), 'https://signalcraft.atelier/');
+    return u.protocol === 'https:' && u.hostname === AD_HOST;
+  } catch {
+    return false;
+  }
+}
