@@ -137,3 +137,43 @@ export function atrK(h, l, c, p) {
   for (let i = p; i < tr.length; i++) a = (a * (p - 1) + tr[i]) / p;
   return a;
 }
+
+const BOARD_SECTORS = ['all', 'majors', 'layer1-2', 'defi', 'ai', 'memes'];
+const BOARD_SORTS = ['confluence', 'sentiment', 'risk', 'time'];
+
+export function parseBoardQuery(search) {
+  const raw = String(search || '');
+  const p = new URLSearchParams(raw.charAt(0) === '?' ? raw.slice(1) : raw);
+  const sectorRaw = p.get('sector') || 'all';
+  const sector = BOARD_SECTORS.indexOf(sectorRaw) >= 0 ? sectorRaw : 'all';
+  let risk = 'all';
+  const r = String(p.get('risk') || '').toLowerCase();
+  if (r === 'low' || r === 'medium' || r === 'high') risk = 'risk-' + r;
+  else if (r === 'risk-low' || r === 'risk-medium' || r === 'risk-high') risk = r;
+  const sortRaw = p.get('sort') || 'confluence';
+  const sort = BOARD_SORTS.indexOf(sortRaw) >= 0 ? sortRaw : 'confluence';
+  return {
+    sector: sector,
+    risk: risk,
+    sort: sort,
+    q: String(p.get('q') || '').trim(),
+    sig: String(p.get('sig') || '').trim(),
+    lang: p.get('lang') || ''
+  };
+}
+
+export function serializeBoardQuery(state, currentSearch) {
+  const raw = String(currentSearch || '');
+  const p = new URLSearchParams(raw.charAt(0) === '?' ? raw.slice(1) : raw);
+  const next = new URLSearchParams();
+  p.forEach(function (v, k) {
+    if (k === 'sector' || k === 'risk' || k === 'sort' || k === 'q' || k === 'sig') return;
+    next.set(k, v);
+  });
+  if (state && state.q) next.set('q', state.q);
+  if (state && state.sector && state.sector !== 'all') next.set('sector', state.sector);
+  if (state && state.risk && state.risk !== 'all') next.set('risk', String(state.risk).replace(/^risk-/, ''));
+  if (state && state.sort && state.sort !== 'confluence') next.set('sort', state.sort);
+  if (state && state.sig) next.set('sig', state.sig);
+  return next.toString();
+}
