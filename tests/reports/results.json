@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-26",
+  "branch": "arena/01a0dcc1-signalcraft",
+  "totals": {
+    "unit": { "tests": 133, "pass": 133, "fail": 0 },
+    "e2e_regression": { "step3": 21, "step4": 12, "step6": 17, "step8": 8, "step9": 8, "pass": 66, "fail": 0 },
+    "e2e_ads_wave": { "step12": 6, "step13": 6, "step14": 1, "step15": 5, "pass": 18, "fail": 0, "shots": 10 }
+  },
+  "steps": {
+    "10_ads_inventory": { "command": "npm run test:step10", "status": "pass", "tests": 16 },
+    "11_ads_logic": { "command": "npm run test:step11", "status": "pass", "tests": 9 },
+    "12_ads_containers": { "command": "npm run test:step12", "tests": 6, "pass": 6 },
+    "13_ads_beta": { "command": "npm run test:step13", "tests": 6, "pass": 6 },
+    "14_ads_shots": { "command": "npm run test:step14", "tests": 1, "pass": 1, "shots": 10 },
+    "15_ads_security": { "command": "npm run test:step15", "unit": 10, "e2e": 5, "pass": 15 }
+  },
+  "wave4_coverage": [
+    "Four layout slots on landing + terminal: side-left, side-right, sticky-mobile, native-footer",
+    "Pinned ad host globalimmaturelunatic.com HTTPS only",
+    "Popunder cap 4/day 2h gap, skip WebDriver",
+    "Sticky 300x250 dismiss 30min; side 160x600 at min-width 1520 without overlapping the shell",
+    "forceAdBlock fair-use gate; landing radGateNote",
+    "Heal refill at 20s, hide failed at 45s",
+    "Deep security: no eval/Function, no javascript: URLs, XSS q= does not inject, proto pollution on leads, document.write isolated"
+  ]
+}

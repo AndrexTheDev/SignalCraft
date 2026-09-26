@@ -1,0 +1,11 @@
+{
+  "seed": 120,
+  "gated": 58,
+  "qualityMissing": 0,
+  "tpFallback": {
+    "tp1": 105,
+    "tp2": 108
+  },
+  "pairMissing": "—",
+  "cap499": 499
+}

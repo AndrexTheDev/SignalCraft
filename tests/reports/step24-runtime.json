@@ -1,0 +1,18 @@
+{
+  "seed": 120,
+  "gated": 58,
+  "sectors": {
+    "all": 58,
+    "memes": 8,
+    "layer1-2": 11,
+    "defi": 17,
+    "majors": 14,
+    "ai": 8
+  },
+  "pageSize25": 3,
+  "riskLow": [
+    "SIG-BTC-014",
+    "SIG-TRX-021"
+  ],
+  "utcSample": "23:59:59 UTC"
+}

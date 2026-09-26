@@ -1,0 +1,7 @@
+# Signalcraft Atelier — assets-only Worker (name matches the Cloudflare script).
+name = "signalcraft"
+compatibility_date = "2026-09-26"
+
+[assets]
+directory = "."
+html_handling = "auto-trailing-slash"

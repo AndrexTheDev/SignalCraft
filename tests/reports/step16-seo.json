@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "index.html",
+    "app.html"
+  ],
+  "langs": [
+    "de",
+    "en",
+    "es",
+    "ar",
+    "zh"
+  ],
+  "graphExtras": [
+    "WebPage",
+    "BreadcrumbList",
+    "sameAs",
+    "ImageObject"
+  ],
+  "head": [
+    "og:image:type",
+    "twitter:image:alt",
+    "applySeoHead",
+    "main.editorial-shell"
+  ]
+}
