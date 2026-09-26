@@ -87,21 +87,26 @@ export async function gotoLanding(page, { lang, viewport } = {}) {
   await page.waitForSelector('.hero-title, .hero-landing', { timeout: 10000 });
 }
 
-export async function gotoApp(page, { lang, viewport, unlockThemes = false } = {}) {
+export async function gotoApp(page, { lang, viewport, unlockThemes = false, storage, query, expectCards = true } = {}) {
   if (viewport) await page.setViewport(viewport);
   await stubMarket(page);
-  if (unlockThemes) {
-    await page.evaluateOnNewDocument(() => {
-      try { localStorage.setItem('unlocked_themes', 'true'); } catch (e) {}
-    });
-  }
-  const q = lang ? `?lang=${lang}` : '';
-  await page.goto(BASE + '/app.html' + q, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  const init = { unlockThemes, storage: storage || {} };
+  await page.evaluateOnNewDocument((init) => {
+    try {
+      if (init.unlockThemes) localStorage.setItem('unlocked_themes', 'true');
+      Object.entries(init.storage || {}).forEach(([k, v]) => localStorage.setItem(k, v));
+    } catch (e) {}
+  }, init);
+  const params = new URLSearchParams();
+  if (lang) params.set('lang', lang);
+  if (query) Object.entries(query).forEach(([k, v]) => params.set(k, v));
+  const qs = params.toString() ? '?' + params.toString() : '';
+  await page.goto(BASE + '/app.html' + qs, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForSelector('#signalsGrid', { timeout: 10000 });
   await new Promise((r) => setTimeout(r, 750));
   const gate = await page.$('.adgate-card');
   if (gate) throw new Error('Ad-block gate visible (false positive)');
-  await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
+  if (expectCards) await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
 }
 
 export async function freshPage(browser) {

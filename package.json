@@ -4,13 +4,16 @@
   "type": "module",
   "description": "Signalcraft Atelier – static terminal + landing. Modular test suite.",
   "scripts": {
-    "test": "npm run test:step1 && npm run test:step2 && npm run test:e2e",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test tests/step1-static.test.mjs tests/step2-unit.test.mjs tests/step6-seo-a11y-security.test.mjs tests/step6-logic.test.mjs",
     "test:step1": "node --test tests/step1-static.test.mjs",
     "test:step2": "node --test tests/step2-unit.test.mjs",
+    "test:step6": "node --test tests/step6-seo-a11y-security.test.mjs tests/step6-logic.test.mjs && node --test --test-concurrency=1 tests/e2e/step6-systematic.test.mjs",
     "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.mjs",
     "test:step3": "node --test --test-concurrency=1 tests/e2e/step3-functional.test.mjs",
     "test:step4": "node --test --test-concurrency=1 tests/e2e/step4-beta.test.mjs",
     "test:step5": "node --test --test-concurrency=1 tests/e2e/step5-screenshots.test.mjs",
+    "test:step7": "node --test --test-concurrency=1 tests/e2e/step7-extra-shots.test.mjs",
     "serve": "python3 -m http.server 4173 --bind 0.0.0.0"
   },
   "devDependencies": {

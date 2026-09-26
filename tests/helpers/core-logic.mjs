@@ -86,3 +86,54 @@ export function mulberry32(a) {
 export function emailLooksValid(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
 }
+
+export function filterSignals(list, { filter = 'all', sector = 'all', q = '', minScore = QUAL_MIN } = {}) {
+  const query = String(q || '').trim().toLowerCase();
+  return list.filter((sig) => {
+    const score = sig.quantScore ?? sig.confluenceScore ?? 0;
+    if (score < minScore) return false;
+    if (filter === 'risk-low' && sig.riskLevel !== 'LOW') return false;
+    if (filter === 'risk-medium' && sig.riskLevel !== 'MEDIUM') return false;
+    if (filter === 'risk-high' && sig.riskLevel !== 'HIGH') return false;
+    if (sector !== 'all' && sig.sector !== sector) return false;
+    if (query) {
+      const hay = [sig.pair, sig.sector, sig.notes].map((x) => String(x || '').toLowerCase()).join(' ');
+      if (!hay.includes(query)) return false;
+    }
+    return true;
+  });
+}
+
+export function paginate(list, page, size) {
+  const total = list.length;
+  const totalPages = Math.max(1, Math.ceil(total / size) || 1);
+  const current = Math.min(Math.max(1, page), totalPages);
+  const start = (current - 1) * size;
+  const end = Math.min(start + size, total);
+  return { total, totalPages, current, start, end, slice: list.slice(start, end) };
+}
+
+export function contrastRatio(hexA, hexB) {
+  const lum = (hex) => {
+    const n = parseInt(String(hex).replace('#', ''), 16);
+    const to = (v) => {
+      const x = v / 255;
+      return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * to((n >> 16) & 255) + 0.7152 * to((n >> 8) & 255) + 0.0722 * to(n & 255);
+  };
+  const a = lum(hexA), b = lum(hexB);
+  const [hi, lo] = a > b ? [a, b] : [b, a];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+export function atrK(h, l, c, p) {
+  p = p || 14;
+  const tr = [];
+  for (let i = 1; i < c.length; i++) {
+    tr.push(Math.max(h[i] - l[i], Math.abs(h[i] - c[i - 1]), Math.abs(l[i] - c[i - 1])));
+  }
+  let a = tr.slice(0, p).reduce((x, y) => x + y, 0) / p;
+  for (let i = p; i < tr.length; i++) a = (a * (p - 1) + tr[i]) / p;
+  return a;
+}

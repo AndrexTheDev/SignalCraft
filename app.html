@@ -369,6 +369,7 @@ html[dir="rtl"] body {
   color: var(--text-main);
   border: 1px solid var(--border);
   padding: 7px 14px;
+  min-height: 36px;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   cursor: pointer;
@@ -1199,7 +1200,7 @@ html[dir="rtl"] body {
         </div>
 
         <!-- Theme Selector (with share-to-unlock) -->
-        <select id="themeSelect" class="tactile-btn" style="padding:6px 10px; cursor:pointer;">
+        <select id="themeSelect" class="tactile-btn" style="padding:6px 10px; cursor:pointer;" aria-label="Theme">
           <option value="gallery-dark">● Gallery Dark</option>
           <option value="terminal-amber">🔒 Terminal Amber</option>
           <option value="paper-light">🔒 Paper Light</option>
@@ -1450,9 +1451,9 @@ html[dir="rtl"] body {
 
   <!-- THEME UNLOCK MODAL -->
   <div class="modal-backdrop" id="themeModalBackdrop">
-    <div class="modal-window">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="themeModalTitle">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:16px;">
-        <h3 style="font-family:var(--font-serif); font-size:1.4rem;">Theme-Galerie freischalten</h3>
+        <h3 id="themeModalTitle" style="font-family:var(--font-serif); font-size:1.4rem;">Theme-Galerie freischalten</h3>
         <button class="tactile-btn" id="btnCloseThemeModal">✕</button>
       </div>
       <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
@@ -1472,9 +1473,9 @@ html[dir="rtl"] body {
 
   <!-- SHARE CARD MODAL (CANVAS GENERATOR 1200x675) -->
   <div class="modal-backdrop" id="shareCardModalBackdrop">
-    <div class="modal-window" style="max-width:760px;">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="shareCardTitle" style="max-width:760px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:16px;">
-        <h3 style="font-family:var(--font-serif); font-size:1.4rem;">Social Share Card (1200x675 px)</h3>
+        <h3 id="shareCardTitle" style="font-family:var(--font-serif); font-size:1.4rem;">Social Share Card (1200x675 px)</h3>
         <button class="tactile-btn" id="btnCloseShareCardModal">✕</button>
       </div>
       <div style="margin-bottom:16px; border:1px solid var(--border); background:var(--bg-main); display:flex; justify-content:center; align-items:center; overflow:hidden;">
@@ -1493,7 +1494,7 @@ html[dir="rtl"] body {
 
   <!-- QUANT DOSSIER MODAL -->
   <div class="modal-backdrop" id="dossierModalBackdrop">
-    <div class="modal-window" style="max-width:720px;">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="dossierTitle" style="max-width:720px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:16px;">
         <div>
           <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent);">INSTITUTIONELLES QUANT-DOSSIER</span>
@@ -1509,7 +1510,7 @@ html[dir="rtl"] body {
 
   <!-- SECRET LEAD VAULT MODAL (ADMIN ONLY) -->
   <div class="modal-backdrop" id="secretVaultModalBackdrop">
-    <div class="modal-window" style="max-width:580px; border-color:var(--accent);">
+    <div class="modal-window" role="dialog" aria-modal="true" style="max-width:580px; border-color:var(--accent);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-accent); padding-bottom:10px; margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="background:var(--accent); color:#fff; font-family:var(--font-mono); font-size:0.65rem; padding:2px 6px; font-weight:700;">DEV VAULT</span>
@@ -1543,7 +1544,7 @@ html[dir="rtl"] body {
 
   <!-- DONATION MODAL (SUPPORTER ENGINE) -->
   <div class="modal-backdrop" id="donationModalBackdrop">
-    <div class="modal-window" style="max-width:680px;">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="donTitle" style="max-width:680px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:16px;">
         <h3 style="font-family:var(--font-serif); font-size:1.4rem;" id="donTitle"></h3>
         <button class="tactile-btn" id="btnCloseDonationModal">✕</button>
@@ -3359,11 +3360,23 @@ html[dir="rtl"] body {
     }
 
     // Secret Trick 1: Keyboard combo Ctrl+Shift+L or Cmd+Shift+L
+    // Escape closes any open modal (theme / share / dossier / vault / donation)
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
         e.preventDefault();
         openSecretVaultModal();
+        return;
       }
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-backdrop.is-visible').forEach(function (b) {
+          b.classList.remove('is-visible');
+        });
+      }
+    });
+    document.querySelectorAll('.modal-backdrop').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        if (e.target === b) b.classList.remove('is-visible');
+      });
     });
 
     // Secret Trick 2: 5 Rapid Clicks on the Brand Crest ✦
@@ -3531,6 +3544,7 @@ html[dir="rtl"] body {
           return;
         }
         document.documentElement.setAttribute('data-theme', val);
+        try { localStorage.setItem('signalcraft_theme', val); } catch (e) {}
         showToast((I18N[currentLang] || I18N.de).thChanged.replace('{v}', val));
       };
     }
@@ -3728,6 +3742,16 @@ html[dir="rtl"] body {
       else initialLang = detectSystemLang();
     } catch (e) { initialLang = 'en'; }
     setLanguage(initialLang, false);
+    try {
+      const urlQ = new URLSearchParams(window.location.search).get('q');
+      if (urlQ) {
+        searchQuery = String(urlQ).trim();
+        if (searchInp) searchInp.value = searchQuery;
+        if (clearBtn) clearBtn.style.display = searchQuery ? 'inline-block' : 'none';
+        currentPage = 1;
+        renderSignals();
+      }
+    } catch (e) {}
     SentimentEngine.fetchLiveFearAndGreed();
     ME.refresh(false);
     ME.startAuto();
@@ -3735,6 +3759,15 @@ html[dir="rtl"] body {
     // Supporter & ad-block bootstrap
     if (isSupporter()) applySupporter();
     updateDonationTexts();
+    (function applySavedTheme() {
+      const select = document.getElementById('themeSelect');
+      const saved = lsGet('signalcraft_theme') || 'gallery-dark';
+      const unlocked = lsGet('unlocked_themes') === 'true' || isSupporter();
+      const ok = saved === 'gallery-dark' || ((saved === 'terminal-amber' || saved === 'paper-light') && unlocked);
+      const val = ok ? saved : 'gallery-dark';
+      if (select) select.value = val;
+      document.documentElement.setAttribute('data-theme', val);
+    })();
     detectAdBlock(function (b) { adBlockActive = b; renderSignals(); if (typeof buildDexWire === 'function') buildDexWire(); });
     setInterval(function () { if (!document.hidden) refreshAdGate(); }, 45000);
     window.addEventListener('focus', function () { if (adBlockActive) refreshAdGate(); });
