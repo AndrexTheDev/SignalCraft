@@ -93,9 +93,17 @@ export async function launchBrowser() {
 
 export async function stubMarket(page, opts = {}) {
   const fng = opts && opts.fng ? opts.fng : null;
+  const klines = opts && opts.klines ? opts.klines : null;
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const url = req.url();
+    if (klines && /\/klines\?/.test(url)) {
+      return req.respond({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(klines)
+      }).catch(() => {});
+    }
     if (fng && /alternative\.me\/fng/.test(url)) {
       return req.respond({
         status: 200,
