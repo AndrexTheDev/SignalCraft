@@ -43,6 +43,6 @@
     "@playwright/test": "1.55.1",
     "@sparticuz/chromium": "^153.0.0",
     "jsdom": "^31.0.1",
-    "puppeteer-core": "^24.0.0"
+    "puppeteer-core": "^25.17.0"
   }
 }
