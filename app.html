@@ -2264,7 +2264,9 @@ html[dir="rtl"] body {
         try {
           if (!manual) {
             const cached = lsGet(this.CACHE_KEY);
-            if (cached) { try { const ca = JSON.parse(cached); if (isLiveCache(ca)) this.apply(ca.signals, 'live', ca.t); } catch (e) {} }
+            let painted = false;
+            if (cached) { try { const ca = JSON.parse(cached); if (isLiveCache(ca)) { this.apply(ca.signals, 'live', ca.t); painted = true; } } catch (e) {} }
+            if (!painted) { try { this.apply(SEED_SIGNALS, 'seed', ME_STAMP); } catch (e) {} }
           }
           const universe = {}; SEED_SIGNALS.forEach(sg => { universe[pairSymbol(sg.pair)] = sg.sector; });
           const syms = Object.keys(universe), out = [];
@@ -2281,7 +2283,7 @@ html[dir="rtl"] body {
           this.apply(signals, 'live', Date.now());
           if (manual) showToast(dd.meLiveToast);
         } catch (e) {
-          this.apply(SEED_SIGNALS, 'seed', ME_STAMP);
+          if (manual || this.status.mode === 'live' || !signalsData.length) this.apply(SEED_SIGNALS, 'seed', ME_STAMP);
           if (manual) showToast(dd.meDemoToast);
         }
         this.busy = false;
@@ -2401,14 +2403,14 @@ html[dir="rtl"] body {
       try {
         const syms = signalsData.map(sg => pairSymbol(sg.pair));
         await CexEngine.fetchAll(syms);
-        attachVenueData();
-        try { renderSignals(); } catch (e) {}
+        const cexAttached = attachVenueData();
+        if (cexAttached > 0) { try { renderSignals(); } catch (e) {} }
         try { ME.badge(); } catch (e) {}
         const gated = signalsData.filter(passesQualityGate);
         const top = (gated.length ? gated : signalsData).slice(0, 18).map(sg => pairSymbol(sg.pair));
         await DexEngine.fetchAll(top);
-        attachVenueData();
-        try { renderSignals(); } catch (e) {}
+        const dexAttached = attachVenueData();
+        if (dexAttached > 0) { try { renderSignals(); } catch (e) {} }
         try { buildDexWire(); } catch (e) {}
         try { buildCexTicker(); } catch (e) {}
         try { ME.badge(); } catch (e) {}
@@ -2417,6 +2419,7 @@ html[dir="rtl"] body {
       if (_venuePending) { _venuePending = false; syncVenueData(); }
     }
     function attachVenueData() {
+      let attached = 0;
       signalsData.forEach(sg => {
         const sym = pairSymbol(sg.pair);
         const c = CexEngine.data[sym];
@@ -2425,10 +2428,12 @@ html[dir="rtl"] body {
           sg.venueLabel = c.venues.slice(0, 3).join(' \u00b7 ');
           if (sg.entryPrice) sg.cexSpread = ((sg.entryPrice - c.med) / c.med * 100).toFixed(2);
           sg.cexMed = c.med;
+          attached++;
         }
         const d = DexEngine.map[sym];
-        if (d && d.price > 0 && !/PERP$/.test(d.dex)) sg.dexInfo = d;
+        if (d && d.price > 0 && !/PERP$/.test(d.dex)) { sg.dexInfo = d; attached++; }
       });
+      return attached;
     }
 
     function updateSectorPillCounts() {
