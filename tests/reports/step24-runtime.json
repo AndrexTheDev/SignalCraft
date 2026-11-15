@@ -1,15 +1,13 @@
 {
   "seed": 120,
-  "gated": 58,
+  "gated": 10,
   "sectors": {
-    "all": 58,
-    "memes": 8,
-    "layer1-2": 11,
-    "defi": 17,
-    "majors": 14,
-    "ai": 8
+    "all": 10,
+    "layer1-2": 1,
+    "defi": 2,
+    "majors": 6,
+    "ai": 1
   },
-  "pageSize25": 3,
   "riskLow": [
     "SIG-BTC-014",
     "SIG-TRX-021"

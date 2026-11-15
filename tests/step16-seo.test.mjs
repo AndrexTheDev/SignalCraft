@@ -107,7 +107,7 @@ describe('step16 / head + i18n seo', () => {
       assert.ok(stat[lang].seoDesc.length >= 80);
     }
     assert.match(stat.en.seoTitle, /Signalcraft/);
-    assert.match(stat.en.seoDesc, /B\+/);
+    assert.match(stat.en.seoDesc, /Grade-A/);
   });
 
   it('landing L packs include title + desc for every language', () => {
@@ -116,8 +116,8 @@ describe('step16 / head + i18n seo', () => {
       assert.ok(L[lang].title, lang + '.title');
       assert.ok(L[lang].desc, lang + '.desc');
     }
-    assert.match(L.en.title, /Crypto Signals/i);
-    assert.match(L.en.desc, /B\+/);
+    assert.match(L.en.title, /Signals|Setups/i);
+    assert.match(L.en.desc, /Grade-A/);
   });
 
   it('both pages update canonical, og:url, locale, title and description in JS', () => {

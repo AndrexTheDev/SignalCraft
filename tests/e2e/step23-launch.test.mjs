@@ -4,7 +4,7 @@ import {
   startServer, stopServer, launchBrowser, freshPage, gotoLanding, gotoApp
 } from '../helpers/browser.mjs';
 import { read, inlineScripts, extractArray } from '../helpers/html.mjs';
-import { QUAL_MIN } from '../helpers/core-logic.mjs';
+import { passesQualityGate } from '../helpers/core-logic.mjs';
 
 const WALLETS = {
   SOL: '79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8',
@@ -14,7 +14,7 @@ const WALLETS = {
 
 const appJs = inlineScripts(read('app.html')).join('\n');
 const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
-const gated = seed.filter((s) => (s.quantScore ?? 0) >= QUAL_MIN).length;
+const gated = seed.filter((s) => passesQualityGate(s)).length;
 
 let browser;
 
@@ -28,12 +28,13 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('landing footer paints v3.4 and the three published wallets', async () => {
+  it('landing footer paints v3.5 and the three published wallets', async () => {
     const page = await freshPage(browser);
     await gotoLanding(page, { lang: 'de' });
     const body = await page.$eval('footer', (el) => el.textContent);
-    assert.match(body, /v3\.4/);
+    assert.match(body, /v3\.5/);
     assert.equal(body.includes('v3.2'), false);
+    assert.equal(body.includes('v3.4'), false);
     for (const w of Object.values(WALLETS)) assert.ok(body.includes(w), w.slice(0, 8));
     assert.match(body, /RISIKOHINWEIS|RISK NOTICE/);
     assert.deepEqual(page._pageErrors, []);
@@ -44,7 +45,7 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const ver = await page.$eval('#ftVersion', (el) => el.textContent);
-    assert.match(ver, /v3\.4/);
+    assert.match(ver, /v3\.5/);
     const wallets = await page.$eval('#ftWallets', (el) => el.textContent);
     for (const w of Object.values(WALLETS)) assert.ok(wallets.includes(w), w.slice(0, 8));
     const n = await page.$eval('#statActiveCount', (el) => el.textContent.trim());
@@ -61,16 +62,16 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('EN FAQ names the B+ gate after language switch', async () => {
+  it('EN FAQ names the Grade-A gate after language switch', async () => {
     const page = await freshPage(browser);
     await gotoLanding(page, { lang: 'en' });
     const a1 = await page.$eval('[data-i18n="a1"]', (el) => el.textContent);
-    assert.match(a1, /B\+/);
-    assert.match(a1, /120\+|pairs|board/i);
+    assert.match(a1, /Grade[ -]A/);
+    assert.match(a1, /pairs|board/i);
     await page.close();
   });
 
-  it('beta: landing wallets → terminal donation modal, B+ cards, no page errors', async () => {
+  it('beta: landing wallets → terminal donation modal, Grade-A cards, no page errors', async () => {
     const page = await freshPage(browser);
     await gotoLanding(page, { lang: 'en' });
     const land = await page.$eval('footer', (el) => el.textContent);
@@ -88,7 +89,8 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     const sol = await page.$eval('#btnDonSol', (el) => el.getAttribute('data-doncopy'));
     assert.equal(sol, WALLETS.SOL);
     const grades = await page.$$eval('.grade-chip', (els) => els.map((e) => e.textContent).join(' '));
-    assert.match(grades, /GRADE\s+(A\+|A|B\+)/);
+    assert.match(grades, /GRADE\s+A\+?/);
+    assert.equal(/GRADE\s+(B|C)\b/.test(grades), false);
     assert.deepEqual(page._pageErrors, []);
     await page.close();
   });

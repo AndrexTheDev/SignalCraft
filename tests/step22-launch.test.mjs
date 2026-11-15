@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   read, inlineScripts, extractArray, stripScripts, jsonLdBlocks, writeReport
 } from './helpers/html.mjs';
-import { QUAL_MIN } from './helpers/core-logic.mjs';
+import { QUAL_MIN, passesQualityGate } from './helpers/core-logic.mjs';
 
 const WALLETS = {
   SOL: '79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8',
@@ -16,9 +16,8 @@ const landing = read('index.html');
 const appJs = inlineScripts(app).join('\n');
 const landJs = inlineScripts(landing).join('\n');
 const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
-const gated = seed.filter((s) => (s.quantScore ?? 0) >= QUAL_MIN);
+const gated = seed.filter((s) => passesQualityGate(s));
 const cex = Function('return (' + extractArray(appJs, 'const CEX_LIST =') + ')')();
-const dex = Function('return (' + extractArray(appJs, 'const DEX_VENUES =') + ')')();
 
 function faqA1Markup(html) {
   const m = stripScripts(html).match(/data-i18n="a1"[^>]*>([\s\S]*?)<\/p>/);
@@ -30,25 +29,26 @@ function i18nA1(js) {
 }
 
 function mentionsGate(text) {
-  return /B\+|Quality-Gate|quality gate|Qualit[aä]ts|بوابة جودة|质量门槛/i.test(text);
+  return /Grade[ -]A|Quality-Gate|quality gate|Qualit[aä]ts|بوابة|质量门槛/i.test(text);
 }
 
 describe('step22 / version lock', () => {
-  it('JSON-LD softwareVersion is 3.4 on landing and terminal', () => {
+  it('JSON-LD softwareVersion is 3.5 on landing and terminal', () => {
     for (const html of [landing, app]) {
       const graph = JSON.parse(jsonLdBlocks(html)[0])['@graph'];
       const sw = graph.find((n) => n['@type'] === 'SoftwareApplication');
-      assert.equal(sw.softwareVersion, '3.4');
+      assert.equal(sw.softwareVersion, '3.5');
     }
   });
 
-  it('visible footers say v3.4 and never v3.2', () => {
+  it('visible footers say v3.5 and never v3.2/v3.4', () => {
     const landMark = stripScripts(landing);
     const appMark = stripScripts(app);
-    assert.match(landMark, /Signalcraft v3\.4/);
-    assert.match(appMark, /Signalcraft Terminal v3\.4/);
+    assert.match(landMark, /Signalcraft v3\.5/);
+    assert.match(appMark, /Signalcraft Terminal v3\.5/);
     assert.equal(/v3\.2/.test(landMark + appMark), false);
     assert.equal(/v3\.2/.test(appJs + landJs), false);
+    assert.equal(/v3\.4/.test(landMark + appMark), false);
   });
 });
 
@@ -82,15 +82,15 @@ describe('step22 / donation wallets', () => {
 });
 
 describe('step22 / universe vs quality gate', () => {
-  it('seed is 120 pairs and the board is the B+ subset', () => {
+  it('seed is 120 pairs and the board is the exclusive Grade-A subset', () => {
     assert.equal(seed.length, 120);
-    assert.equal(QUAL_MIN, 78);
+    assert.equal(QUAL_MIN, 86);
     assert.ok(gated.length < seed.length);
-    assert.equal(gated.length, 58);
-    assert.match(appJs, /nEl\.textContent = adBlockActive \? '—' : String\(gatedList\.length\)/);
+    assert.equal(gated.length, 10);
+    assert.match(appJs, /const BOARD_MIN = 86/);
   });
 
-  it('FAQ copy that talks about opening the terminal names the B+ gate', () => {
+  it('FAQ copy that talks about opening the terminal names the Grade-A gate', () => {
     const a1html = faqA1Markup(landing);
     assert.ok(a1html.length > 20, 'missing landing a1 markup');
     assert.ok(mentionsGate(a1html), a1html);
@@ -106,11 +106,16 @@ describe('step22 / universe vs quality gate', () => {
 });
 
 describe('step22 / live inventory + legal', () => {
-  it('CEX_LIST is 11 names and DEX_VENUES is 12 venues', () => {
+  it('CEX_LIST is 11 real exchange names; DEX coverage is live-fetched, not a static prop list', () => {
     assert.equal(cex.length, 11);
-    assert.equal(dex.length, 12);
+    assert.equal(new Set(cex).size, 11);
     assert.ok(cex.includes('BINANCE'));
-    assert.ok(dex.some((v) => v.n === 'UNISWAP V3'));
+    // DEX data comes from real public APIs at runtime (Hyperliquid, dYdX v4, DexScreener).
+    assert.match(appJs, /api\.hyperliquid\.xyz/);
+    assert.match(appJs, /dydx\.trade\/v4/);
+    assert.match(appJs, /dexscreener\.com/);
+    // No static invented-TVL venue table may creep back in.
+    assert.equal(/DEX_VENUES/.test(appJs), false);
   });
 
   it('risk disclaimer and developer mailto are on both public pages', () => {
@@ -128,10 +133,10 @@ describe('step22 / live inventory + legal', () => {
 });
 
 writeReport('step22-launch.json', {
-  version: '3.4',
+  version: '3.5',
   seed: seed.length,
   gated: gated.length,
   cex: cex.length,
-  dex: dex.length,
+  dex: 'dynamic: hyperliquid + dydx v4 + dexscreener (runtime)',
   wallets: Object.keys(WALLETS)
 });

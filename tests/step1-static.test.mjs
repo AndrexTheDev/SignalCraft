@@ -5,7 +5,7 @@ import {
   read, exists, htmlIds, inlineScripts, jsonLdBlocks,
   extractBalanced, extractArray, cssVarsDefined, cssVarsUsed, writeReport, stripScripts
 } from './helpers/html.mjs';
-import { QUAL_MIN, longLevels, parseRrString } from './helpers/core-logic.mjs';
+import { QUAL_MIN, longLevels, parseRrString, passesQualityGate } from './helpers/core-logic.mjs';
 
 const app = read('app.html');
 const landing = read('index.html');
@@ -98,7 +98,7 @@ describe('step1 / html ids', () => {
     const ids = new Set(htmlIds(app));
     for (const id of [
       'signalsGrid', 'pairSearchInput', 'langSelect', 'themeSelect', 'sortSelect',
-      'btnPrevPage', 'btnNextPage', 'faq', 'shareCardCanvas', 'dossierModalBackdrop',
+      'faq', 'shareCardCanvas', 'dossierModalBackdrop',
       'donationModalBackdrop', 'themeModalBackdrop', 'qualityGateNote'
     ]) {
       assert.ok(ids.has(id), 'missing #' + id);
@@ -207,14 +207,18 @@ describe('step1 / seed universe', () => {
     assert.equal(bad.length, 0, JSON.stringify(bad.slice(0, 8), null, 2));
   });
 
-  it('quality-gate copy matches the grade scale (B+ at QUAL_MIN, not B)', () => {
-    assert.match(appJs, /quantScore >= QUAL_MIN \? 'B\+'/);
-    const below = seed.filter((s) => (s.quantScore ?? 0) < QUAL_MIN).length;
-    assert.ok(below >= 0);
+  it('board gate is Grade A (>= 86) with RSI <= 75 and real 10M$ volume', () => {
+    assert.equal(QUAL_MIN, 86);
+    assert.match(appJs, /const BOARD_MIN = 86/);
+    assert.match(appJs, /quantScore >= 86 \? 'A'/);
+    assert.match(appJs, /rsi > 75/);
+    assert.match(appJs, /volMio/);
+    const onBoard = seed.filter((s) => passesQualityGate(s)).length;
+    assert.equal(onBoard, 10);
     writeReport('step1-seed-stats.json', {
       count: seed.length,
-      belowGate: below,
-      onBoard: seed.length - below,
+      belowGate: seed.length - onBoard,
+      onBoard: onBoard,
       sectors: seed.reduce((acc, s) => ((acc[s.sector] = (acc[s.sector] || 0) + 1), acc), {}),
       risks: seed.reduce((acc, s) => ((acc[s.riskLevel] = (acc[s.riskLevel] || 0) + 1), acc), {}),
       grades: seed.reduce((acc, s) => ((acc[s.grade] = (acc[s.grade] || 0) + 1), acc), {})

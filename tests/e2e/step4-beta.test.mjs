@@ -79,13 +79,11 @@ describe('step4 beta', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('page-size All shows more than 30 cards', async () => {
+  it('exclusive board shows all gated setups at once (no pager)', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    await page.click('#sizeAllBtn');
-    await new Promise((r) => setTimeout(r, 400));
     const n = await page.$$eval('#signalsGrid article.signal-card:not(.lead-capture-bento-card)', (els) => els.length);
-    assert.ok(n > 30, 'all size produced ' + n);
+    assert.equal(n, 10);
     await page.close();
   });
 

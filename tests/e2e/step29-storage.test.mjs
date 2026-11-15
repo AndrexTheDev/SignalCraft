@@ -42,7 +42,7 @@ describe('step29 storage e2e', { timeout: 180_000 }, () => {
     const gate = await page.$('.adgate-card');
     assert.equal(gate, null);
     const n = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
-    assert.equal(n, 25);
+    assert.equal(n, 10);
     const badge = await page.$eval('#meBadge', (el) => el.textContent);
     assert.match(badge, /DEMO/);
     await page.select('#langSelect', 'de');
