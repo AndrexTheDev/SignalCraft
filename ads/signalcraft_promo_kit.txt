@@ -1,15 +1,18 @@
 ================================================================================
-SIGNALCRAFT — PROMOTION NOTES (v3.5, ENGLISH EDITION)
+SIGNALCRAFT — PROMOTION NOTES (v3.6, ENGLISH EDITION)
 Product: https://signalcraft.click  •  Terminal: app.html  •  Landing: index.html
 Maker: AndrexTheDev (hippie.highho@gmail.com)
-Companion files: ads/shots/*_v35.jpg (fresh 2026-11-15 captures of the
-v3.5 build — verify they still match the live site before publishing)
+Companion files: ads/shots/*_v36.jpg (2026-11-15 captures of the v3.6 build;
+also in Drive: SignalCraft v3.6 Screenshots folder
+https://drive.google.com/drive/folders/1gkZuZ6Htw4G13jUpEiwxmZVG5tfo7_Dn).
+Captured from the DEMO build snapshot; the older *_v35.jpg set remains
+in ads/shots/ and in the Drive v3.5 folder. Verify before publishing)
 ================================================================================
 
 HOW TO USE THIS FILE
 --------------------------------------------------------------------------------
-Copy, paste, publish. Pair the copy with the fresh v3.5 screenshots in
-ads/shots/ (captured 2026-11-15 from the real build).
+Copy, paste, publish. Pair the copy with the fresh v3.6 screenshots in
+ads/shots/ (captured 2026-11-15 from the DEMO build snapshot).
 
 Two rules before you post anything:
 
