@@ -100,14 +100,6 @@ describe('step6 / security', () => {
     assert.equal(/\beval\s*\(/.test(stripped), false);
   });
 
-  it('CSV sanitizer is used on lead export', () => {
-    assert.match(appJs, /sanitizeCsvField\(l\.email\)/);
-  });
-
-  it('lead form has a honeypot field', () => {
-    assert.match(appJs, /leadHpField/);
-  });
-
   it('Escape and backdrop-click close modals', () => {
     assert.match(appJs, /e\.key === 'Escape'/);
     assert.match(appJs, /e\.target === b/);
@@ -119,7 +111,7 @@ describe('step6 / persistence contracts', () => {
     assert.match(appJs, /signalcraft_lang/);
     assert.match(appJs, /signalcraft_theme/);
     assert.match(appJs, /signalcraft_supporter/);
-    assert.match(appJs, /unlocked_themes/);
+    assert.equal(/unlocked_themes|signalcraft_leads/.test(appJs), false);
   });
 
   it('logo and favicon files exist on disk', () => {

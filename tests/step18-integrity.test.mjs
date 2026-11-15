@@ -65,11 +65,10 @@ describe('step18 / storage + cache hardening', () => {
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => 'nope') }), false);
   });
 
-  it('terminal uses safeJsonArray for leads and isLiveCache for the market cache', () => {
-    assert.match(appJs, /function safeJsonArray\s*\(/);
+  it('terminal uses isLiveCache for the market cache and no lead store remains', () => {
     assert.match(appJs, /function isLiveCache\s*\(/);
-    assert.match(appJs, /safeJsonArray\(raw\)/);
     assert.match(appJs, /isLiveCache\(ca\)/);
+    assert.equal(/function safeJsonArray|signalcraft_leads/.test(appJs), false);
   });
 
   it('apply() refuses a non-array live list', () => {
@@ -136,16 +135,15 @@ describe('step18 / functional wiring still present', () => {
   });
 
   it('saved theme is whitelisted', () => {
-    assert.match(appJs, /saved === 'gallery-dark'/);
-    assert.match(appJs, /saved === 'terminal-amber'/);
-    assert.match(appJs, /saved === 'paper-light'/);
+    assert.match(appJs, /\['gallery-dark', 'terminal-amber', 'paper-light'\]/);
+    assert.match(appJs, /\.includes\(saved\)/);
   });
 
   it('writes the integrity report', () => {
     writeReport('step18-integrity.json', {
       seed: seed.length,
       longPlanOk: seed.every(longPlanValid),
-      helpers: ['safeJsonArray', 'isLiveCache', 'clampPct']
+      helpers: ['isLiveCache', 'clampPct']
     });
   });
 });

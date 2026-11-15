@@ -52,26 +52,6 @@ describe('step29 storage e2e', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('copy-unlock still unlocks themes when clipboard is missing', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    await page.evaluate(() => {
-      try { delete navigator.clipboard; } catch (e) {}
-      try { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); } catch (e) {}
-    });
-    await page.click('#btnOpenThemeUnlock');
-    await page.waitForSelector('#themeModalBackdrop.is-visible', { timeout: 5000 });
-    await page.click('#btnShareUnlockCopy');
-    await new Promise((r) => setTimeout(r, 200));
-    await page.click('#btnCloseThemeModal');
-    await new Promise((r) => setTimeout(r, 150));
-    await page.select('#themeSelect', 'paper-light');
-    const theme = await page.$eval('html', (el) => el.getAttribute('data-theme'));
-    assert.equal(theme, 'paper-light');
-    assert.deepEqual(page._pageErrors, []);
-    await page.close();
-  });
-
   it('landing still boots with blocked storage and no page errors', async () => {
     const page = await freshPage(browser);
     await blockStorage(page);

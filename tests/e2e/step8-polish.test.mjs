@@ -100,26 +100,38 @@ describe('step8 polish e2e', { timeout: 240_000 }, () => {
     await page.close();
   });
 
-  it('unlocked theme options relabel in English', async () => {
+  it('theme options are plain and free in English', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', unlockThemes: true });
+    await gotoApp(page, { lang: 'en' });
     const amber = await page.$eval('#themeSelect option[value="terminal-amber"]', (el) => el.textContent);
     const paper = await page.$eval('#themeSelect option[value="paper-light"]', (el) => el.textContent);
-    assert.match(amber, /Unlocked/);
-    assert.match(paper, /Unlocked/);
-    assert.equal(/Freigeschaltet/.test(amber), false);
+    assert.match(amber, /Terminal Amber/);
+    assert.match(paper, /Paper Light/);
+    assert.equal(/Unlock|Freigeschaltet/.test(amber), false);
     await page.close();
   });
 
   it('Fear & Greed badge localizes with the language switcher', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
+    await gotoApp(page, { lang: 'en', fng: { value: 72, classification: 'Greed' } });
+    await new Promise((r) => setTimeout(r, 400));
     const en = await page.$eval('#globalFngBadge', (el) => el.textContent);
-    assert.match(en, /Index/);
+    assert.match(en, /Index 72/);
+    assert.match(en, /Greed/);
     await page.select('#langSelect', 'de');
     await new Promise((r) => setTimeout(r, 250));
     const de = await page.$eval('#globalFngBadge', (el) => el.textContent);
-    assert.match(de, /Gier|Angst|Neutral|Greed|Fear/);
+    assert.match(de, /72/);
+    assert.match(de, /Gier|Neutral/);
+    await page.close();
+  });
+
+  it('Fear & Greed badge honestly shows a dash when the API is unreachable', async () => {
+    const page = await freshPage(browser);
+    await gotoApp(page, { lang: 'en' });
+    await new Promise((r) => setTimeout(r, 400));
+    const text = await page.$eval('#globalFngBadge', (el) => el.textContent);
+    assert.equal(text.trim(), '● F&G –');
     await page.close();
   });
 });

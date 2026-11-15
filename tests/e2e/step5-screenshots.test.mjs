@@ -43,7 +43,7 @@ describe('step5 extra screenshot matrix', { timeout: 420_000 }, () => {
     const themes = ['gallery-dark', 'terminal-amber', 'paper-light'];
     for (const lang of LANGS) {
       const page = await freshPage(browser);
-      await gotoApp(page, { lang, viewport: VIEWPORTS.desktop, unlockThemes: true });
+      await gotoApp(page, { lang, viewport: VIEWPORTS.desktop });
       for (const theme of themes) {
         await page.select('#themeSelect', theme);
         await new Promise((r) => setTimeout(r, 140));
@@ -57,7 +57,7 @@ describe('step5 extra screenshot matrix', { timeout: 420_000 }, () => {
     for (const lang of ['de', 'en', 'ar']) {
       for (const vp of ['tablet', 'mobile']) {
         const page = await freshPage(browser);
-        await gotoApp(page, { lang, viewport: VIEWPORTS[vp], unlockThemes: true });
+        await gotoApp(page, { lang, viewport: VIEWPORTS[vp] });
         await shot(page, `app_${lang}_gallery-dark_${vp}.png`);
         await page.close();
       }
@@ -66,7 +66,8 @@ describe('step5 extra screenshot matrix', { timeout: 420_000 }, () => {
 
   it('state extras: drawers, dossier, share, donation, faq, empty', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', viewport: VIEWPORTS.desktop, unlockThemes: true });
+    // deterministic brand shots regardless of theme persisted by earlier steps
+    await gotoApp(page, { lang: 'en', viewport: VIEWPORTS.desktop, storage: { signalcraft_theme: 'gallery-dark' } });
 
     await page.click('.sentiment-pill-btn');
     await shot(page, 'state_sentiment_open.png');
@@ -90,10 +91,10 @@ describe('step5 extra screenshot matrix', { timeout: 420_000 }, () => {
     await shot(page, 'state_donation.png');
     await page.click('#btnCloseDonationModal');
 
-    await page.click('#btnOpenThemeUnlock');
+    await page.select('#themeSelect', 'paper-light');
     await new Promise((r) => setTimeout(r, 120));
-    await shot(page, 'state_theme_unlock.png');
-    await page.click('#btnCloseThemeModal');
+    await shot(page, 'state_theme_paper.png');
+    await page.select('#themeSelect', 'gallery-dark');
 
     const toggles = await page.$$('#faq .faq-header-toggle');
     if (toggles[1]) await toggles[1].click();

@@ -30,13 +30,13 @@ export async function gotoLanding(page, { lang, viewport } = {}) {
   await page.waitForSelector('.hero-title, .hero-landing');
 }
 
-export async function gotoApp(page, { lang, viewport, unlockThemes = false } = {}) {
+export async function gotoApp(page, { lang, viewport, storage } = {}) {
   if (viewport) await page.setViewportSize(viewport);
   await stubMarketApis(page);
-  if (unlockThemes) {
-    await page.addInitScript(() => {
-      try { localStorage.setItem('unlocked_themes', 'true'); } catch (e) {}
-    });
+  if (storage) {
+    await page.addInitScript((entries) => {
+      try { Object.entries(entries).forEach(([k, v]) => localStorage.setItem(k, v)); } catch (e) {}
+    }, storage);
   }
   const q = lang ? `?lang=${lang}` : '';
   await page.goto('/app.html' + q, { waitUntil: 'domcontentloaded' });

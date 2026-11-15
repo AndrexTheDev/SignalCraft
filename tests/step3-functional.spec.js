@@ -73,7 +73,7 @@ test.describe('step3 / terminal board', () => {
     await page.waitForTimeout(200);
     await page.locator('.size-btn[data-size="20"]').click();
     await page.waitForTimeout(200);
-    const n = await page.locator('#signalsGrid article.signal-card:not(.lead-capture-bento-card)').count();
+    const n = await page.locator('#signalsGrid article.signal-card').count();
     expect(n).toBeLessThanOrEqual(20);
   });
 
@@ -129,17 +129,15 @@ test.describe('step3 / drawers & modals', () => {
     await expect(page.locator('#btnShareCardDirect')).toBeVisible();
   });
 
-  test('theme lock opens unlock modal; unlocked themes apply', async ({ page }) => {
+  test('all themes apply without unlock', async ({ page }) => {
     await gotoApp(page, { lang: 'en' });
-    await page.selectOption('#themeSelect', 'terminal-amber');
-    await expect(page.locator('#themeModalBackdrop')).toHaveClass(/is-visible/);
-    await page.click('#btnCloseThemeModal');
-    await page.evaluate(() => localStorage.setItem('unlocked_themes', 'true'));
-    await page.selectOption('#themeSelect', 'paper-light');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper-light');
+    for (const theme of ['terminal-amber', 'paper-light', 'gallery-dark']) {
+      await page.selectOption('#themeSelect', theme);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+    }
   });
 
-  test('donation modal opens from the bar', async ({ page }) => {
+  test('donation modal opens from the masthead button', async ({ page }) => {
     await gotoApp(page, { lang: 'de' });
     await page.click('#btnOpenDonation');
     await expect(page.locator('#donationModalBackdrop')).toHaveClass(/is-visible/);
@@ -153,15 +151,6 @@ test.describe('step3 / drawers & modals', () => {
     await expect(item).toHaveClass(/is-open/);
   });
 
-  test('lead form rejects invalid email', async ({ page }) => {
-    await gotoApp(page, { lang: 'en' });
-    const form = page.locator('#leadCaptureForm');
-    if (await form.count()) {
-      await page.fill('#leadEmailInput', 'not-an-email');
-      await page.locator('#leadCaptureForm button[type="submit"]').click();
-      await expect(page.locator('#editorialToast')).toHaveClass(/is-active/);
-    }
-  });
 });
 
 test.describe('step3 / i18n terminal', () => {

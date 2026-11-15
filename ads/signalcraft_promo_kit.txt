@@ -2,15 +2,14 @@
 SIGNALCRAFT — PROMOTION NOTES (v3.5, ENGLISH EDITION)
 Product: https://signalcraft.click  •  Terminal: app.html  •  Landing: index.html
 Maker: AndrexTheDev (hippie.highho@gmail.com)
-Companion files: ads/shots/*.png (historical screenshots from the v3.x build —
-re-take them from the live terminal before publishing anything)
+Companion files: ads/shots/*_v35.jpg (fresh 2026-11-15 captures of the
+v3.5 build — verify they still match the live site before publishing)
 ================================================================================
 
 HOW TO USE THIS FILE
 --------------------------------------------------------------------------------
-Copy, paste, publish. Pair the copy with fresh screenshots of the current
-build — the UI in ads/shots/*.png predates v3.5 and shows the retired
-paginated 120+ board. Do not reuse those images as-is.
+Copy, paste, publish. Pair the copy with the fresh v3.5 screenshots in
+ads/shots/ (captured 2026-11-15 from the real build).
 
 Two rules before you post anything:
 
@@ -28,8 +27,10 @@ PART 1 — THE PRODUCT, EXPLAINED LIKE A HUMAN
 Signalcraft is a free, no-account browser terminal that scores 120 crypto
 pairs on real Binance daily data and shows you only the setups that clear an
 exclusive quantitative gate: Grade A or better (Quant-Score >= 86), with a
-healthy RSI (<= 75) and real 24h dollar volume (>= $10M). Usually that means
-the board is quiet — only a handful of Grade-A setups at a time. Every board
+healthy RSI (<= 75), real 24h dollar volume (>= $10M), and — for live-computed
+signals — a live trend check (ADX(14) >= 15) with positive risk-adjusted 30d
+momentum. Usually that means the board is quiet — only a handful of Grade-A
+setups at a time. Every board
 signal ships as a finished plan: entry, stop-loss, take-profit targets at a
 minimum 1:2 risk-reward, an honest risk badge, and full data provenance.
 No ads, no paywall, no registration.
@@ -42,10 +43,12 @@ Kraken, OKX and the rest — scrolling across the top.
 Below, the board: only Grade-A setups that passed the gate right now (the
 terminal shows how many candidates were rejected today). Each card shows the
 pair, direction, Quant-Grade, buying-pressure score (real taker buy/sell
-flows, volume momentum, the global Fear & Greed index) and a risk badge.
+flows over 7d and relative volume vs. the 30-day average — the Fear & Greed
+index is shown separately, never mixed into the score) and a risk badge.
 
 Click a card for the full dossier: entry, stop, both targets, ATR, SMA 50 /
-200, 90d-high distance, 7d/30d performance, score component breakdown, and a
+200, ADX (trend strength), risk-adjusted momentum, Bollinger-squeeze status,
+90d-high distance, 7d/30d performance, six-factor score component breakdown, and a
 data-as-of stamp. A second click opens the candlestick chart with the trade
 levels painted on. One click copies the setup or opens a share card.
 
@@ -56,15 +59,23 @@ languages (DE / EN / ES / AR / ZH), three themes. Phone, laptop, tablet.
 --------------------------------------------------------------------------------
 CORE
  • Exclusive Grade-A board gate: Quant >= 86 AND RSI(14) <= 75 AND 24h volume
-   >= $10M — typically ~10 of 120 scored pairs make the cut
+   >= $10M AND — for live signals — ADX(14) >= 15 AND positive risk-adjusted
+   30d momentum (the static build snapshot keeps the base gate; the terminal
+   labels it DEMO). Only a handful of 120 pairs make the cut
  • Finished trade plans: entry, stop-loss, TP1/TP2, minimum 1:2 R:R
- • Quant-Grade A+ / A / B+ / B / C from real computed indicators
- • Buying-pressure score 0-100: taker buy/sell flows (7d), volume momentum,
-   global Fear & Greed — no invented social chatter, no invented on-chain data
+ • Quant-Grade A+ / A / B+ / B / C from six transparent, individually
+   documented factors: EMA trend, ADX trend quality, risk-adjusted momentum,
+   relative volume + OBV, taker buy pressure, Bollinger-squeeze structure —
+   no hidden calibration
+ • Buying-pressure score 0-100: taker buy/sell flows (7d) and relative
+   volume vs. the 30-day average — the global Fear & Greed index is displayed
+   separately — no invented social chatter, no invented on-chain data
  • Rejected-candidate counter: the terminal shows how many setups failed the
    gate today (transparency over fake abundance)
- • Full dossier: ATR, SMA 50/200, distance to 90d high, 7d/30d performance,
-   score components, Binance Spot API provenance + data-as-of timestamp
+ • Full dossier: ATR, SMA 50/200, ADX (14) with +DI/−DI, risk-adjusted 30d
+   momentum, Bollinger-squeeze percentile with OBV direction, distance to 90d
+   high, 7d/30d performance, six score components, Binance Spot API provenance
+   + data-as-of timestamp
  • Interactive candlestick chart with entry / SL / TP lines
  • 1-2% account-risk position-size calculator in the dossier (e.g. 1% of a
    $10,000 account ≈ $100 risk at the printed stop)

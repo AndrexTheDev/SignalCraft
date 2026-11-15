@@ -16,40 +16,6 @@ describe('step27 hardening e2e', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('lead honeypot is discarded; duplicate is rejected; valid email is stored', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    assert.ok(await page.$('#leadCaptureForm'));
-
-    await page.$eval('#leadHpField', (el) => { el.value = 'http://spam.example'; });
-    await page.click('#leadEmailInput', { clickCount: 3 });
-    await page.type('#leadEmailInput', 'bot@example.com');
-    await page.click('#leadCaptureForm button[type="submit"]');
-    await new Promise((r) => setTimeout(r, 200));
-    const afterHp = await page.evaluate(() => localStorage.getItem('signalcraft_leads'));
-    assert.equal(afterHp, null);
-
-    await page.$eval('#leadHpField', (el) => { el.value = ''; });
-    await page.click('#leadEmailInput', { clickCount: 3 });
-    await page.keyboard.press('Backspace');
-    await page.type('#leadEmailInput', 'trader@example.com');
-    await page.click('#leadCaptureForm button[type="submit"]');
-    await new Promise((r) => setTimeout(r, 250));
-    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_leads') || '[]'));
-    assert.equal(stored.length, 1);
-    assert.equal(stored[0].email, 'trader@example.com');
-
-    await page.type('#leadEmailInput', 'trader@example.com');
-    await page.click('#leadCaptureForm button[type="submit"]');
-    await new Promise((r) => setTimeout(r, 250));
-    const toast = await page.$eval('#toastMessage', (el) => el.textContent);
-    assert.match(toast, /already on the list/i);
-    const stored2 = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_leads') || '[]'));
-    assert.equal(stored2.length, 1);
-    assert.deepEqual(page._pageErrors, []);
-    await page.close();
-  });
-
   it('DEMO badge; exclusive board renders exactly the gated set in DE and ES', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });

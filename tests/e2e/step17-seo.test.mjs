@@ -35,8 +35,8 @@ describe('step17 seo e2e', { timeout: 180_000 }, () => {
     await gotoLanding(page, { lang: 'en' });
     const h = await seoHead(page);
     assert.equal(h.lang, 'en');
-    assert.match(h.title, /Crypto Signals/i);
-    assert.match(h.desc, /B\+/);
+    assert.match(h.title, /Grade-A Crypto Setups/i);
+    assert.match(h.desc, /Grade A|Grade-A/);
     assert.equal(h.canonical, 'https://signalcraft.click/index.html?lang=en');
     assert.equal(h.ogUrl, h.canonical);
     assert.equal(h.ogLocale, 'en_US');
@@ -51,7 +51,7 @@ describe('step17 seo e2e', { timeout: 180_000 }, () => {
     await new Promise((r) => setTimeout(r, 120));
     const h = await seoHead(page);
     assert.equal(h.lang, 'de');
-    assert.match(h.title, /Krypto-Signale/);
+    assert.match(h.title, /Krypto-Setups/);
     assert.equal(h.canonical, 'https://signalcraft.click/index.html');
     assert.equal(h.ogLocale, 'de_DE');
     await page.close();
@@ -63,7 +63,7 @@ describe('step17 seo e2e', { timeout: 180_000 }, () => {
     const h = await seoHead(page);
     assert.equal(h.lang, 'es');
     assert.match(h.title, /Signalcraft/);
-    assert.match(h.desc, /B\+/);
+    assert.match(h.desc, /Grade-A/);
     assert.equal(h.canonical, 'https://signalcraft.click/app.html?lang=es');
     assert.equal(h.ogUrl, h.canonical);
     assert.equal(h.ogLocale, 'es_ES');

@@ -99,7 +99,7 @@ describe('step1 / html ids', () => {
     for (const id of [
       'signalsGrid', 'pairSearchInput', 'langSelect', 'themeSelect', 'sortSelect',
       'faq', 'shareCardCanvas', 'dossierModalBackdrop',
-      'donationModalBackdrop', 'themeModalBackdrop', 'qualityGateNote'
+      'donationModalBackdrop', 'btnOpenDonation', 'qualityGateNote'
     ]) {
       assert.ok(ids.has(id), 'missing #' + id);
     }

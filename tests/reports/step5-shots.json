@@ -1,5 +1,5 @@
 {
-  "count": 40,
+  "count": 49,
   "dir": "tests/artifacts/shots",
   "files": [
     "app_ar_gallery-dark_desktop.png",
@@ -23,6 +23,15 @@
     "app_zh_gallery-dark_desktop.png",
     "app_zh_paper-light_desktop.png",
     "app_zh_terminal-amber_desktop.png",
+    "extra_app_ar_mobile_rtl.png",
+    "extra_app_en_paper_mobile.png",
+    "extra_app_zh_mobile.png",
+    "extra_deeplink_sol_de.png",
+    "extra_dossier_es.png",
+    "extra_filter_majors_en.png",
+    "extra_filter_majors_high_en.png",
+    "extra_landing_zh_tablet.png",
+    "extra_theme_amber_es.png",
     "landing_ar_desktop.png",
     "landing_ar_mobile.png",
     "landing_de_desktop.png",
@@ -41,6 +50,6 @@
     "state_faq.png",
     "state_sentiment_open.png",
     "state_sharecard.png",
-    "state_theme_unlock.png"
+    "state_theme_paper.png"
   ]
 }
