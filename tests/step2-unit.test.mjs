@@ -39,11 +39,11 @@ describe('step2 / xss + csv', () => {
 });
 
 describe('step2 / quality gate + grades', () => {
-  it('B+ starts at QUAL_MIN 78', () => {
-    assert.equal(QUAL_MIN, 78);
+  it('Grade A starts at QUAL_MIN 86 (the exclusive board floor)', () => {
+    assert.equal(QUAL_MIN, 86);
     assert.equal(gradeFromQuant(93), 'A+');
     assert.equal(gradeFromQuant(86), 'A');
-    assert.equal(gradeFromQuant(78), 'B+');
+    assert.equal(gradeFromQuant(85), 'B+');
     assert.equal(gradeFromQuant(77), 'B');
     assert.equal(gradeFromQuant(69), 'C');
   });

@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  QUAL_MIN, gradeFromQuant, filterSignals, paginate, atrK, rsi, longLevels
+  QUAL_MIN, gradeFromQuant, filterSignals, atrK, rsi, longLevels
 } from './helpers/core-logic.mjs';
 import { read, inlineScripts, extractArray } from './helpers/html.mjs';
 
@@ -12,7 +12,7 @@ describe('step6 / filter matrix', () => {
   it('quality gate drops C-grade setups', () => {
     assert.equal(gated.every((s) => (s.quantScore ?? 0) >= QUAL_MIN), true);
     assert.ok(gated.length < seed.length);
-    assert.ok(gated.length >= 20);
+    assert.equal(gated.length, 10);
   });
 
   it('risk-high is a strict subset of the gated board', () => {
@@ -41,28 +41,6 @@ describe('step6 / filter matrix', () => {
 
   it('impossible query is empty', () => {
     assert.equal(filterSignals(seed, { q: 'ZZZNOCOIN999' }).length, 0);
-  });
-});
-
-describe('step6 / pagination math', () => {
-  it('clamps a page past the end back to the last page', () => {
-    const p = paginate(gated, 99, 25);
-    assert.equal(p.current, p.totalPages);
-    assert.ok(p.slice.length <= 25);
-    assert.equal(p.end, p.total);
-  });
-
-  it('page 1 of 20 never exceeds the page size', () => {
-    const p = paginate(gated, 1, 20);
-    assert.ok(p.slice.length <= 20);
-    assert.equal(p.start, 0);
-  });
-
-  it('empty list still reports one page', () => {
-    const p = paginate([], 3, 25);
-    assert.equal(p.totalPages, 1);
-    assert.equal(p.current, 1);
-    assert.deepEqual(p.slice, []);
   });
 });
 

@@ -1,0 +1,23 @@
+{
+  "adNetworksRemoved": [
+    "globalimmaturelunatic.com",
+    "googlesyndication.com",
+    "doubleclick.net",
+    "googletagservices.com",
+    "amazon-adsystem.com",
+    "adnxs.com",
+    "adservice.google",
+    "pagead2.googlesyndication"
+  ],
+  "gateMachineryRemoved": [
+    "detectAdBlock",
+    "refreshAdGate",
+    "forceAdBlock",
+    "adgate-card",
+    "radGateNote"
+  ],
+  "pages": [
+    "index.html",
+    "app.html"
+  ]
+}

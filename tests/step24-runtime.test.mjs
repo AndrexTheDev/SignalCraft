@@ -4,8 +4,8 @@ import {
   read, inlineScripts, extractArray, writeReport
 } from './helpers/html.mjs';
 import {
-  QUAL_MIN, filterSignals, paginate, copyLevelsText, sortSignalsList,
-  fillPaginTpl, fmtUtcTime, sectorCounts, isLiveCache, parseBoardQuery,
+  QUAL_MIN, filterSignals, copyLevelsText, sortSignalsList,
+  fmtUtcTime, sectorCounts, isLiveCache, parseBoardQuery,
   serializeBoardQuery, fmtP, escapeHtml
 } from './helpers/core-logic.mjs';
 
@@ -15,6 +15,7 @@ const appJs = inlineScripts(app).join('\n');
 const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
 const gated = filterSignals(seed, {});
 const counts = sectorCounts(seed);
+function qualMinGate() { return gated.length; }
 
 function i18nKeys(block) {
   return [...block.matchAll(/^\s{8}([A-Za-z0-9_]+):/gm)].map((m) => m[1]);
@@ -69,37 +70,21 @@ describe('step24 / copyLevelsText', () => {
   });
 });
 
-describe('step24 / filter + pagination + sort', () => {
-  it('gated board is 58 B+ setups and never 120', () => {
+describe('step24 / filter + sort', () => {
+  it('gated board is the exclusive 10 Grade-A setups, never 120', () => {
     assert.equal(seed.length, 120);
-    assert.equal(gated.length, 58);
+    assert.equal(qualMinGate(), 10);
     assert.equal(gated.every((s) => (s.quantScore ?? 0) >= QUAL_MIN), true);
   });
 
   it('sector pills must count gated setups, not the raw 24-per-bucket seed', () => {
-    assert.equal(counts.all, 58);
-    assert.equal(counts.majors, 14);
-    assert.equal(counts['layer1-2'], 11);
-    assert.equal(counts.defi, 17);
-    assert.equal(counts.ai, 8);
-    assert.equal(counts.memes, 8);
+    assert.equal(counts.all, 10);
+    assert.equal(counts.majors, 6);
+    assert.equal(counts['layer1-2'], 1);
+    assert.equal(counts.defi, 2);
+    assert.equal(counts.ai, 1);
+    assert.equal(counts.memes, undefined);
     assert.equal(Object.values(counts).filter((n) => n === 24).length, 0);
-  });
-
-  it('page size 25 over 58 items is 3 pages; page 3 has the last 8', () => {
-    const p1 = paginate(gated, 1, 25);
-    const p3 = paginate(gated, 3, 25);
-    assert.equal(p1.totalPages, 3);
-    assert.equal(p1.slice.length, 25);
-    assert.equal(p3.current, 3);
-    assert.equal(p3.slice.length, 8);
-    assert.equal(p3.end, 58);
-  });
-
-  it('paginTpl fills 1–25 of 58 and 0–0 of an empty filter', () => {
-    const tpl = 'Showing signals {s}–{e} of {t} (page {p} of {tp})';
-    assert.equal(fillPaginTpl(tpl, 0, 25, 58, 1, 3), 'Showing signals 1–25 of 58 (page 1 of 3)');
-    assert.equal(fillPaginTpl(tpl, 0, 0, 0, 1, 1), 'Showing signals 0–0 of 0 (page 1 of 1)');
   });
 
   it('risk-low on the gated board is exactly BTC and TRX', () => {
@@ -107,13 +92,13 @@ describe('step24 / filter + pagination + sort', () => {
     assert.deepEqual(low.map((s) => s.id).sort(), ['SIG-BTC-014', 'SIG-TRX-021']);
   });
 
-  it('sort by risk puts LOW ahead of HIGH; confluence puts PEPE first', () => {
+  it('sort by risk puts LOW ahead of HIGH; confluence puts the top score first', () => {
     const byRisk = sortSignalsList(gated, 'risk');
     assert.equal(byRisk[0].riskLevel, 'LOW');
     assert.equal(byRisk[0].id, 'SIG-BTC-014');
     assert.equal(byRisk[byRisk.length - 1].riskLevel, 'HIGH');
     const byConf = sortSignalsList(gated, 'confluence');
-    assert.match(byConf[0].pair, /PEPE/);
+    assert.equal(byConf[0].id, 'SIG-G-003');
     assert.ok(byConf[0].confluenceScore >= byConf[1].confluenceScore);
   });
 });
@@ -133,8 +118,8 @@ describe('step24 / clocks, cache, query', () => {
   it('isLiveCache rejects the wrong length and non-objects', () => {
     const one = { id: 'SIG-1', pair: 'AAA / USD' };
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => one) }), true);
-    assert.equal(isLiveCache({ signals: Array.from({ length: 119 }, () => one) }), false);
-    assert.equal(isLiveCache({ signals: Array.from({ length: 121 }, () => one) }), false);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 99 }, () => one) }), false);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 100 }, () => one) }), true);
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => null) }), false);
   });
 
@@ -199,14 +184,8 @@ describe('step24 / xss + i18n contracts', () => {
     }
   });
 
-  it('every paginTpl still has {s} {e} {t} {p} {tp}', () => {
-    const tpls = [...appJs.matchAll(/paginTpl:\s*"([^"]+)"/g)].map((m) => m[1]);
-    assert.equal(tpls.length, 5);
-    for (const t of tpls) {
-      for (const token of ['{s}', '{e}', '{t}', '{p}', '{tp}']) {
-        assert.ok(t.includes(token), t + ' missing ' + token);
-      }
-    }
+  it('pagination remnants are gone from markup and i18n packs', () => {
+    assert.equal(/paginTpl|btnPrevPage|btnNextPage/.test(appJs), false);
   });
 });
 
@@ -214,7 +193,6 @@ writeReport('step24-runtime.json', {
   seed: seed.length,
   gated: gated.length,
   sectors: counts,
-  pageSize25: paginate(gated, 1, 25).totalPages,
   riskLow: filterSignals(seed, { filter: 'risk-low' }).map((s) => s.id),
   utcSample: fmtUtcTime(1790035199999)
 });

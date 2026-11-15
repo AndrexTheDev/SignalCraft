@@ -50,37 +50,30 @@ describe('step27 hardening e2e', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('page-size change resets to page 1; DEMO badge; ES pagin uses de 58', async () => {
+  it('DEMO badge; exclusive board renders exactly the gated set in DE and ES', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const badge = await page.$eval('#meBadge', (el) => el.textContent);
     assert.match(badge, /DEMO/);
-
-    await page.click('#btnNextPage');
-    await new Promise((r) => setTimeout(r, 200));
-    const p2 = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
-    assert.match(p2, /Seite 2 von 3/);
-
-    await page.click('[data-size="20"]');
-    await new Promise((r) => setTimeout(r, 200));
-    const p1 = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
-    assert.match(p1, /Seite 1 von/);
-    assert.equal(/Seite 2 von/.test(p1), false);
-    const n20 = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
-    assert.equal(n20, 20);
+    const nDe = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
+    assert.equal(nDe, 10);
+    // pagination UI was removed with the exclusive board
+    assert.equal(await page.$('#paginationInfoLabel'), null);
+    assert.equal(await page.$('#btnNextPage'), null);
     assert.deepEqual(page._pageErrors, []);
     await page.close();
 
     const pageEs = await freshPage(browser);
     await gotoApp(pageEs, { lang: 'es' });
-    const es = await pageEs.$eval('#paginationInfoLabel', (el) => el.textContent);
-    assert.match(es, /de 58/);
-    assert.match(es, /página 1 de 3/i);
+    const nEs = await pageEs.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
+    assert.equal(nEs, 10);
+    const esNote = await pageEs.$eval('#qualityGateNote', (el) => el.textContent);
+    assert.ok(esNote.length > 10);
     assert.deepEqual(pageEs._pageErrors, []);
     await pageEs.close();
   });
 
-  it('dossier on-chain, share canvas, sentiment, donation copy — no page errors', async () => {
+  it('dossier data, share canvas, sentiment, donation copy — no page errors', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
 

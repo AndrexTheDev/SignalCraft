@@ -68,14 +68,16 @@ describe('step19 integrity e2e', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('bottom pagination advances the board', async () => {
+  it('exclusive board has no pagination remnants anywhere', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    const first = await page.$eval('.sc-asset-title', (el) => el.textContent);
-    await page.click('#btnNextPageBottom');
-    await new Promise((r) => setTimeout(r, 250));
-    const second = await page.$eval('.sc-asset-title', (el) => el.textContent);
-    assert.notEqual(second, first);
+    assert.equal(await page.$('#btnNextPage'), null);
+    assert.equal(await page.$('#btnPrevPage'), null);
+    assert.equal(await page.$('#btnNextPageBottom'), null);
+    assert.equal(await page.$('#btnPrevPageBottom'), null);
+    assert.equal(await page.$('#paginationInfoLabel'), null);
+    const n = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
+    assert.equal(n, 10);
     await page.close();
   });
 

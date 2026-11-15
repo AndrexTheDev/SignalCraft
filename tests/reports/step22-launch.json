@@ -1,9 +1,9 @@
 {
-  "version": "3.4",
+  "version": "3.5",
   "seed": 120,
-  "gated": 58,
+  "gated": 10,
   "cex": 11,
-  "dex": 12,
+  "dex": "dynamic: hyperliquid + dydx v4 + dexscreener (runtime)",
   "wallets": [
     "SOL",
     "BTC",

@@ -15,7 +15,7 @@ const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
 const gated = filterSignals(seed, {});
 
 describe('step26 / qualityScore gate', () => {
-  it('missing, null and NaN quantScore are 0 and fail the B+ gate', () => {
+  it('missing, null and NaN quantScore are 0 and fail the Grade-A gate', () => {
     assert.equal(qualityScore({}), 0);
     assert.equal(qualityScore({ quantScore: null, confluenceScore: 99 }), 0);
     assert.equal(qualityScore({ quantScore: undefined, confluenceScore: 99 }), 0);
@@ -38,8 +38,8 @@ describe('step26 / qualityScore gate', () => {
     assert.deepEqual(out.map((s) => s.id), ['SIG-BTC-014']);
   });
 
-  it('gated seed is still 58 and terminal uses the same helper', () => {
-    assert.equal(gated.length, 58);
+  it('gated seed is the exclusive 10 Grade-A setups and terminal uses the same helper', () => {
+    assert.equal(gated.length, 10);
     assert.equal(gated.every((s) => passesQualityGate(s)), true);
     assert.match(appJs, /function qualityScore\s*\(/);
     assert.match(appJs, /function passesQualityGate\s*\(/);
@@ -84,14 +84,12 @@ describe('step26 / take-profit + pair guards', () => {
 });
 
 describe('step26 / dossier on-chain + indicators', () => {
-  it('dossier never interpolates sig.onchain.* raw into innerHTML', () => {
-    assert.equal(/\$\{sig\.onchain\./.test(appJs), false);
-    assert.match(appJs, /const oc = sig\.onchain \|\| \{\}/);
-    assert.match(appJs, /escapeHtml\(String\(oc\.netflowM/);
-    assert.match(appJs, /escapeHtml\(String\(oc\.whalePct/);
+  it('dossier exposes no on-chain data and escapes what it renders', () => {
+    assert.equal(/sig\.onchain|netflowM|whalePct/.test(appJs), false);
+    assert.match(appJs, /escapeHtml\(String\(sig\.dexInfo\.dex\)\)/);
     assert.match(appJs, /sig\.metrics && sig\.metrics\.comp/);
     assert.match(appJs, /String\(ind/);
-    assert.match(appJs, /escapeHtml\(d\.sentPillTitle\)/);
+    assert.match(appJs, /escapeHtml\(sentChg\)/);
   });
 
   it('escapeHtml still wins on a poisoned on-chain field', () => {

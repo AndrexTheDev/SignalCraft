@@ -49,15 +49,14 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('terminal renders gated cards, quality note and pagination', async () => {
+  it('terminal renders the exclusive Grade-A board, quality note and no pagination', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const n = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
-    assert.ok(n > 3, 'expected signal cards, got ' + n);
+    assert.equal(n, 10);
     const note = await page.$eval('#qualityGateNote', (el) => el.textContent);
     assert.ok(note.trim().length > 0);
-    const pagin = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
-    assert.match(pagin, /Signale|signals|señales|الإشارات|信号/i);
+    assert.equal(await page.$('#paginationInfoLabel'), null);
     await page.close();
   });
 
@@ -74,35 +73,28 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('risk filter and sector pills change the board', async () => {
+  it('risk filter and sector pills narrow the board', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    const before = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
     await page.click('.filter-btn[data-filter="risk-high"]');
     await new Promise((r) => setTimeout(r, 200));
-    const afterRisk = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
-    assert.notEqual(afterRisk, before);
+    const high = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
+    assert.equal(high, 1);
+    await page.click('.filter-btn[data-filter="all"]');
     await page.click('.sector-pill[data-sector="majors"]');
     await new Promise((r) => setTimeout(r, 200));
-    const afterSec = await page.$eval('#paginationInfoLabel', (el) => el.textContent);
-    assert.ok(afterSec);
+    const majors = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
+    assert.equal(majors, 6);
     await page.close();
   });
 
-  it('pagination next/prev and page size 20', async () => {
+  it('exclusive board renders all 10 setups without a pager', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    const first = await page.$eval('.sc-asset-title', (el) => el.textContent);
-    await page.click('#btnNextPage');
-    await new Promise((r) => setTimeout(r, 250));
-    const second = await page.$eval('.sc-asset-title', (el) => el.textContent);
-    assert.notEqual(second, first);
-    await page.click('#btnPrevPage');
-    await new Promise((r) => setTimeout(r, 200));
-    await page.click('.size-btn[data-size="20"]');
-    await new Promise((r) => setTimeout(r, 250));
     const n = await page.$$eval('#signalsGrid article.signal-card:not(.lead-capture-bento-card)', (els) => els.length);
-    assert.ok(n <= 20, 'page size 20 produced ' + n);
+    assert.equal(n, 10);
+    assert.equal(await page.$('#btnNextPage'), null);
+    assert.equal(await page.$('#btnPrevPage'), null);
     await page.close();
   });
 

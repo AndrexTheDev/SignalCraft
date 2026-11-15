@@ -31,10 +31,12 @@ export function sanitizeCsvField(field) {
   return '"' + str.replace(/"/g, '""') + '"';
 }
 
-export const QUAL_MIN = 78;
+export const QUAL_MIN = 86;
+export const MIN_RSI = 75;
+export const MIN_VOL_MIO = 10;
 
 export function gradeFromQuant(quantScore) {
-  return quantScore >= 93 ? 'A+' : quantScore >= 86 ? 'A' : quantScore >= QUAL_MIN ? 'B+' : quantScore >= 70 ? 'B' : 'C';
+  return quantScore >= 93 ? 'A+' : quantScore >= 86 ? 'A' : quantScore >= 78 ? 'B+' : quantScore >= 70 ? 'B' : 'C';
 }
 
 export function longLevels(entry, stopLoss, tp1, tp2) {
@@ -98,7 +100,14 @@ export function qualityScore(sig) {
 }
 
 export function passesQualityGate(sig, minScore = QUAL_MIN) {
-  return qualityScore(sig) >= minScore;
+  const score = qualityScore(sig);
+  if (!(score >= minScore)) return false;
+  const m = sig && sig.metrics;
+  if (m && (Number.isFinite(m.rsi) || Number.isFinite(m.volMio))) {
+    if (Number.isFinite(m.rsi) && m.rsi > MIN_RSI) return false;
+    if (Number.isFinite(m.volMio) && m.volMio < MIN_VOL_MIO) return false;
+  }
+  return true;
 }
 
 export function pairSymbol(pair) {
@@ -123,7 +132,7 @@ export function capLeads(leads, max = 500) {
 export function filterSignals(list, { filter = 'all', sector = 'all', q = '', minScore = QUAL_MIN } = {}) {
   const query = String(q || '').trim().toLowerCase();
   return list.filter((sig) => {
-    if (qualityScore(sig) < minScore) return false;
+    if (!passesQualityGate(sig, minScore)) return false;
     if (filter === 'risk-low' && sig.riskLevel !== 'LOW') return false;
     if (filter === 'risk-medium' && sig.riskLevel !== 'MEDIUM') return false;
     if (filter === 'risk-high' && sig.riskLevel !== 'HIGH') return false;
@@ -134,15 +143,6 @@ export function filterSignals(list, { filter = 'all', sector = 'all', q = '', mi
     }
     return true;
   });
-}
-
-export function paginate(list, page, size) {
-  const total = list.length;
-  const totalPages = Math.max(1, Math.ceil(total / size) || 1);
-  const current = Math.min(Math.max(1, page), totalPages);
-  const start = (current - 1) * size;
-  const end = Math.min(start + size, total);
-  return { total, totalPages, current, start, end, slice: list.slice(start, end) };
 }
 
 export function contrastRatio(hexA, hexB) {
@@ -210,50 +210,6 @@ export function serializeBoardQuery(state, currentSearch) {
   return next.toString();
 }
 
-export const AD_HOST = 'globalimmaturelunatic.com';
-export const AD_KEYS = {
-  side: '6372f131e3637d818f7cc8c102951da9',
-  sticky: '13b82827e922917915d927184e84b454',
-  native: '8a466ff3d4c93e29bba42607317f6266',
-  social: '9d2f8187ee40c1bb86d4839820efab46',
-  popunder: 'eacc536c1170ad59f25e5561dc85e037'
-};
-export const AD_POPUNDER_GAP_MS = 2 * 3600e3;
-export const AD_POPUNDER_DAY_MAX = 4;
-export const AD_STICKY_DISMISS_MS = 1_800_000;
-
-export function popunderCapOk(now, lastTs, dayCount, dayStamp, today, gapMs, dayMax) {
-  gapMs = gapMs == null ? AD_POPUNDER_GAP_MS : gapMs;
-  dayMax = dayMax == null ? AD_POPUNDER_DAY_MAX : dayMax;
-  const day = dayStamp !== today ? 0 : (dayCount || 0);
-  return (now - (lastTs || 0)) >= gapMs && day < dayMax;
-}
-
-export function stickyIsDismissed(now, storedTs, ttlMs) {
-  ttlMs = ttlMs == null ? AD_STICKY_DISMISS_MS : ttlMs;
-  const d = +storedTs || 0;
-  return !!(d && now - d < ttlMs);
-}
-
-export function shouldRefillAdSlot(state, hasIframe, display) {
-  if (hasIframe) return false;
-  if (display === 'none') return false;
-  return state === 'err' || state === 'ok';
-}
-
-export function shouldHideFailedAd(state, hasIframe) {
-  return !hasIframe && state === 'err';
-}
-
-export function isPinnedAdUrl(url) {
-  try {
-    const u = new URL(String(url), 'https://signalcraft.click/');
-    return u.protocol === 'https:' && u.hostname === AD_HOST;
-  } catch {
-    return false;
-  }
-}
-
 export function safeJsonArray(raw) {
   try {
     const v = JSON.parse(String(raw == null ? '[]' : raw));
@@ -279,7 +235,7 @@ export function longPlanValid(sig) {
 }
 
 export function isLiveCache(ca) {
-  return !!(ca && Array.isArray(ca.signals) && ca.signals.length === 120
+  return !!(ca && Array.isArray(ca.signals) && ca.signals.length >= 100
     && ca.signals.every((s) => s && typeof s === 'object' && typeof s.pair === 'string' && typeof s.id === 'string'));
 }
 
@@ -315,7 +271,7 @@ function bucketPct(b) {
   return d ? Math.round((100 * b.hit) / d) : null;
 }
 
-/** Rolling R:R geometry on each close except the last bar. */
+/** Historical per-setup backtest path: no overlapping rolling closes. */
 export function copyLevelsText(sig) {
   const { tp1, tp2 } = takeProfitLevels(sig);
   const tpPart = '$' + fmtP(tp1) + ' / $' + fmtP(tp2);
@@ -338,15 +294,6 @@ export function sortSignalsList(list, sortMode) {
   return arr;
 }
 
-export function fillPaginTpl(tpl, start, end, total, page, totalPages) {
-  return String(tpl)
-    .replace('{s}', String(total === 0 ? 0 : start + 1))
-    .replace('{e}', String(end))
-    .replace('{t}', String(total))
-    .replace('{p}', String(page))
-    .replace('{tp}', String(totalPages));
-}
-
 export function fmtUtcTime(ts) {
   const d = new Date(ts);
   if (!Number.isFinite(d.getTime())) return '—';
@@ -355,13 +302,13 @@ export function fmtUtcTime(ts) {
 
 export function sectorCounts(list, minScore) {
   minScore = minScore == null ? QUAL_MIN : minScore;
-  const gated = (list || []).filter((s) => qualityScore(s) >= minScore);
+  const gated = (list || []).filter((s) => passesQualityGate(s, minScore));
   const counts = { all: gated.length };
   gated.forEach((s) => { counts[s.sector] = (counts[s.sector] || 0) + 1; });
   return counts;
 }
 
-export function rollingTrackRecord(setups) {
+export function trackRecordSetups(setups) {
   const tot = { hit: 0, stop: 0, open: 0, none: 0, n: 0 };
   const byGrade = {};
   const list = Array.isArray(setups) ? setups : [];
@@ -371,30 +318,33 @@ export function rollingTrackRecord(setups) {
     const entry = +(row.e != null ? row.e : row.entryPrice);
     const sl = +(row.sl != null ? row.sl : row.stopLoss);
     const tp1 = +(row.tp != null ? row.tp : (row.targets && row.targets[0]));
-    if (!(entry > 0 && sl > 0 && tp1 > entry && k.length > 1)) continue;
+    if (!(entry > 0 && sl > 0 && sl < entry && tp1 > entry && k.length > 1)) continue;
     const risk = (entry - sl) / entry;
     const rew = (tp1 - entry) / entry;
     if (!(risk > 0 && rew > 0)) continue;
-    const g = row.g || row.grade || 'B+';
+    const g = row.g || row.grade || 'A';
+    const btEntry = candleHL(k[0]).c;
+    if (!Number.isFinite(btEntry) || btEntry <= 0) continue;
     if (!byGrade[g]) byGrade[g] = { hit: 0, stop: 0, open: 0, none: 0 };
+    const r = simulateLongTp1(btEntry, btEntry * (1 - risk), btEntry * (1 + rew), k, 1);
+    tot[r]++;
+    byGrade[g][r]++;
     tot.n++;
-    for (let i = 0; i < k.length - 1; i++) {
-      const e = candleHL(k[i]).c;
-      if (!Number.isFinite(e) || e <= 0) continue;
-      const r = simulateLongTp1(e, e * (1 - risk), e * (1 + rew), k, i + 1);
-      tot[r]++;
-      byGrade[g][r]++;
-    }
   }
   const grades = {};
   Object.keys(byGrade).forEach((g) => {
-    grades[g] = Object.assign({}, byGrade[g], { pct: bucketPct(byGrade[g]) });
+    const b = byGrade[g];
+    const n = (b.hit || 0) + (b.stop || 0) + (b.open || 0) + (b.none || 0);
+    grades[g] = Object.assign({}, b, { n, pct: bucketPct(b) });
   });
   return {
     total: tot,
     byGrade: grades,
     pct: bucketPct(tot),
     resolved: tot.hit + tot.stop,
-    setups: tot.n
+    setups: tot.n,
+    hit: tot.hit,
+    stop: tot.stop,
+    open: tot.open
   };
 }

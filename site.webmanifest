@@ -1,7 +1,7 @@
 {
   "name": "Signalcraft Atelier",
   "short_name": "Signalcraft",
-  "description": "120+ crypto signals with live sentiment, on-chain score and a B+ quality gate.",
+  "description": "Exclusive crypto signal terminal: 120 pairs scored on real Binance data, only Grade A reaches the board. Free, no account, no ads.",
   "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",

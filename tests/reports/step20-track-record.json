@@ -1,24 +1,19 @@
 {
-  "setups": 58,
-  "resolved": 1253,
-  "hits": 909,
-  "stops": 344,
-  "pct": 73,
+  "setups": 10,
+  "resolved": 10,
+  "hits": 8,
+  "stops": 2,
+  "pct": 80,
   "byGrade": {
     "A+": {
-      "pct": 81,
-      "hit": 55,
-      "stop": 13
+      "pct": 100,
+      "hit": 1,
+      "stop": 0
     },
     "A": {
-      "pct": 72,
-      "hit": 312,
-      "stop": 123
-    },
-    "B+": {
-      "pct": 72,
-      "hit": 542,
-      "stop": 208
+      "pct": 78,
+      "hit": 7,
+      "stop": 2
     }
   }
 }

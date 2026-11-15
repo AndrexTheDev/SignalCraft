@@ -1,7 +1,7 @@
 {
   "count": 120,
-  "belowGate": 62,
-  "onBoard": 58,
+  "belowGate": 110,
+  "onBoard": 10,
   "sectors": {
     "memes": 16,
     "layer1-2": 34,
@@ -10,9 +10,9 @@
     "ai": 16
   },
   "risks": {
-    "HIGH": 89,
-    "MEDIUM": 29,
-    "LOW": 2
+    "MEDIUM": 78,
+    "HIGH": 36,
+    "LOW": 6
   },
   "grades": {
     "A+": 3,

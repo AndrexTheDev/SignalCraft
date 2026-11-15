@@ -93,21 +93,12 @@ describe('step6 systematic e2e', { timeout: 240_000 }, () => {
     await page.close();
   });
 
-  it('next is disabled on the last page', async () => {
+  it('exclusive board has no pager controls', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    await page.click('#sizeAllBtn');
-    await new Promise((r) => setTimeout(r, 300));
-    const disabled = await page.$eval('#btnNextPage', (el) => el.disabled);
-    assert.equal(disabled, true);
-    await page.close();
-  });
-
-  it('prev is disabled on page 1', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'de' });
-    const disabled = await page.$eval('#btnPrevPage', (el) => el.disabled);
-    assert.equal(disabled, true);
+    assert.equal(await page.$('#btnNextPage'), null);
+    assert.equal(await page.$('#btnPrevPage'), null);
+    assert.equal(await page.$('#sizeAllBtn'), null);
     await page.close();
   });
 

@@ -38,9 +38,10 @@ describe('step18 / seed integrity', () => {
     }
   });
 
-  it('runtime enrich overwrites grade from quantScore (B+ at QUAL_MIN)', () => {
-    assert.equal(QUAL_MIN, 78);
+  it('runtime enrich overwrites grade from quantScore (Grade A at QUAL_MIN)', () => {
+    assert.equal(QUAL_MIN, 86);
     assert.match(appJs, /sig\.grade = gradeFromQuant\(sig\.quantScore\)/);
+    assert.match(appJs, /Number\(sig\.confluenceScore\) \|\| 0/);
     assert.equal(gradeFromQuant(85), 'B+');
     assert.equal(gradeFromQuant(77), 'B');
   });
@@ -55,11 +56,12 @@ describe('step18 / storage + cache hardening', () => {
     assert.deepEqual(safeJsonArray(null), []);
   });
 
-  it('isLiveCache requires 120 object signals with id+pair', () => {
-    const ok = { signals: Array.from({ length: 120 }, (_, i) => ({ id: 'SIG-' + i, pair: 'AAA / USD' })) };
+  it('isLiveCache requires >= 100 object signals with id+pair', () => {
+    const ok = { signals: Array.from({ length: 110 }, (_, i) => ({ id: 'SIG-' + i, pair: 'AAA / USD' })) };
     assert.equal(isLiveCache(ok), true);
     assert.equal(isLiveCache({ signals: 'x'.repeat(120) }), false);
     assert.equal(isLiveCache({ signals: [] }), false);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 99 }, (_, i) => ({ id: 'SIG-' + i, pair: 'AAA / USD' })) }), false);
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => 'nope') }), false);
   });
 
@@ -76,10 +78,9 @@ describe('step18 / storage + cache hardening', () => {
 });
 
 describe('step18 / xss + numeric css', () => {
-  it('on-chain pills and dex venue are escaped before innerHTML', () => {
-    assert.match(appJs, /escapeHtml\(oc\.netflowM\)|escapeHtml\(String\(oc\.netflowM\)\)/);
-    assert.match(appJs, /escapeHtml\(oc\.dex\)/);
-    assert.match(appJs, /escapeHtml\(sig\.dexInfo\.dex\)|escapeHtml\(String\(sig\.dexInfo\.dex/);
+  it('dossier escapes the dex venue and carries no on-chain fields', () => {
+    assert.match(appJs, /escapeHtml\(String\(sig\.dexInfo\.dex\)\)/);
+    assert.equal(/netflowM|whalePct|sig\.onchain|dexInfo\.netflow/.test(appJs), false);
   });
 
   it('sentiment meter width is clamped to 0–100', () => {
@@ -128,11 +129,10 @@ describe('step18 / links + referrer + scripts', () => {
 });
 
 describe('step18 / functional wiring still present', () => {
-  it('bottom pagination and copy-dossier are wired', () => {
-    assert.match(appJs, /btnPrevPageBottom/);
-    assert.match(appJs, /btnNextPageBottom/);
+  it('copy dossier is wired; pagination was removed with the exclusive board', () => {
     assert.match(appJs, /btnCopyDossierData/);
-    assert.match(stripScripts(app), /id="btnNextPageBottom"/);
+    assert.equal(/btnPrevPageBottom|btnNextPageBottom|btnPrevPage\b|btnNextPage\b/.test(appJs), false);
+    assert.equal(/id="btnPrevPage"|id="btnNextPage"/.test(stripScripts(app)), false);
   });
 
   it('saved theme is whitelisted', () => {
