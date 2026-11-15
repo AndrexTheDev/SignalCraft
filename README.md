@@ -9,6 +9,16 @@ Statische Site — kein Backend, kein Account, keine Ads, kein Tracking, keine E
 
 - 120 Paare werden aus echten Binance-Tagesdaten bewertet; nur **Grade A** (Quant ≥ 86 **und** RSI(14) ≤ 75 **und** 24h-Volumen ≥ 10 Mio. $ **und** ADX(14) ≥ 15 **und** positiv risikoadjustiertes 30T-Momentum) kommt aufs Board — im Build-Seed sind das genau 10 Setups. Hinweis: Die neuen Gate-Regeln gelten für live berechnete Signale; der statische Build-Snapshot im Seed bleibt als Fallback (DEMO-Modus) mit seiner ursprünglichen Kalibrierung sichtbar, wird also nicht stillschweigend „umbenotet“.
 
+## Was ist neu in v3.6
+
+- **Sechs-Faktor-Modell v2** durchgehend verdrahtet (Engine in `app.html`, gespiegelt in `tests/helpers/core-logic.mjs` mit Drift-Guard `step31`): Trend (EMA), Trend-Qualität (ADX(14) Wilder + DI-Richtung), risikoadjustiertes Momentum (30T-Return ÷ annualisierte Vol), relatives Volumen + OBV, Taker-Kaufdruck, Struktur (BB-Squeeze-Perzentil + Abstand zum 90T-Hoch).
+- **Erweitertes Live-Gate**: zusätzlich ADX(14) ≥ 15 und positives risikoadjustiertes 30T-Momentum (nur für live berechnete Signale). Das Gate schlägt nie stillschweigend offen fehl; der DEMO-Build-Snapshot bleibt als solcher gekennzeichnet.
+- **Dossier**: neue Zeilen (ADX mit +DI/−DI, risikoadjustiertes Momentum, Squeeze-Status mit OBV-Richtung, 90T-Hoch-Abstand), sechs Komponenten-Bars, LIVE/DEMO-Modus-Tags, lokalisierte Kicker- und Ticker-DEMO-Labels (DE/EN/ES/AR/ZH), korrigierte Abschnitts-Header (keine doppelten Klammern mehr), Komponenten-Wert XSS-gehärtet (`Number()`).
+- **Landing + Terminal** komplett auf Sechs-Faktoren-Copy umgestellt; Meta/OG/Twitter/JSON-LD (`softwareVersion` 3.6) konsistent; Footer-Versionen synchron.
+- **Tests**: neu `step30-factor-v2` (Engine v2) und `step31-mirror-sync` (Mirror-Drift-Guard). Stand: Unit 227/227, E2E 95/95 (14 Suites) — siehe `tests/reports/`.
+- **Sicherheit**: A/B-getestet — ein strikter CSP im `<meta>`-Tag brach den Offline/DEMO-Render-Pfad (E2E fiel auf 86/95) und wurde deshalb bewusst **nicht** erzwungen. Empfehlung: auf dem Host zuerst `Content-Security-Policy-Report-Only` mit Report-Endpoint 1–2 Wochen laufen lassen, danach mit Nonces enforce'n (nie mit `'unsafe-inline'`).
+- **Backtest-Harness** `tools/backtest.mjs` committed (`--selftest` prüft nur Determinismus, nicht Modellgüte). Historische Statistiken werden erst nach Prüfung mit echten Binance-Daten veröffentlicht — ohne Netz gibt es hier keine erfundenen Zahlen.
+
 ## Signal-Modell
 
 Der Quant-Score (0–100) ist die rohe Summe von sechs transparenten Komponenten — keine versteckte Kalibrierung, kein erfundener On-Chain-Flow:
