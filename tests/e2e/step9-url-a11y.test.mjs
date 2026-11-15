@@ -24,7 +24,7 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en', query: { sector: 'majors' } });
     const ids = await page.$$eval(
-      '#signalsGrid article.signal-card:not(.lead-capture-bento-card)',
+      '#signalsGrid article.signal-card',
       (els) => els.map((e) => e.getAttribute('data-id'))
     );
     assert.ok(ids.includes('SIG-BTC-014'), ids.join(','));
@@ -47,7 +47,7 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
     assert.equal(params(page.url()).get('risk'), 'high');
     assert.equal(params(page.url()).get('sector'), 'majors');
     const ids = await page.$$eval(
-      '#signalsGrid article.signal-card:not(.lead-capture-bento-card)',
+      '#signalsGrid article.signal-card',
       (els) => els.map((e) => e.getAttribute('data-id'))
     );
     assert.equal(ids.includes('SIG-BTC-014'), false);
@@ -130,9 +130,9 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
     await page.close();
   });
 
-  it('theme-color follows paper-light when unlocked', async () => {
+  it('theme-color follows the paper-light theme', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', unlockThemes: true });
+    await gotoApp(page, { lang: 'en' });
     const before = await page.$eval('meta[name="theme-color"]', (el) => el.getAttribute('content'));
     assert.equal(before, '#121316');
     await page.select('#themeSelect', 'paper-light');

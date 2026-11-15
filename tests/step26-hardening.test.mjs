@@ -5,8 +5,7 @@ import {
 } from './helpers/html.mjs';
 import {
   QUAL_MIN, qualityScore, passesQualityGate, filterSignals, pairSymbol,
-  takeProfitLevels, capLeads, emailLooksValid, sanitizeCsvField, escapeHtml,
-  fmtP, copyLevelsText
+  takeProfitLevels, escapeHtml, fmtP, copyLevelsText
 } from './helpers/core-logic.mjs';
 
 const app = read('app.html');
@@ -100,33 +99,6 @@ describe('step26 / dossier on-chain + indicators', () => {
   });
 });
 
-describe('step26 / leads + csv', () => {
-  it('capLeads drops the oldest entries once 500 is reached', () => {
-    const full = Array.from({ length: 500 }, (_, i) => ({ email: i + '@x.co' }));
-    const next = capLeads(full);
-    assert.equal(next.length, 499);
-    assert.equal(next[0].email, '1@x.co');
-    assert.equal(capLeads(null).length, 0);
-    assert.equal(capLeads([{ email: 'a@b.c' }]).length, 1);
-  });
-
-  it('terminal uses capLeads before push', () => {
-    assert.match(appJs, /function capLeads\s*\(/);
-    assert.match(appJs, /leads = capLeads\(leads\)/);
-  });
-
-  it('email regex still rejects junk; csv prefixes formula + quotes newlines', () => {
-    assert.equal(emailLooksValid('trader@example.com'), true);
-    assert.equal(emailLooksValid(' a@b.c '), true);
-    assert.equal(emailLooksValid('not-an-email'), false);
-    assert.equal(emailLooksValid('a@b'), false);
-    assert.equal(emailLooksValid('foo@bar'), false);
-    const csv = sanitizeCsvField('=cmd|"/c calc"\nfoo');
-    assert.match(csv, /^"'/);
-    assert.equal(csv.includes('"'), true);
-  });
-});
-
 describe('step26 / enrich finite scores', () => {
   it('enrich coerces a missing confluence base instead of writing NaN', () => {
     assert.match(appJs, /Number\(sig\.confluenceScore\) \|\| 0/);
@@ -143,6 +115,5 @@ writeReport('step26-hardening.json', {
   gated: gated.length,
   qualityMissing: qualityScore({ confluenceScore: 99 }),
   tpFallback: takeProfitLevels({ entryPrice: 100 }),
-  pairMissing: pairSymbol(undefined),
-  cap499: capLeads(Array.from({ length: 500 }, (_, i) => i)).length
+  pairMissing: pairSymbol(undefined)
 });

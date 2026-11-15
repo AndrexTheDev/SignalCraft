@@ -55,7 +55,7 @@ test.describe('step4 / beta journeys', () => {
     await gotoApp(page, { lang: 'de' });
     await page.click('#sizeAllBtn');
     await page.waitForTimeout(300);
-    const n = await page.locator('#signalsGrid article.signal-card:not(.lead-capture-bento-card)').count();
+    const n = await page.locator('#signalsGrid article.signal-card').count();
     expect(n).toBeGreaterThan(30);
   });
 
@@ -72,13 +72,13 @@ test.describe('step4 / beta journeys', () => {
     await expect(page.locator('#faq')).toBeInViewport({ timeout: 5000 });
   });
 
-  test('theme gallery button opens modal', async ({ page }) => {
+  test('theme select applies themes without a modal', async ({ page }) => {
     await gotoApp(page, { lang: 'en' });
-    await page.click('#btnOpenThemeUnlock');
-    await expect(page.locator('#themeModalBackdrop')).toHaveClass(/is-visible/);
+    await page.selectOption('#themeSelect', 'paper-light');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper-light');
   });
 
-  test('supporter flow unlocks themes without crash', async ({ page }) => {
+  test('supporter flow activates badge without crash', async ({ page }) => {
     await gotoApp(page, { lang: 'en' });
     await page.click('#btnOpenDonation');
     await page.click('#btnDonated');

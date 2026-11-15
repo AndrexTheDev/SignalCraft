@@ -58,14 +58,14 @@ describe('step4 beta', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('Arabic RTL terminal: dir=rtl and ETH search', async () => {
+  it('Arabic RTL terminal: dir=rtl and BTC search', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'ar', viewport: VIEWPORTS.desktop });
     assert.equal(await page.$eval('html', (el) => el.getAttribute('dir')), 'rtl');
-    await page.type('#pairSearchInput', 'ETH');
+    await page.type('#pairSearchInput', 'BTC');
     await new Promise((r) => setTimeout(r, 250));
     const titles = await page.$$eval('.sc-asset-title', (els) => els.map((e) => e.textContent));
-    assert.ok(titles.some((t) => /ETH/i.test(t)), titles.join('|'));
+    assert.ok(titles.some((t) => /BTC/i.test(t)), titles.join('|'));
     await page.close();
   });
 
@@ -82,7 +82,7 @@ describe('step4 beta', { timeout: 180_000 }, () => {
   it('exclusive board shows all gated setups at once (no pager)', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    const n = await page.$$eval('#signalsGrid article.signal-card:not(.lead-capture-bento-card)', (els) => els.length);
+    const n = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
     assert.equal(n, 10);
     await page.close();
   });
@@ -107,15 +107,15 @@ describe('step4 beta', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('theme gallery button opens modal', async () => {
+  it('theme select applies Terminal Amber immediately (no unlock step)', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en' });
-    await page.click('#btnOpenThemeUnlock');
-    assert.match(await page.$eval('#themeModalBackdrop', (el) => el.className), /is-visible/);
+    await page.select('#themeSelect', 'terminal-amber');
+    assert.equal(await page.$eval('html', (el) => el.getAttribute('data-theme')), 'terminal-amber');
     await page.close();
   });
 
-  it('supporter flow unlocks themes', async () => {
+  it('supporter flow: honor-system badge activates without any unlock wall', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en' });
     await page.click('#btnOpenDonation');

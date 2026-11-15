@@ -16,7 +16,7 @@ describe('step19 integrity e2e', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('corrupt leads JSON does not crash the board or pollute Object', async () => {
+  it('a stale legacy lead key in storage does not crash the board or pollute Object', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en', storage: { signalcraft_leads: '{"email":"x","__proto__":{"pwn":1}}' } });
     const n = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
@@ -33,7 +33,7 @@ describe('step19 integrity e2e', { timeout: 180_000 }, () => {
       lang: 'en',
       storage: { signalcraft_live_v1: JSON.stringify({ t: Date.now(), signals: 'x'.repeat(120) }) }
     });
-    const n = await page.$$eval('#signalsGrid article.signal-card:not(.lead-capture-bento-card)', (els) => els.length);
+    const n = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
     assert.ok(n > 3, 'cards ' + n);
     assert.deepEqual(page._pageErrors, []);
     await page.close();
@@ -111,14 +111,6 @@ describe('step19 integrity e2e', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('#vault deep-link opens the secret vault', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    await page.evaluate(() => { location.hash = 'vault'; location.reload(); });
-    await page.waitForSelector('#secretVaultModalBackdrop.is-visible', { timeout: 8000 });
-    assert.deepEqual(page._pageErrors, []);
-    await page.close();
-  });
 
   it('landing and terminal boot without page errors', async () => {
     const land = await freshPage(browser);

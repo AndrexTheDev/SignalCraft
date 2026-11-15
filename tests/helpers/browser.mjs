@@ -53,7 +53,29 @@ export function stopServer() {
   }
 }
 
+async function ensureSystemLibs() {
+  // @sparticuz/chromium's bundled al2023 libs must be extracted once per
+  // sandbox (they land in /tmp, which does not survive restarts). Without
+  // them Chromium fails to launch with "libnspr4.so: cannot open shared object".
+  try {
+    const fs = await import('node:fs');
+    if (fs.existsSync('/tmp/al2023/lib/libnss3.so') && fs.existsSync('/tmp/al2023/lib/libnspr4.so')) return;
+    // NOTE: the package exports map hides ./build/lambdafs.js — import by file URL
+    const path = await import('node:path');
+    const { pathToFileURL } = await import('node:url');
+    const base = path.join(ROOT, 'node_modules', '@sparticuz', 'chromium');
+    const lambdafs = pathToFileURL(path.join(base, 'build', 'lambdafs.js')).href;
+    const tar = path.join(base, 'bin', 'al2023.tar.br');
+    const { inflate } = await import(lambdafs);
+    await inflate(tar);
+  } catch (e) {
+    // best effort: if extraction fails the launch error will carry the reason
+    console.error('chromium system libs setup failed:', e && e.message ? e.message : e);
+  }
+}
+
 export async function launchBrowser() {
+  await ensureSystemLibs();
   process.env.LD_LIBRARY_PATH = ['/tmp/al2023/lib', '/tmp', process.env.LD_LIBRARY_PATH || ''].filter(Boolean).join(':');
   const chromium = (await import('@sparticuz/chromium')).default;
   const puppeteer = (await import('puppeteer-core')).default;
@@ -69,10 +91,18 @@ export async function launchBrowser() {
   return browser;
 }
 
-export async function stubMarket(page) {
+export async function stubMarket(page, opts = {}) {
+  const fng = opts && opts.fng ? opts.fng : null;
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const url = req.url();
+    if (fng && /alternative\.me\/fng/.test(url)) {
+      return req.respond({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: [{ value: String(fng.value), value_classification: fng.classification || 'Neutral' }] })
+      }).catch(() => {});
+    }
     if (MARKET.test(url) && !/fonts\.googleapis|fonts\.gstatic|globalimmaturelunatic/.test(url)) {
       return req.abort().catch(() => {});
     }
@@ -80,21 +110,20 @@ export async function stubMarket(page) {
   });
 }
 
-export async function gotoLanding(page, { lang, viewport } = {}) {
+export async function gotoLanding(page, { lang, viewport, fng } = {}) {
   if (viewport) await page.setViewport(viewport);
-  await stubMarket(page);
+  await stubMarket(page, { fng });
   const q = lang ? `?lang=${lang}` : '';
   await page.goto(BASE + '/index.html' + q, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForSelector('.hero-title, .hero-landing', { timeout: 10000 });
 }
 
-export async function gotoApp(page, { lang, viewport, unlockThemes = false, storage, query, expectCards = true } = {}) {
+export async function gotoApp(page, { lang, viewport, storage, query, expectCards = true, fng } = {}) {
   if (viewport) await page.setViewport(viewport);
-  await stubMarket(page);
-  const init = { unlockThemes, storage: storage || {} };
+  await stubMarket(page, { fng });
+  const init = { storage: storage || {} };
   await page.evaluateOnNewDocument((init) => {
     try {
-      if (init.unlockThemes) localStorage.setItem('unlocked_themes', 'true');
       Object.entries(init.storage || {}).forEach(([k, v]) => localStorage.setItem(k, v));
     } catch (e) {}
   }, init);

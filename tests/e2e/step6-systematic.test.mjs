@@ -40,9 +40,9 @@ describe('step6 systematic e2e', { timeout: 240_000 }, () => {
     await page.close();
   });
 
-  it('unlocked theme persists across reload', async () => {
+  it('chosen theme persists across reload', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', unlockThemes: true });
+    await gotoApp(page, { lang: 'en' });
     await page.select('#themeSelect', 'paper-light');
     assert.equal(await page.$eval('html', (el) => el.getAttribute('data-theme')), 'paper-light');
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -99,49 +99,6 @@ describe('step6 systematic e2e', { timeout: 240_000 }, () => {
     assert.equal(await page.$('#btnNextPage'), null);
     assert.equal(await page.$('#btnPrevPage'), null);
     assert.equal(await page.$('#sizeAllBtn'), null);
-    await page.close();
-  });
-
-  it('lead honeypot pretends success without storing', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    await page.$eval('#leadHpField', (el) => { el.value = 'http://spam.test'; });
-    await page.type('#leadEmailInput', 'bot@example.com');
-    await page.click('#leadCaptureForm button[type="submit"]');
-    await page.waitForSelector('#editorialToast.is-active');
-    const stored = await page.evaluate(() => localStorage.getItem('signalcraft_leads'));
-    assert.ok(!stored || !stored.includes('bot@example.com'));
-    await page.close();
-  });
-
-  it('valid lead is stored once; duplicate is rejected', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    await page.type('#leadEmailInput', 'alpha@signalcraft.test');
-    await page.click('#leadCaptureForm button[type="submit"]');
-    await page.waitForSelector('#editorialToast.is-active');
-    await new Promise((r) => setTimeout(r, 3300));
-    await page.type('#leadEmailInput', 'alpha@signalcraft.test');
-    await page.click('#leadCaptureForm button[type="submit"]');
-    await page.waitForSelector('#editorialToast.is-active');
-    const leads = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_leads') || '[]'));
-    const n = leads.filter((l) => l.email === 'alpha@signalcraft.test').length;
-    assert.equal(n, 1);
-    await page.close();
-  });
-
-  it('?admin=1 opens the vault modal', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', query: { admin: '1' } });
-    await page.waitForSelector('#secretVaultModalBackdrop.is-visible', { timeout: 5000 });
-    await page.close();
-  });
-
-  it('five clicks on the crest open the vault', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    for (let i = 0; i < 5; i++) await page.click('#brandCrestLogo');
-    await page.waitForSelector('#secretVaultModalBackdrop.is-visible', { timeout: 4000 });
     await page.close();
   });
 

@@ -56,10 +56,13 @@ describe('step15 / deep security static', () => {
     }
   });
 
-  it('lead CSV sanitizer still prefixes formula injection', () => {
-    assert.match(sanitizeCsvField('=cmd|"/c calc"!A0'), /^"'=/);
-    assert.match(appJs, /sanitizeCsvField\(l\.email\)/);
+  it('escapeHtml still neutralises markup injection', () => {
     assert.equal(escapeHtml('<img src=x onerror=alert(1)>').includes('<img'), false);
+  });
+
+  it('no fake lead capture or CSV export remains in the terminal or tests', () => {
+    assert.equal(/sanitizeCsvField|appendLeadCard|signalcraft_leads|exportLeadsCsv|LEAD_TS_KEY/.test(appJs), false);
+    assert.equal(/secretVaultModalBackdrop|openSecretVaultModal|leadCaptureForm/.test(app), false);
   });
 
   it('share popups request noopener and do not echo the query string', () => {

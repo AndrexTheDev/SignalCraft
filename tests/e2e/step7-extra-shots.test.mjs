@@ -32,7 +32,7 @@ describe('step7 extra screenshot matrix', { timeout: 300_000 }, () => {
 
   it('filter + theme + mobile extras', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', viewport: VIEWPORTS.desktop, unlockThemes: true });
+    await gotoApp(page, { lang: 'en', viewport: VIEWPORTS.desktop });
     await page.click('.sector-pill[data-sector="majors"]');
     await shot(page, 'extra_filter_majors_en.png');
     await page.click('.filter-btn[data-filter="risk-high"]');
@@ -40,12 +40,12 @@ describe('step7 extra screenshot matrix', { timeout: 300_000 }, () => {
     await page.close();
 
     const p2 = await freshPage(browser);
-    await gotoApp(p2, { lang: 'zh', viewport: VIEWPORTS.mobile, unlockThemes: true });
+    await gotoApp(p2, { lang: 'zh', viewport: VIEWPORTS.mobile });
     await shot(p2, 'extra_app_zh_mobile.png');
     await p2.close();
 
     const p3 = await freshPage(browser);
-    await gotoApp(p3, { lang: 'en', viewport: VIEWPORTS.mobile, unlockThemes: true });
+    await gotoApp(p3, { lang: 'en', viewport: VIEWPORTS.mobile });
     await p3.select('#themeSelect', 'paper-light');
     await shot(p3, 'extra_app_en_paper_mobile.png');
     await p3.close();
@@ -60,8 +60,8 @@ describe('step7 extra screenshot matrix', { timeout: 300_000 }, () => {
     await p5.click('[data-inspect-sig]');
     await shot(p5, 'extra_dossier_es.png');
     await p5.keyboard.press('Escape');
-    await p5.click('#btnOpenThemeUnlock');
-    await shot(p5, 'extra_theme_lock_es.png');
+    await p5.select('#themeSelect', 'terminal-amber');
+    await shot(p5, 'extra_theme_amber_es.png');
     await p5.close();
 
     const p6 = await freshPage(browser);

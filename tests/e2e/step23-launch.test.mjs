@@ -28,11 +28,11 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('landing footer paints v3.5 and the three published wallets', async () => {
+  it('landing footer paints v3.6 and the three published wallets', async () => {
     const page = await freshPage(browser);
     await gotoLanding(page, { lang: 'de' });
     const body = await page.$eval('footer', (el) => el.textContent);
-    assert.match(body, /v3\.5/);
+    assert.match(body, /v3\.6/);
     assert.equal(body.includes('v3.2'), false);
     assert.equal(body.includes('v3.4'), false);
     for (const w of Object.values(WALLETS)) assert.ok(body.includes(w), w.slice(0, 8));
@@ -45,7 +45,7 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const ver = await page.$eval('#ftVersion', (el) => el.textContent);
-    assert.match(ver, /v3\.5/);
+    assert.match(ver, /v3\.6/);
     const wallets = await page.$eval('#ftWallets', (el) => el.textContent);
     for (const w of Object.values(WALLETS)) assert.ok(wallets.includes(w), w.slice(0, 8));
     const n = await page.$eval('#statActiveCount', (el) => el.textContent.trim());

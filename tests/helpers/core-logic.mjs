@@ -348,3 +348,160 @@ export function trackRecordSetups(setups) {
     open: tot.open
   };
 }
+
+
+// ===== Signal factor model v2 (mirrors app.html for unit tests) =====
+
+export function emaSeries(x, p) {
+  const k = 2 / (p + 1);
+  const out = new Array(x.length);
+  out[0] = x[0];
+  for (let i = 1; i < x.length; i++) out[i] = x[i] * k + out[i - 1] * (1 - k);
+  return out;
+}
+
+export function emaLast(x, p) { const a = emaSeries(x, p); return a[a.length - 1]; }
+
+export function adxWilder(h, l, c, p) {
+  p = p || 14;
+  const n = c.length;
+  if (n < 2 * p + 2) return { adx: NaN, plusDi: NaN, minusDi: NaN };
+  const tr = [], pdm = [], mdm = [];
+  for (let i = 1; i < n; i++) {
+    const up = h[i] - h[i - 1], dn = l[i - 1] - l[i];
+    pdm.push(up > dn && up > 0 ? up : 0);
+    mdm.push(dn > up && dn > 0 ? dn : 0);
+    tr.push(Math.max(h[i] - l[i], Math.abs(h[i] - c[i - 1]), Math.abs(l[i] - c[i - 1])));
+  }
+  let atr = tr.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  let spdm = pdm.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  let smdm = mdm.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  const dx = [];
+  let lastPdi = 0, lastMdi = 0;
+  for (let i = p; i < tr.length; i++) {
+    atr = (atr * (p - 1) + tr[i]) / p;
+    spdm = (spdm * (p - 1) + pdm[i]) / p;
+    smdm = (smdm * (p - 1) + mdm[i]) / p;
+    const pdi = atr === 0 ? 0 : (100 * spdm) / atr;
+    const mdi = atr === 0 ? 0 : (100 * smdm) / atr;
+    const sum = pdi + mdi;
+    dx.push(sum === 0 ? 0 : (100 * Math.abs(pdi - mdi)) / sum);
+    if (i === tr.length - 1) { lastPdi = pdi; lastMdi = mdi; }
+  }
+  if (dx.length < p) return { adx: NaN, plusDi: lastPdi, minusDi: lastMdi };
+  let adx = dx.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  for (let i = p; i < dx.length; i++) adx = (adx * (p - 1) + dx[i]) / p;
+  return { adx: adx, plusDi: lastPdi, minusDi: lastMdi };
+}
+
+export function returnVol(c, p) {
+  const r = [];
+  for (let i = Math.max(1, c.length - p); i < c.length; i++) r.push(c[i] / c[i - 1] - 1);
+  if (!r.length) return 0;
+  const m = r.reduce((a, b) => a + b, 0) / r.length;
+  const v = r.reduce((a, b) => a + (b - m) * (b - m), 0) / r.length;
+  return Math.sqrt(v);
+}
+
+export function riskAdjMom(c, p) {
+  p = p || 30;
+  if (c.length < p + 2) return NaN;
+  const ret = c[c.length - 1] / c[c.length - 1 - p] - 1;
+  const vol = returnVol(c, p) * Math.sqrt(p);
+  return vol === 0 ? 0 : ret / vol;
+}
+
+export function obvTrend(c, qv, p) {
+  p = p || 20;
+  if (c.length < p + 2 || qv.length !== c.length) return { pct: 0, dir: 'flat' };
+  const series = [0];
+  let obv = 0;
+  for (let i = 1; i < c.length; i++) {
+    const d = c[i] === c[i - 1] ? 0 : (c[i] > c[i - 1] ? 1 : -1);
+    obv += d * qv[i];
+    series.push(obv);
+  }
+  const delta = series[series.length - 1] - series[series.length - 1 - p];
+  const avgVol = qv.slice(-p).reduce((a, b) => a + b, 0) / p;
+  const pct = avgVol === 0 ? 0 : delta / (avgVol * p);
+  return { pct: pct, dir: pct > 0.05 ? 'up' : pct < -0.05 ? 'down' : 'flat' };
+}
+
+export function bbWidthPercentile(c, p, lookback) {
+  p = p || 20; lookback = lookback || 120;
+  if (c.length < p + 5) return 50;
+  const bws = [];
+  for (let end = p; end <= c.length; end++) {
+    const slice = c.slice(end - p, end);
+    const mean = slice.reduce((a, b) => a + b, 0) / p;
+    if (mean === 0) continue;
+    const sd = Math.sqrt(slice.reduce((a, b) => a + (b - mean) * (b - mean), 0) / p);
+    bws.push((4 * sd) / mean);
+  }
+  if (!bws.length) return 50;
+  const cur = bws[bws.length - 1];
+  const hist = bws.slice(-lookback);
+  const below = hist.filter(x => x <= cur).length;
+  return Math.round((below / hist.length) * 100);
+}
+
+export function factorScores(h, l, c, qv, tq) {
+  const last = c[c.length - 1];
+  const e20 = emaLast(c, 20), e50 = emaLast(c, 50), e200 = emaLast(c, 200);
+  const p7 = last / c[c.length - 8] - 1;
+  const p30 = last / c[c.length - 31] - 1;
+  const relVol = qv[qv.length - 1] / (qv.slice(-31, -1).reduce((x, y) => x + y, 0) / 30);
+  const adxR = adxWilder(h, l, c, 14);
+  const ra30 = riskAdjMom(c, 30);
+  const obv = obvTrend(c, qv, 20);
+  const bwPct = bbWidthPercentile(c, 20, 120);
+  const hi90 = Math.max.apply(null, h.slice(-90));
+  const hi90d = (hi90 - last) / last;
+  const tr = (last > e20 ? 6 : 0) + (e20 > e50 ? 7 : 0) + (e50 > e200 ? 6 : 0) + (last > e200 ? 6 : 0);
+  const adxV = adxR.adx;
+  let q = Number.isFinite(adxV) ? (adxV >= 25 ? 10 : adxV >= 20 ? 7 : adxV >= 15 ? 4 : 1) : 2;
+  if (Number.isFinite(adxR.plusDi) && adxR.plusDi > adxR.minusDi) q += 5;
+  let mo = Number.isFinite(ra30) ? (ra30 >= 0.9 ? 13 : ra30 >= 0.6 ? 11 : ra30 >= 0.35 ? 8 : ra30 >= 0.1 ? 5 : ra30 >= 0 ? 2 : 0) : 4;
+  mo += (p7 >= 0.08 ? 6 : p7 >= 0.03 ? 4 : p7 >= 0 ? 2 : 0);
+  mo += (p30 >= 0.20 ? 6 : p30 >= 0.08 ? 4 : p30 >= 0 ? 2 : 0);
+  const vo = (relVol >= 2 ? 9 : relVol >= 1.5 ? 7 : relVol >= 1.1 ? 5 : relVol >= 0.8 ? 3 : 1) + (obv.dir === 'up' ? 6 : obv.dir === 'flat' ? 3 : 0);
+  const tb7 = tq.slice(-7).reduce((x, y) => x + y, 0) / qv.slice(-7).reduce((x, y) => x + y, 0);
+  const tq3 = tq.slice(-3).reduce((x, y) => x + y, 0), qv3 = qv.slice(-3).reduce((x, y) => x + y, 0);
+  const tq4 = tq.slice(-7, -3).reduce((x, y) => x + y, 0), qv4 = qv.slice(-7, -3).reduce((x, y) => x + y, 0);
+  const tb3 = qv3 === 0 ? 0 : tq3 / qv3, tbPrior = qv4 === 0 ? 0 : tq4 / qv4;
+  const tbDelta = tb3 - tbPrior;
+  const pr = (tb7 >= 0.55 ? 6 : tb7 >= 0.52 ? 5 : tb7 >= 0.5 ? 4 : tb7 >= 0.47 ? 2 : 1) + (tbDelta > 0.02 ? 4 : tbDelta > 0 ? 2 : 0);
+  let st;
+  if (bwPct <= 25) st = (last > e20 && p7 >= 0 ? 6 : 2);
+  else if (bwPct <= 60) st = 4;
+  else st = 3;
+  st += (hi90d <= 0.05 ? 4 : hi90d <= 0.12 ? 3 : hi90d <= 0.25 ? 1 : 0);
+  return {
+    comp: { tr: tr, q: q, mo: mo, vo: vo, pr: pr, st: st },
+    adx: Number.isFinite(adxV) ? +adxV.toFixed(1) : null,
+    plusDi: Number.isFinite(adxR.plusDi) ? +adxR.plusDi.toFixed(1) : null,
+    minusDi: Number.isFinite(adxR.minusDi) ? +adxR.minusDi.toFixed(1) : null,
+    riskAdj30: Number.isFinite(ra30) ? +ra30.toFixed(2) : null,
+    obvDir: obv.dir,
+    bbWidthPct: bwPct,
+    tbDelta: +(tbDelta * 100).toFixed(1)
+  };
+}
+
+export const MIN_ADX = 15;
+export const MIN_RISKADJ30 = 0;
+
+export function passesGateV2(sig) {
+  const mm = sig && sig.metrics ? sig.metrics : null;
+  const rsi = mm ? Number(mm.rsi) : NaN;
+  const vol = mm ? Number(mm.volMio) : NaN;
+  const q = Number(sig && sig.quantScore);
+  if (!Number.isFinite(q) || q < 86) return false;
+  if (Number.isFinite(rsi) && rsi > 75) return false;
+  if (Number.isFinite(vol) && vol < 10) return false;
+  const adx = mm && mm.adx != null ? Number(mm.adx) : NaN;
+  if (Number.isFinite(adx) && adx < MIN_ADX) return false;
+  const ra = mm && mm.riskAdj30 != null ? Number(mm.riskAdj30) : NaN;
+  if (Number.isFinite(ra) && !(ra > MIN_RISKADJ30)) return false;
+  return true;
+}

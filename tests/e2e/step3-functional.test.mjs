@@ -91,7 +91,7 @@ describe('step3 functional', { timeout: 180_000 }, () => {
   it('exclusive board renders all 10 setups without a pager', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
-    const n = await page.$$eval('#signalsGrid article.signal-card:not(.lead-capture-bento-card)', (els) => els.length);
+    const n = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
     assert.equal(n, 10);
     assert.equal(await page.$('#btnNextPage'), null);
     assert.equal(await page.$('#btnPrevPage'), null);
@@ -162,20 +162,17 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('locked theme opens unlock modal; unlocked paper-light applies', async () => {
+  it('all three themes apply without any unlock step', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en' });
-    await page.select('#themeSelect', 'terminal-amber');
-    const cls = await page.$eval('#themeModalBackdrop', (el) => el.className);
-    assert.match(cls, /is-visible/);
-    await page.click('#btnCloseThemeModal');
-    await page.evaluate(() => localStorage.setItem('unlocked_themes', 'true'));
-    await page.select('#themeSelect', 'paper-light');
-    assert.equal(await page.$eval('html', (el) => el.getAttribute('data-theme')), 'paper-light');
+    for (const theme of ['terminal-amber', 'paper-light', 'gallery-dark']) {
+      await page.select('#themeSelect', theme);
+      assert.equal(await page.$eval('html', (el) => el.getAttribute('data-theme')), theme);
+    }
     await page.close();
   });
 
-  it('donation modal opens from the bar', async () => {
+  it('donation modal opens from the masthead button', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     await page.click('#btnOpenDonation');
@@ -195,17 +192,6 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('lead form rejects invalid email', async () => {
-    const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en' });
-    const form = await page.$('#leadCaptureForm');
-    assert.ok(form, 'lead form missing on page 1');
-    await page.click('#leadEmailInput', { clickCount: 3 });
-    await page.type('#leadEmailInput', 'not-an-email');
-    const valid = await page.$eval('#leadEmailInput', (el) => el.checkValidity());
-    assert.equal(valid, false);
-    await page.close();
-  });
 
   for (const lang of LANGS) {
     it(`?lang=${lang} sets html lang`, async () => {

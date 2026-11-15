@@ -2,7 +2,6 @@
   "seed": 120,
   "longPlanOk": true,
   "helpers": [
-    "safeJsonArray",
     "isLiveCache",
     "clampPct"
   ]

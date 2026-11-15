@@ -24,7 +24,7 @@ test.describe('step5 / extra screenshot matrix', () => {
   test('terminal × 5 langs × 3 themes × desktop', async ({ page }) => {
     const themes = ['gallery-dark', 'terminal-amber', 'paper-light'];
     for (const lang of LANGS) {
-      await gotoApp(page, { lang, viewport: VIEWPORTS.desktop, unlockThemes: true });
+      await gotoApp(page, { lang, viewport: VIEWPORTS.desktop });
       for (const theme of themes) {
         await page.selectOption('#themeSelect', theme);
         await page.waitForTimeout(120);
@@ -36,14 +36,14 @@ test.describe('step5 / extra screenshot matrix', () => {
   test('terminal mobile + tablet EN/DE/AR', async ({ page }) => {
     for (const lang of ['de', 'en', 'ar']) {
       for (const vp of ['tablet', 'mobile']) {
-        await gotoApp(page, { lang, viewport: VIEWPORTS[vp], unlockThemes: true });
+        await gotoApp(page, { lang, viewport: VIEWPORTS[vp] });
         await shot(page, `app_${lang}_gallery-dark_${vp}.png`);
       }
     }
   });
 
   test('state extras: drawers, dossier, share, donation, faq, empty', async ({ page }) => {
-    await gotoApp(page, { lang: 'en', viewport: VIEWPORTS.desktop, unlockThemes: true });
+    await gotoApp(page, { lang: 'en', viewport: VIEWPORTS.desktop, storage: { signalcraft_theme: 'gallery-dark' } });
     await page.locator('.sentiment-pill-btn').first().click();
     await shot(page, 'state_sentiment_open.png');
 
@@ -66,10 +66,10 @@ test.describe('step5 / extra screenshot matrix', () => {
     await shot(page, 'state_donation.png');
     await page.click('#btnCloseDonationModal');
 
-    await page.click('#btnOpenThemeUnlock');
+    await page.selectOption('#themeSelect', 'paper-light');
     await page.waitForTimeout(120);
-    await shot(page, 'state_theme_unlock.png');
-    await page.click('#btnCloseThemeModal');
+    await shot(page, 'state_theme_paper.png');
+    await page.selectOption('#themeSelect', 'gallery-dark');
 
     await page.locator('#faq .faq-header-toggle').nth(1).click();
     await page.locator('#faq').scrollIntoViewIfNeeded();

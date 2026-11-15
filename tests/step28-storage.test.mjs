@@ -21,24 +21,17 @@ describe('step28 / storage helpers', () => {
     assert.match(appJs, /try \{ localStorage\.removeItem\(k\); \}/);
   });
 
-  it('leads, live cache, lang, theme and unlock go through the helpers', () => {
-    assert.match(mainJs, /lsGet\('signalcraft_leads'\)/);
-    assert.match(mainJs, /lsSet\('signalcraft_leads'/);
-    assert.match(mainJs, /lsDel\('signalcraft_leads'\)/);
+  it('live cache, lang, theme and supporter flags go through the helpers', () => {
     assert.match(mainJs, /lsGet\(this\.CACHE_KEY\)/);
     assert.match(mainJs, /lsSet\(this\.CACHE_KEY/);
     assert.match(mainJs, /lsGet\('signalcraft_lang'\)/);
     assert.match(mainJs, /lsSet\('signalcraft_lang'/);
-    assert.match(mainJs, /lsGet\('unlocked_themes'\)/);
-    assert.match(mainJs, /lsSet\('unlocked_themes'/);
+    assert.match(mainJs, /lsGet\('signalcraft_theme'\)/);
     assert.match(mainJs, /lsSet\('signalcraft_theme'/);
-    assert.equal(/localStorage\.getItem\('signalcraft_leads'\)/.test(mainJs), false);
-    assert.equal(/localStorage\.setItem\('signalcraft_leads'/.test(mainJs), false);
-    assert.equal(/localStorage\.removeItem\('signalcraft_leads'\)/.test(mainJs), false);
+    assert.match(mainJs, /lsSet\('signalcraft_supporter'/);
+    assert.equal(/signalcraft_leads|unlocked_themes|signalcraft_don_extra/.test(mainJs), false);
     assert.equal(/localStorage\.getItem\('signalcraft_lang'\)/.test(mainJs), false);
     assert.equal(/localStorage\.setItem\('signalcraft_lang'/.test(mainJs), false);
-    assert.equal(/localStorage\.getItem\('unlocked_themes'\)/.test(mainJs), false);
-    assert.equal(/localStorage\.setItem\('unlocked_themes'/.test(mainJs), false);
     assert.equal(/localStorage\.getItem\(this\.CACHE_KEY\)/.test(mainJs), false);
   });
 
@@ -52,10 +45,9 @@ describe('step28 / storage helpers', () => {
 });
 
 describe('step28 / clipboard + pair + r5', () => {
-  it('copyText swallows a missing clipboard; unlock and copy-levels use it', () => {
+  it('copyText swallows a missing clipboard and copy-levels uses it', () => {
     assert.match(appJs, /function copyText\s*\(/);
     assert.match(appJs, /copyText\(txt\)/);
-    assert.match(appJs, /copyText\('https:\/\/signalcraft\.click\/app\.html'\)/);
     assert.equal(/navigator\.clipboard\.writeText\('https:\/\/signalcraft\.click/.test(appJs), false);
   });
 

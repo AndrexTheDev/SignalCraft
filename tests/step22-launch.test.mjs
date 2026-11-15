@@ -33,22 +33,23 @@ function mentionsGate(text) {
 }
 
 describe('step22 / version lock', () => {
-  it('JSON-LD softwareVersion is 3.5 on landing and terminal', () => {
+  it('JSON-LD softwareVersion is 3.6 on landing and terminal', () => {
     for (const html of [landing, app]) {
       const graph = JSON.parse(jsonLdBlocks(html)[0])['@graph'];
       const sw = graph.find((n) => n['@type'] === 'SoftwareApplication');
-      assert.equal(sw.softwareVersion, '3.5');
+      assert.equal(sw.softwareVersion, '3.6');
     }
   });
 
-  it('visible footers say v3.5 and never v3.2/v3.4', () => {
+  it('visible footers say v3.6 and never v3.2/v3.4/v3.5', () => {
     const landMark = stripScripts(landing);
     const appMark = stripScripts(app);
-    assert.match(landMark, /Signalcraft v3\.5/);
-    assert.match(appMark, /Signalcraft Terminal v3\.5/);
+    assert.match(landMark, /Signalcraft v3\.6/);
+    assert.match(appMark, /Signalcraft Terminal v3\.6/);
     assert.equal(/v3\.2/.test(landMark + appMark), false);
     assert.equal(/v3\.2/.test(appJs + landJs), false);
     assert.equal(/v3\.4/.test(landMark + appMark), false);
+    assert.equal(/v3\.5/.test(landMark + appMark), false);
   });
 });
 
@@ -133,7 +134,7 @@ describe('step22 / live inventory + legal', () => {
 });
 
 writeReport('step22-launch.json', {
-  version: '3.5',
+  version: '3.6',
   seed: seed.length,
   gated: gated.length,
   cex: cex.length,

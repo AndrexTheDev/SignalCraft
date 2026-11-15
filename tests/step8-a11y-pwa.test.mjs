@@ -86,15 +86,13 @@ describe('step8 / copy levels + slash search', () => {
 });
 
 describe('step8 / leftover German runtime strings', () => {
-  it('EXTRA_I18N covers unlock, vault and FNG helpers in 5 langs', () => {
+  it('EXTRA_I18N covers the FNG helpers and share footer in 5 langs', () => {
     const extra = parseObj(appJs, 'const EXTRA_I18N =');
     for (const lang of LANGS) {
-      for (const key of ['longBadge', 'unlockedAmber', 'unlockedPaper', 'vaultOpen', 'vaultEmpty', 'vaultExport', 'vaultClearAsk', 'sentLoading', 'leadQueued', 'shareFoot']) {
+      for (const key of ['longBadge', 'sentLoading', 'shareFoot']) {
         assert.ok(extra[lang][key], lang + '.' + key);
       }
     }
-    assert.match(extra.en.unlockedAmber, /Unlocked/);
-    assert.match(extra.de.unlockedAmber, /Freigeschaltet/);
   });
 
   it('runtime JS no longer hardcodes German vault/unlock toasts', () => {
@@ -103,9 +101,9 @@ describe('step8 / leftover German runtime strings', () => {
     assert.equal(/showToast\('Lade globale Sentiment/.test(appJs), false);
     assert.equal(/showToast\('Keine gespeicherten Leads/.test(appJs), false);
     assert.equal(/Zugriff autorisiert für AndrexTheDev/.test(appJs), false);
+    assert.equal(/secretVaultModalBackdrop|openSecretVaultModal|relabelUnlockedThemes/.test(appJs), false);
     assert.match(appJs, /function tx\s*\(/);
     assert.match(appJs, /function fngClassLabel\s*\(/);
-    assert.match(appJs, /function relabelUnlockedThemes\s*\(/);
     assert.match(appJs, /tx\('shareFoot'\)/);
   });
 
