@@ -6,3 +6,4 @@ blob-report/
 tests/artifacts/
 .DS_Store
 *.log
+.wrangler/

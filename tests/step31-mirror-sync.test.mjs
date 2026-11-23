@@ -39,7 +39,7 @@ const appHtml = fs.readFileSync(path.join(ROOT, 'app.html'), 'utf8');
 const appJs = appHtml.match(/<script>([\s\S]*?)<\/script>/)[1];
 const mirror = fs.readFileSync(path.join(ROOT, 'tests/helpers/core-logic.mjs'), 'utf8');
 
-const FACTOR_FNS = ['emaSeries', 'emaLast', 'adxWilder', 'returnVol', 'riskAdjMom', 'obvTrend', 'bbWidthPercentile', 'factorScores'];
+const FACTOR_FNS = ['parseMarketNumber', 'fmtP', 'priceChange', 'factorWindowComputable', 'emaSeries', 'emaLast', 'adxWilder', 'returnVol', 'riskAdjMom', 'obvTrend', 'bbWidthPercentile', 'factorScores', 'roundTargetUp', 'validLongPlan', 'isLiveCache', 'takeProfitLevels', 'quoteUnit', 'quotedPrice', 'copyLevelsText'];
 
 describe('step31 / mirror sync — factor engine v2', () => {
   for (const name of FACTOR_FNS) {

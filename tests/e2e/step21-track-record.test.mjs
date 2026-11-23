@@ -74,7 +74,7 @@ describe('step21 track-record e2e', { timeout: 180_000 }, () => {
     assert.match(pct, /^\d+\/\d+$/);
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-      page.click('a[href="app.html"]')
+      page.click('a[data-terminal-link]')
     ]);
     await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
     await new Promise((r) => setTimeout(r, 800));

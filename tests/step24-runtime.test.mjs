@@ -48,23 +48,23 @@ describe('step24 / copyLevelsText', () => {
     const btc = seed.find((s) => s.id === 'SIG-BTC-014');
     assert.ok(btc);
     const txt = copyLevelsText(btc);
-    assert.match(txt, /^BTC \/ USD Setup \| Entry: \$/);
-    assert.ok(txt.includes('SL: $' + fmtP(btc.stopLoss)));
-    assert.ok(txt.includes('TP: $' + fmtP(btc.targets[0]) + ' / $' + fmtP(btc.targets[1])));
+    assert.match(txt, /^BTC \/ USD Setup \| Entry: /);
+    assert.ok(txt.includes('SL: ' + fmtP(btc.stopLoss) + ' USD'));
+    assert.ok(txt.includes('TP: ' + fmtP(btc.targets[0]) + ' USD / ' + fmtP(btc.targets[1]) + ' USD'));
     assert.ok(txt.includes('R:R: ' + btc.riskRewardRatio));
     assert.match(txt, /\(Signalcraft\)$/);
   });
 
-  it('falls back to +5% / +8% TP when targets are missing', () => {
+  it('does not fabricate TP levels when targets are missing', () => {
     const txt = copyLevelsText({
       pair: 'AAA / USD', entryPrice: 100, stopLoss: 90, riskRewardRatio: '1:2.0'
     });
-    assert.ok(txt.includes('TP: $' + fmtP(105) + ' / $' + fmtP(108)));
+    assert.ok(txt.includes('TP: - USD / - USD'));
   });
 
   it('terminal helper stays in sync with the unit mirror', () => {
     assert.match(appJs, /function copyLevelsText\s*\(/);
-    assert.match(appJs, /pair \+ ' Setup \| Entry: \$'/);
+    assert.match(appJs, /pair \+ ' Setup \| Entry: '/);
     assert.match(appJs, /function fmtUtcTime\s*\(/);
     assert.match(appJs, /function sortSignalsList\s*\(/);
   });
@@ -116,11 +116,12 @@ describe('step24 / clocks, cache, query', () => {
   });
 
   it('isLiveCache rejects the wrong length and non-objects', () => {
-    const one = { id: 'SIG-1', pair: 'AAA / USD' };
-    assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => one) }), true);
-    assert.equal(isLiveCache({ signals: Array.from({ length: 99 }, () => one) }), false);
-    assert.equal(isLiveCache({ signals: Array.from({ length: 100 }, () => one) }), true);
+    const one = i => ({ ...seed[0], id: 'SIG-' + i, pair: 'AAA' + i + ' / USDT', modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } });
+    assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, (_, i) => one(i)) }), true);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 99 }, (_, i) => one(i)) }), false);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 100 }, (_, i) => one(i)) }), true);
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => null) }), false);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 100 }, () => one(1)) }), false);
   });
 
   it('parse/serialize keep lang and drop default board keys', () => {
@@ -156,8 +157,8 @@ describe('step24 / xss + i18n contracts', () => {
   });
 
   it('share-card levels use fmtP, not locale rounding', () => {
-    assert.match(appJs, /fmtP\(sig\.entryPrice\)/);
-    assert.match(appJs, /fmtP\(sig\.stopLoss\)/);
+    assert.match(appJs, /quotedPrice\(sig, sig\.entryPrice\)/);
+    assert.match(appJs, /quotedPrice\(sig, sig\.stopLoss\)/);
     assert.equal(/Number\(sig\.entryPrice\)\.toLocaleString\(\)/.test(appJs), false);
   });
 

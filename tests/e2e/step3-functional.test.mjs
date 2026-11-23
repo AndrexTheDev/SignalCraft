@@ -21,7 +21,7 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await gotoLanding(page, { lang: 'de' });
     const h1 = await page.$eval('h1', (el) => el.textContent);
     assert.match(h1, /Signalcraft/);
-    assert.ok(await page.$('a[href="app.html"]'));
+    assert.ok(await page.$('a[data-terminal-link]'));
     assert.equal(await page.$eval('html', (el) => el.getAttribute('lang')), 'de');
     await page.close();
   });
@@ -43,9 +43,9 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await gotoLanding(page, { lang: 'en' });
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-      page.click('a[href="app.html"]')
+      page.click('a[data-terminal-link]')
     ]);
-    assert.match(page.url(), /app\.html/);
+    assert.match(new URL(page.url()).pathname, /^\/app$/);
     await page.close();
   });
 

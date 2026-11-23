@@ -55,7 +55,7 @@ describe('step16 / json-ld graph', () => {
     it(`${name} SoftwareApplication is free, versioned and imaged`, () => {
       const appNode = byType(graph(html), 'SoftwareApplication')[0];
       assert.equal(appNode.isAccessibleForFree, true);
-      assert.match(String(appNode.url), /app\.html/);
+      assert.match(String(appNode.url), /\/app$/);
       assert.match(String(appNode.image || ''), /og-preview\.png/);
       assert.equal(appNode.offers.priceCurrency, 'EUR');
       assert.ok(Array.isArray(appNode.availableLanguage));
@@ -73,13 +73,8 @@ describe('step16 / json-ld graph', () => {
     }
   });
 
-  it('SearchAction still deep-links into ?q=', () => {
-    for (const html of [app, landing]) {
-      const site = byType(graph(html), 'WebSite')[0];
-      const target = site.potentialAction.target;
-      const url = typeof target === 'string' ? target : target.urlTemplate;
-      assert.match(url, /app\.html\?q=\{search_term_string\}/);
-    }
+  it('does not advertise the retired sitelinks search box', () => {
+    for (const html of [app, landing]) assert.equal(byType(graph(html), 'WebSite')[0].potentialAction, undefined);
   });
 });
 
@@ -140,8 +135,8 @@ describe('step16 / sitemap + robots', () => {
     for (const lang of LANGS.concat(['x-default'])) {
       assert.match(sm, new RegExp(`hreflang="${lang}"`));
     }
-    assert.match(sm, /index\.html/);
-    assert.match(sm, /app\.html/);
+    assert.ok(sm.includes('<loc>https://signalcraft.click/</loc>'));
+    assert.ok(sm.includes('<loc>https://signalcraft.click/app</loc>'));
   });
 
   it('robots.txt still allows Google and lists the sitemap', () => {

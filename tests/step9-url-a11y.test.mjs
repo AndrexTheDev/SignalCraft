@@ -157,10 +157,10 @@ describe('step9 / PWA head + sitemap', () => {
     }
   });
 
-  it('sitemap lastmod tracks the 3.5 release (2026-11-15)', () => {
+  it('does not publish unverifiable sitemap last-modified dates', () => {
     assert.equal(exists('sitemap.xml'), true);
     const sm = read('sitemap.xml');
-    assert.match(sm, /<lastmod>2026-11-15<\/lastmod>/);
+    assert.doesNotMatch(sm, /<lastmod>/);
     assert.equal(/2026-09-20/.test(sm), false);
   });
 });

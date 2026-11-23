@@ -50,10 +50,10 @@ describe('step26 / qualityScore gate', () => {
 });
 
 describe('step26 / take-profit + pair guards', () => {
-  it('takeProfitLevels falls back to +5% / +8% when targets are missing', () => {
+  it('takeProfitLevels leaves missing targets unavailable rather than guessing', () => {
     const t = takeProfitLevels({ entryPrice: 100 });
-    assert.equal(t.tp1, 105);
-    assert.equal(t.tp2, 108);
+    assert.ok(Number.isNaN(t.tp1));
+    assert.ok(Number.isNaN(t.tp2));
     const btc = seed.find((s) => s.id === 'SIG-BTC-014');
     assert.equal(takeProfitLevels(btc).tp1, btc.targets[0]);
     assert.equal(takeProfitLevels(btc).tp2, btc.targets[1]);
@@ -85,7 +85,7 @@ describe('step26 / take-profit + pair guards', () => {
 describe('step26 / dossier on-chain + indicators', () => {
   it('dossier exposes no on-chain data and escapes what it renders', () => {
     assert.equal(/sig\.onchain|netflowM|whalePct/.test(appJs), false);
-    assert.match(appJs, /escapeHtml\(String\(sig\.dexInfo\.dex\)\)/);
+    assert.doesNotMatch(appJs, /sig\.dexInfo\.dex/);
     assert.match(appJs, /sig\.metrics && sig\.metrics\.comp/);
     assert.match(appJs, /String\(ind/);
     assert.match(appJs, /escapeHtml\(sentChg\)/);
@@ -105,7 +105,7 @@ describe('step26 / enrich finite scores', () => {
     assert.match(appJs, /Number\.isFinite\(q\) \? q : 0/);
     assert.match(appJs, /copyLevelsText\(sig\)/);
     const txt = copyLevelsText({ pair: 'AAA / USD', entryPrice: 100, stopLoss: 90, riskRewardRatio: '1:2.0' });
-    assert.ok(txt.includes('TP: $' + fmtP(105) + ' / $' + fmtP(108)));
+    assert.ok(txt.includes('TP: - USD / - USD'));
     assert.equal(copyLevelsText({ entryPrice: 100, stopLoss: 90, riskRewardRatio: '1:1' }).startsWith('— Setup'), true);
   });
 });

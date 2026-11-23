@@ -29,7 +29,7 @@ describe('step6 / seo', () => {
       assert.match(html, /og-preview\.png/);
       assert.match(html, /name="twitter:card"/);
       assert.match(html, /summary_large_image/);
-      assert.match(html, /rel="canonical"/);
+      assert.match(html, /createElement\('link'\)/);
     }
   });
 
@@ -47,10 +47,45 @@ describe('step6 / seo', () => {
     assert.match(robots, /Sitemap:/);
   });
 
-  it('JSON-LD SearchAction uses the ?q= deep link the app now honours', () => {
-    const data = JSON.parse(jsonLdBlocks(app)[0]);
-    const site = data['@graph'].find((n) => n['@type'] === 'WebSite');
-    assert.match(site.potentialAction.target, /app\.html\?q=\{search_term_string\}/);
+  it('keeps public HTML indexable and permits Googlebot on all public language URLs', () => {
+    for (const [name, html] of [['index.html', landing], ['app.html', app]]) {
+      const meta = html.match(/<meta\b[^>]*>/gi) || [];
+      for (const tag of meta) assert.doesNotMatch(tag, /\bnoindex\b/i, name + ': ' + tag);
+      assert.match(html, /<meta\s+name=["']robots["']\s+content=["']index,\s*follow/i);
+    }
+    const robots = read('robots.txt').replace(/#[^\n]*/g, '');
+    const groups = [];
+    let group = null, hasRules = false;
+    for (const raw of robots.split(/\r?\n/)) {
+      const match = raw.trim().match(/^([^:]+):\s*(.*)$/);
+      if (!match) continue;
+      const key = match[1].trim().toLowerCase(), value = match[2].trim();
+      if (key === 'user-agent') {
+        if (!group || hasRules) { group = { agents: [], rules: [] }; groups.push(group); hasRules = false; }
+        group.agents.push(value.toLowerCase());
+      } else if (group && (key === 'allow' || key === 'disallow')) {
+        group.rules.push({ key, value }); hasRules = true;
+      }
+    }
+    const specific = groups.filter(g => g.agents.includes('googlebot'));
+    const selected = specific.length ? specific : groups.filter(g => g.agents.includes('*'));
+    assert.ok(selected.length, 'no applicable robots group');
+    const rules = selected.flatMap(g => g.rules).filter(r => r.value);
+    for (const url of ['/', '/index.html', '/app.html', ...['de','en','es','ar','zh'].flatMap(lang => ['/index.html?lang=' + lang, '/app.html?lang=' + lang])]) {
+      const matches = rules.filter(r => {
+        const anchored = r.value.endsWith('$');
+        const path = anchored ? r.value.slice(0, -1) : r.value;
+        const pattern = path.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+        return new RegExp('^' + pattern + (anchored ? '$' : '')).test(url);
+      }).sort((a, b) => b.value.replace(/[\*$]/g, '').length - a.value.replace(/[\*$]/g, '').length || (a.key === 'allow' ? -1 : 1));
+      assert.notEqual(matches[0]?.key, 'disallow', 'Googlebot blocked: ' + url);
+    }
+    if (exists('_headers')) assert.doesNotMatch(read('_headers'), /x-robots-tag\s*:\s*[^\n]*noindex/i);
+  });
+
+  it('keeps board search while omitting retired sitelinks search box markup', () => {
+    const site = JSON.parse(jsonLdBlocks(app)[0])['@graph'].find((n) => n['@type'] === 'WebSite');
+    assert.equal(site.potentialAction, undefined);
     assert.match(appJs, /get\('q'\)/);
   });
 
@@ -89,10 +124,12 @@ describe('step6 / a11y tokens', () => {
 });
 
 describe('step6 / security', () => {
-  it('signal cards escape pair, notes and venue before innerHTML', () => {
+  it('signal cards escape pair, notes and validated model source before innerHTML', () => {
     assert.match(appJs, /escapeHtml\(sig\.pair\)/);
     assert.match(appJs, /escapeHtml\(sig\.notes\)/);
-    assert.match(appJs, /escapeHtml\(sig\.venue/);
+    assert.match(appJs, /escapeHtml\(modelSource\(sig\)\)/);
+    assert.match(appJs, /sig\.venue === 'BINANCE SPOT'/);
+    assert.match(appJs, /sig\.venue === 'BINANCE-US SPOT'/);
   });
 
   it('does not call eval() in application JS', () => {

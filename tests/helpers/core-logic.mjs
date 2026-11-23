@@ -1,11 +1,20 @@
 /** Pure logic mirrors of Signalcraft terminal helpers — kept in sync for unit tests. */
 
+export function parseMarketNumber(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : NaN;
+  if (typeof value !== 'string' || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value.trim())) return NaN;
+  const n = Number(value);
+  if (n === 0 && /[1-9]/.test(value.trim().split(/[eE]/)[0])) return NaN;
+  return Number.isFinite(n) ? n : NaN;
+}
+
 export function fmtP(v) {
-  if (!isFinite(v)) return '-';
-  const abs = Math.abs(v);
-  if (abs >= 1) return Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 });
-  const dec = Math.min(12, Math.max(2, 2 - Math.floor(Math.log10(abs))));
-  return Number(v).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  if (v == null || (typeof v === 'string' && !v.trim())) return '-';
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '-';
+  if ((n !== 0 && Math.abs(n) < 1e-6) || Math.abs(n) >= 1e15) return n.toString();
+  if (Number(n.toPrecision(12)) !== n) return n.toLocaleString(undefined, { maximumSignificantDigits: 17 });
+  return n.toLocaleString(undefined, { maximumSignificantDigits: 12 });
 }
 
 export function r5(x) {
@@ -116,11 +125,8 @@ export function pairSymbol(pair) {
 }
 
 export function takeProfitLevels(sig) {
-  const entry = Number(sig && sig.entryPrice);
-  const t = sig && sig.targets;
-  const tp1 = (t && t[0] != null) ? t[0] : (Number.isFinite(entry) ? entry * 1.05 : NaN);
-  const tp2 = (t && t[1] != null) ? t[1] : (Number.isFinite(entry) ? entry * 1.08 : NaN);
-  return { tp1, tp2 };
+  const t = sig && Array.isArray(sig.targets) ? sig.targets : [];
+  return { tp1: t[0] == null ? NaN : t[0], tp2: t[1] == null ? NaN : t[1] };
 }
 
 export function capLeads(leads, max = 500) {
@@ -234,9 +240,41 @@ export function longPlanValid(sig) {
     && sl < entry && entry < tp1 && tp1 <= tp2;
 }
 
-export function isLiveCache(ca) {
-  return !!(ca && Array.isArray(ca.signals) && ca.signals.length >= 100
-    && ca.signals.every((s) => s && typeof s === 'object' && typeof s.pair === 'string' && typeof s.id === 'string'));
+export function isLiveCache(ca, singleCandidate) {
+  if (!ca || !Array.isArray(ca.signals) || (singleCandidate === true ? ca.signals.length !== 1 : ca.signals.length < 100)) return false;
+  const ids = new Set(), pairs = new Set();
+  return ca.signals.every(function (s) {
+    if (!s || typeof s !== 'object' || typeof s.id !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(s.id) || ids.has(s.id) ||
+        typeof s.pair !== 'string' || !/^[A-Z0-9]{1,20} \/ USDT$/.test(s.pair) || pairs.has(s.pair) ||
+        s.live !== true || s.modelVersion !== 3 || s.type !== 'LONG' ||
+        !['LOW', 'MEDIUM', 'HIGH'].includes(s.riskLevel) ||
+        !['majors', 'layer1-2', 'defi', 'ai', 'memes'].includes(s.sector) ||
+        !Array.isArray(s.indicatorsUsed) || !s.indicatorsUsed.every(function (v) { return typeof v === 'string'; }) ||
+        !Number.isInteger(s.quantScore) || s.quantScore < 0 || s.quantScore > 100 || s.confluenceScore !== s.quantScore ||
+        !s.metrics || typeof s.metrics !== 'object' || s.metrics.score !== s.quantScore || !Array.isArray(s.targets) || s.targets.length !== 2 ||
+        !validLongPlan(s.entryPrice, s.stopLoss, s.targets[0], s.targets[1])) return false;
+    if (['venue', 'timeframe', 'notes'].some(function (k) { return typeof s[k] !== 'string'; }) ||
+        !s.sentiment || typeof s.sentiment !== 'object' || Array.isArray(s.sentiment) ||
+        ['label', 'socialChange', 'headline', 'catalyst'].some(function (k) { return typeof s.sentiment[k] !== 'string'; }) ||
+        typeof s.sentiment.score !== 'number' || !Number.isFinite(s.sentiment.score) || s.sentiment.score < 0 || s.sentiment.score > 100) return false;
+    // Displayed metrics must be numbers, never markup or coercible objects.
+    const m = s.metrics;
+    if (typeof m.top !== 'string' || (m.obvDir != null && !['up', 'down', 'flat'].includes(m.obvDir)) ||
+        ['rsi', 'atr', 'atrPct', 'sma50', 'sma200', 'volX', 'tb7', 'perf7', 'perf30', 'hi90d', 'chg24', 'volMio'].some(function (k) { return typeof m[k] !== 'number' || !Number.isFinite(m[k]); }) ||
+        ['adx', 'plusDi', 'minusDi', 'riskAdj30', 'bbWidthPct', 'tbDelta'].some(function (k) { return m[k] != null && (typeof m[k] !== 'number' || !Number.isFinite(m[k])); }) ||
+        (m.comp != null && (typeof m.comp !== 'object' || Array.isArray(m.comp) || Object.values(m.comp).some(function (v) { return typeof v !== 'number' || !Number.isFinite(v); })))) return false;
+    const rr = (s.targets[1] - s.entryPrice) / (s.entryPrice - s.stopLoss);
+    if (!Number.isFinite(rr) || !Number.isFinite(rr * 10) || s.riskRewardRatio !== '1:' + (Math.floor((rr + 1e-10) * 10) / 10).toFixed(1)) return false;
+    const g = s.gateMetrics;
+    if (!g || ['rsi', 'volMio'].some(function (k) { return typeof g[k] !== 'number' || !Number.isFinite(g[k]); }) ||
+        ['adx', 'riskAdj30'].some(function (k) { return g[k] !== null && (typeof g[k] !== 'number' || !Number.isFinite(g[k])); }) ||
+        g.rsi < 0 || g.rsi > 100 || g.volMio < 0 || (g.adx !== null && (g.adx < 0 || g.adx > 100))) return false;
+    if (!Array.isArray(s.k24) || s.k24.length !== 24 || !s.k24.every(function (row) {
+      return Array.isArray(row) && row.length === 4 && row.every(Number.isFinite) && row[2] > 0 &&
+        row[1] >= Math.max(row[0], row[2], row[3]) && row[2] <= Math.min(row[0], row[1], row[3]);
+    })) return false;
+    ids.add(s.id); pairs.add(s.pair); return true;
+  });
 }
 
 export function candleHL(c) {
@@ -272,11 +310,16 @@ function bucketPct(b) {
 }
 
 /** Historical per-setup backtest path: no overlapping rolling closes. */
+export function quoteUnit(sig) {
+  const quote = String((sig && sig.pair) || '').split(' / ')[1];
+  return quote === 'USDT' || quote === 'USD' ? quote : '?';
+}
+export function quotedPrice(sig, value) { return fmtP(value) + ' ' + quoteUnit(sig); }
 export function copyLevelsText(sig) {
   const { tp1, tp2 } = takeProfitLevels(sig);
-  const tpPart = '$' + fmtP(tp1) + ' / $' + fmtP(tp2);
+  const tpPart = quotedPrice(sig, tp1) + ' / ' + quotedPrice(sig, tp2);
   const pair = String((sig && sig.pair) || '—');
-  return pair + ' Setup | Entry: $' + fmtP(sig.entryPrice) + ' | SL: $' + fmtP(sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
+  return pair + ' Setup | Entry: ' + quotedPrice(sig, sig.entryPrice) + ' | SL: ' + quotedPrice(sig, sig.stopLoss) + ' | TP: ' + tpPart + ' | R:R: ' + sig.riskRewardRatio + ' (Signalcraft)';
 }
 
 export function sortSignalsList(list, sortMode) {
@@ -352,6 +395,69 @@ export function trackRecordSetups(setups) {
 
 // ===== Signal factor model v2 (mirrors app.html for unit tests) =====
 
+// Positive prices cannot represent a real 100% loss; reject overflow and
+// underflow/rounding that erase a nonzero price ratio or price difference.
+export function priceChange(close, entry) {
+  const ratio = close / entry;
+  if (!Number.isFinite(ratio) || ratio <= 0 || (ratio === 1 && close !== entry)) return null;
+  const change = ratio - 1;
+  return Number.isFinite(change) && change > -1 ? change : null;
+}
+
+// The shared factor code uses unscaled sums and squared deviations. Reject a
+// window if those intermediate operations cannot be represented reliably;
+// otherwise NaN comparisons can accidentally produce ordinary factor scores.
+export function factorWindowComputable(h, c, qv, tq) {
+  const finiteSum = values => {
+    const sum = values.reduce((a, b) => a + b, 0);
+    return Number.isFinite(sum) ? sum : NaN;
+  };
+  const qTotal = finiteSum(qv), tTotal = finiteSum(tq);
+  if (!Number.isFinite(qTotal) || !Number.isFinite(tTotal)) return false;
+  // Bound Wilder and EMA intermediates before additions and 100x DI scaling.
+  if (Math.max(...h) > Number.MAX_VALUE / 10000) return false;
+  const avg30 = finiteSum(qv.slice(-31, -1)) / 30;
+  const relative = qv.at(-1) / avg30;
+  if (!(avg30 > 0) || !Number.isFinite(relative) || relative <= 0) return false;
+  for (const [from, to] of [[-7, undefined], [-3, undefined], [-7, -3]]) {
+    const quotes = finiteSum(qv.slice(from, to)), buys = finiteSum(tq.slice(from, to));
+    if (!(quotes > 0) || !Number.isFinite(buys)) return false;
+    const ratio = buys / quotes;
+    if (!Number.isFinite(ratio) || (buys > 0 && ratio === 0) || (buys < quotes && ratio === 1)) return false;
+  }
+  // Both return volatility and Bollinger width square deviations. A zero or
+  // infinity caused by arithmetic range is not an actual zero-volatility bar.
+  const varianceSafe = (values, mean) => {
+    let sum = 0;
+    for (const value of values) {
+      const diff = value - mean, square = diff * diff;
+      if (!Number.isFinite(square) || (diff !== 0 && square === 0)) return false;
+      sum += square;
+      if (!Number.isFinite(sum)) return false;
+    }
+    return !(sum > 0 && sum / values.length === 0);
+  };
+  const returns = [];
+  for (let i = c.length - 30; i < c.length; i++) {
+    const change = priceChange(c[i], c[i - 1]);
+    if (change === null) return false;
+    returns.push(change);
+  }
+  const returnMean = finiteSum(returns) / returns.length;
+  if (!Number.isFinite(returnMean) || !varianceSafe(returns, returnMean) ||
+      priceChange(c.at(-1), c.at(-31)) === null || priceChange(c.at(-1), c.at(-8)) === null ||
+      priceChange(Math.max(...h.slice(-90)), c.at(-1)) === null) return false;
+  for (let end = 20; end <= c.length; end++) {
+    const prices = c.slice(end - 20, end), mean = finiteSum(prices) / 20;
+    if (!(mean > 0) || !Number.isFinite(mean) || !varianceSafe(prices, mean)) return false;
+    const variance = prices.reduce((sum, value) => sum + (value - mean) * (value - mean), 0) / 20;
+    const width = 4 * Math.sqrt(variance) / mean;
+    if (!Number.isFinite(width) || (variance > 0 && width === 0)) return false;
+  }
+  return true;
+}
+
+
 export function emaSeries(x, p) {
   const k = 2 / (p + 1);
   const out = new Array(x.length);
@@ -414,19 +520,18 @@ export function riskAdjMom(c, p) {
 export function obvTrend(c, qv, p) {
   p = p || 20;
   if (c.length < p + 2 || qv.length !== c.length) return { pct: 0, dir: 'flat' };
-  const series = [0];
-  let obv = 0;
-  for (let i = 1; i < c.length; i++) {
+  // Only the last p changes contribute to this delta. Summing an older OBV
+  // baseline and subtracting it again can erase small recent volumes.
+  let delta = 0, total = 0;
+  for (let i = c.length - p; i < c.length; i++) {
     const d = c[i] === c[i - 1] ? 0 : (c[i] > c[i - 1] ? 1 : -1);
-    obv += d * qv[i];
-    series.push(obv);
+    delta += d * qv[i];
+    total += qv[i];
   }
-  const delta = series[series.length - 1] - series[series.length - 1 - p];
-  const avgVol = qv.slice(-p).reduce((a, b) => a + b, 0) / p;
-  const pct = avgVol === 0 ? 0 : delta / (avgVol * p);
+  // Dividing by the total directly also avoids underflow in (total / p) * p.
+  const pct = total === 0 ? 0 : delta / total;
   return { pct: pct, dir: pct > 0.05 ? 'up' : pct < -0.05 ? 'down' : 'flat' };
 }
-
 export function bbWidthPercentile(c, p, lookback) {
   p = p || 20; lookback = lookback || 120;
   if (c.length < p + 5) return 50;
@@ -504,4 +609,18 @@ export function passesGateV2(sig) {
   const ra = mm && mm.riskAdj30 != null ? Number(mm.riskAdj30) : NaN;
   if (Number.isFinite(ra) && !(ra > MIN_RISKADJ30)) return false;
   return true;
+}
+
+// Rounded trade-plan helpers mirrored from the terminal.
+export function roundTargetUp(value) {
+  if (!Number.isFinite(value) || value <= 0) return NaN;
+  const rounded = +value.toPrecision(5);
+  if (rounded >= value) return rounded;
+  const step = Math.pow(10, Math.floor(Math.log10(value)) - 4);
+  return +(rounded + step).toPrecision(5);
+}
+export function validLongPlan(entry, stop, tp1, tp2) {
+  if (![entry, stop, tp1, tp2].every(Number.isFinite) || !(stop > 0 && stop < entry && entry < tp1 && tp1 <= tp2)) return false;
+  // Allow only a tiny tolerance for binary floating-point arithmetic at exactly 1:2.
+  return (tp2 - entry) / (entry - stop) >= 2 - 1e-10;
 }

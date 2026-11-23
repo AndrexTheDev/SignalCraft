@@ -78,7 +78,7 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     assert.ok(land.includes(WALLETS.SOL));
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-      page.click('a[href="app.html"]')
+      page.click('a[data-terminal-link]')
     ]);
     await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
     await new Promise((r) => setTimeout(r, 800));

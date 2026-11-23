@@ -3,8 +3,8 @@
   "gated": 10,
   "qualityMissing": 0,
   "tpFallback": {
-    "tp1": 105,
-    "tp2": 108
+    "tp1": null,
+    "tp2": null
   },
   "pairMissing": "—"
 }

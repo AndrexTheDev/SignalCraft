@@ -21,7 +21,7 @@ describe('step8 / pwa manifest', () => {
     assert.equal(exists('site.webmanifest'), true);
     const man = JSON.parse(read('site.webmanifest'));
     assert.ok(man.name && man.short_name);
-    assert.match(man.start_url, /app\.html/);
+    assert.equal(man.start_url, '/app');
     assert.equal(man.display, 'standalone');
     assert.ok(Array.isArray(man.icons) && man.icons.length >= 2);
     assert.ok(man.icons.some((i) => /logo\.png/.test(i.src)));
