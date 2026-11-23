@@ -27,13 +27,15 @@ describe('step6 systematic e2e', { timeout: 240_000 }, () => {
     await page.close();
   });
 
-  it('language persists from landing to terminal via localStorage', async () => {
+  it('language is carried from landing to terminal by its explicit URL', async () => {
     const page = await freshPage(browser);
     await gotoLanding(page, { lang: 'en' });
     await page.select('#langSelect', 'es');
     const stored = await page.evaluate(() => localStorage.getItem('signalcraft_lang'));
     assert.equal(stored, 'es');
-    await page.goto(page.url().replace(/index\.html.*/, 'app.html'), { waitUntil: 'domcontentloaded' });
+    const target = await page.$eval('a[data-terminal-link]', el => el.href);
+    assert.equal(new URL(target).searchParams.get('lang'), 'es');
+    await page.goto(target, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#signalsGrid');
     await new Promise((r) => setTimeout(r, 800));
     assert.equal(await page.$eval('html', (el) => el.getAttribute('lang')), 'es');

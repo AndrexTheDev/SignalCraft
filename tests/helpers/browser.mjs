@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import path from 'node:path';
-import { ROOT } from './html.mjs';
+import { ROOT, read, extractArray } from './html.mjs';
 
 export const LANGS = ['de', 'en', 'es', 'ar', 'zh'];
 export const VIEWPORTS = {
@@ -32,7 +32,7 @@ export async function startServer() {
   let port = 4173;
   if (!(await portFree(port))) port = 4174;
   BASE = `http://127.0.0.1:${port}`;
-  serverProc = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], {
+  serverProc = spawn('python3', ['tools/serve.py', '--port', String(port), '--bind', '127.0.0.1'], {
     cwd: ROOT,
     stdio: 'ignore'
   });
@@ -97,6 +97,13 @@ export async function stubMarket(page, opts = {}) {
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const url = req.url();
+    if (klines && /\/ticker\/24hr(?:\?|$)/.test(url)) {
+      const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+      const isUs = url.includes('api.binance.us');
+      const values = isUs ? (opts.usTicker || {}) : (opts.globalTicker || {});
+      const body = values.missing ? [] : seed.map(s => ({ symbol: s.pair.split(' / ')[0] + 'USDT', quoteVolume: String(values.quoteVolume ?? opts.quoteVolume ?? klines[klines.length - 1][7]), priceChangePercent: String(values.priceChangePercent ?? opts.priceChangePercent ?? 1), closeTime: Date.now() + (values.timeOffset || 0) }));
+      return req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(body) }).catch(() => {});
+    }
     if (klines && /\/klines\?/.test(url)) {
       return req.respond({
         status: 200,
@@ -108,7 +115,7 @@ export async function stubMarket(page, opts = {}) {
       return req.respond({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ data: [{ value: String(fng.value), value_classification: fng.classification || 'Neutral' }] })
+        body: JSON.stringify({ data: [{ value: String(fng.value), value_classification: fng.classification || 'Neutral', timestamp: String(fng.timestamp ?? Math.floor(Date.now() / 1000)) }] })
       }).catch(() => {});
     }
     if (MARKET.test(url) && !/fonts\.googleapis|fonts\.gstatic|globalimmaturelunatic/.test(url)) {

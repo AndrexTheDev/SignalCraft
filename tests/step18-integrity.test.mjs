@@ -56,8 +56,8 @@ describe('step18 / storage + cache hardening', () => {
     assert.deepEqual(safeJsonArray(null), []);
   });
 
-  it('isLiveCache requires >= 100 object signals with id+pair', () => {
-    const ok = { signals: Array.from({ length: 110 }, (_, i) => ({ id: 'SIG-' + i, pair: 'AAA / USD' })) };
+  it('isLiveCache requires >= 100 valid unique LIVE records', () => {
+    const ok = { signals: Array.from({ length: 110 }, (_, i) => ({ ...seed[0], id: 'SIG-' + i, pair: 'AAA' + i + ' / USDT', modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } })) };
     assert.equal(isLiveCache(ok), true);
     assert.equal(isLiveCache({ signals: 'x'.repeat(120) }), false);
     assert.equal(isLiveCache({ signals: [] }), false);
@@ -77,8 +77,8 @@ describe('step18 / storage + cache hardening', () => {
 });
 
 describe('step18 / xss + numeric css', () => {
-  it('dossier escapes the dex venue and carries no on-chain fields', () => {
-    assert.match(appJs, /escapeHtml\(String\(sig\.dexInfo\.dex\)\)/);
+  it('dossier does not associate unverified DEX tokens or fabricate on-chain fields', () => {
+    assert.doesNotMatch(appJs, /sig\.dexInfo\.dex/);
     assert.equal(/netflowM|whalePct|sig\.onchain|dexInfo\.netflow/.test(appJs), false);
   });
 
@@ -92,8 +92,8 @@ describe('step18 / xss + numeric css', () => {
   });
 
   it('search haystack never calls toLowerCase on a missing notes field', () => {
-    assert.match(appJs, /String\(sig\.notes \|\| ''\)/);
-    assert.match(appJs, /String\(sig\.pair \|\| ''\)/);
+    assert.match(appJs, /String\(displayed\.notes \|\| ''\)/);
+    assert.match(appJs, /String\(displayed\.pair \|\| ''\)/);
   });
 
   it('escapeHtml still neutralizes tags', () => {
@@ -121,8 +121,8 @@ describe('step18 / links + referrer + scripts', () => {
   });
 
   it('invalid lang is ignored at init (I18N / L lookup)', () => {
-    assert.match(appJs, /if \(urlLang && I18N\[urlLang\]\)/);
-    assert.match(landJs, /if \(q && L\[q\]\)/);
+    assert.match(appJs, /Object\.prototype\.hasOwnProperty\.call\(I18N, urlLang\)/);
+    assert.match(landJs, /Object\.prototype\.hasOwnProperty\.call\(L, q\)/);
     assert.match(appJs, /if \(!I18N\[code\]\) code = 'en'/);
   });
 });

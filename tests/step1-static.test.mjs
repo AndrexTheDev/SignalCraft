@@ -46,9 +46,9 @@ describe('step1 / inventory', () => {
 
   it('sitemap lists landing + terminal for all 5 languages', () => {
     const sm = read('sitemap.xml');
-    for (const page of ['index.html', 'app.html']) {
-      assert.match(sm, new RegExp(page.replace('.', '\\.')));
-      for (const lang of ['de', 'en', 'es', 'ar', 'zh']) {
+    for (const page of ['/', '/app']) {
+      assert.ok(sm.includes('https://signalcraft.click' + page + '</loc>'));
+      for (const lang of ['en', 'es', 'ar', 'zh']) {
         assert.match(sm, new RegExp(`${page}\\?lang=${lang}`));
       }
     }
@@ -266,7 +266,8 @@ describe('step1 / markup hygiene', () => {
     for (const h of hrefs) {
       if (/^(https?:|mailto:|data:|javascript:|#)/i.test(h)) continue;
       const file = h.split('?')[0].replace(/^\//, '');
-      if (file && !exists(file)) missing.push(h);
+      const asset = file === 'app' ? 'app.html' : file; // Cloudflare's clean HTML route
+      if (asset && !exists(asset)) missing.push(h);
     }
     assert.deepEqual(missing, []);
   });

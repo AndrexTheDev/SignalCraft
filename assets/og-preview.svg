@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title description">
+  <title id="title">Signalcraft: crypto setups and risk analysis</title>
+  <desc id="description">An abstract market chart beside the Signalcraft name and a research disclaimer. The chart is decorative, not market data.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#141619"/><stop offset="1" stop-color="#202427"/></linearGradient>
+    <linearGradient id="line" x1="0" x2="1"><stop stop-color="#c85a32"/><stop offset="1" stop-color="#e4aa72"/></linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#background)"/>
+  <rect x="18" y="18" width="1164" height="639" rx="8" fill="none" stroke="#7f7770" stroke-opacity=".35" stroke-width="2"/>
+  <rect x="54" y="58" width="5" height="34" rx="2.5" fill="#c85a32"/>
+  <text x="78" y="83" fill="#e8e6e3" font-family="Georgia,serif" font-size="32" letter-spacing="2">SIGNALCRAFT ATELIER</text>
+  <text x="58" y="180" fill="#b9b4ad" font-family="Arial,sans-serif" font-size="21" letter-spacing="4">QUANTITATIVE RESEARCH</text>
+  <text x="55" y="258" fill="#f3eee6" font-family="Georgia,serif" font-size="63">Crypto setups.</text>
+  <text x="55" y="328" fill="#e7b188" font-family="Georgia,serif" font-size="63">Clear risk levels.</text>
+  <text x="59" y="393" fill="#c9c6c0" font-family="Arial,sans-serif" font-size="23">Entry · stop · targets · six factors</text>
+  <rect x="58" y="434" width="435" height="48" rx="24" fill="#292522" stroke="#8d5a43"/>
+  <text x="81" y="465" fill="#e6cfbf" font-family="Arial,sans-serif" font-size="17" letter-spacing=".6">LIVE WHEN AVAILABLE  /  LABELLED DEMO</text>
+  <g transform="translate(658 148)">
+    <rect width="477" height="338" rx="12" fill="#171b1d" stroke="#645b55" stroke-opacity=".7"/>
+    <g stroke="#898279" stroke-opacity=".16" stroke-width="1">
+      <path d="M30 69H447M30 137H447M30 205H447M30 273H447"/>
+      <path d="M99 32V300M169 32V300M239 32V300M309 32V300M379 32V300"/>
+    </g>
+    <path d="M32 245 L80 219 L120 229 L164 176 L204 187 L248 135 L290 158 L332 113 L374 124 L445 65" fill="none" stroke="url(#line)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="445" cy="65" r="8" fill="#efbc91"/>
+    <text x="30" y="321" fill="#a8a6a0" font-family="Arial,sans-serif" font-size="14" letter-spacing="1">ILLUSTRATION · NOT MARKET DATA</text>
+  </g>
+  <path d="M58 548H1141" stroke="#898279" stroke-opacity=".35"/>
+  <text x="58" y="595" fill="#c9c6c0" font-family="Arial,sans-serif" font-size="20">Educational analysis · not investment advice</text>
+  <text x="1140" y="595" text-anchor="end" fill="#e3ad86" font-family="Arial,sans-serif" font-size="20">signalcraft.click</text>
+</svg>

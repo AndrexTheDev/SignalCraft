@@ -24,7 +24,6 @@ describe('step28 / storage helpers', () => {
   it('live cache, lang, theme and supporter flags go through the helpers', () => {
     assert.match(mainJs, /lsGet\(this\.CACHE_KEY\)/);
     assert.match(mainJs, /lsSet\(this\.CACHE_KEY/);
-    assert.match(mainJs, /lsGet\('signalcraft_lang'\)/);
     assert.match(mainJs, /lsSet\('signalcraft_lang'/);
     assert.match(mainJs, /lsGet\('signalcraft_theme'\)/);
     assert.match(mainJs, /lsSet\('signalcraft_theme'/);
@@ -38,7 +37,6 @@ describe('step28 / storage helpers', () => {
   it('landing language persist uses guarded helpers', () => {
     assert.match(landJs, /function lsGet\s*\(/);
     assert.match(landJs, /function lsSet\s*\(/);
-    assert.match(landJs, /lsGet\('signalcraft_lang'\)/);
     assert.match(landJs, /lsSet\('signalcraft_lang'/);
     assert.equal(/localStorage\.getItem\('signalcraft_lang'\)/.test(landJs), false);
   });
@@ -70,7 +68,7 @@ describe('step28 / clipboard + pair + r5', () => {
 
   it('live toSignal guards missing metrics; FNG ignores a non-finite index', () => {
     assert.match(appJs, /const m = \(b && b\.metrics\) \|\| \{\}/);
-    assert.match(appJs, /if \(!Number\.isFinite\(n\)\) return;/);
+    assert.match(appJs, /if \(!Number\.isInteger\(n\) \|\| n < 0 \|\| n > 100\) throw new Error\('fng-invalid'\);/);
     assert.match(appJs, /this\.fngValue = n;/);
   });
 });

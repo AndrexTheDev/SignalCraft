@@ -1,6 +1,7 @@
 # Tooling and private trees — never serve as public assets.
 node_modules
 .git
+.wrangler
 .browsers
 tests
 ads
@@ -11,6 +12,7 @@ playwright.config.js
 .gitignore
 .assetsignore
 wrangler.toml
+worker.mjs
 README.md
 *.log
 .DS_Store

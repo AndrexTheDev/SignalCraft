@@ -1,148 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://signalcraft.click/index.html</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/index.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/index.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/index.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/index.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/index.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/index.html"/>
+    <loc>https://signalcraft.click/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/app.html</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app.html"/>
+    <loc>https://signalcraft.click/?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/index.html?lang=de</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/index.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/index.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/index.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/index.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/index.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/index.html"/>
+    <loc>https://signalcraft.click/?lang=es</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/index.html?lang=en</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/index.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/index.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/index.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/index.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/index.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/index.html"/>
+    <loc>https://signalcraft.click/?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/index.html?lang=es</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/index.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/index.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/index.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/index.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/index.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/index.html"/>
+    <loc>https://signalcraft.click/?lang=zh</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/index.html?lang=ar</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/index.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/index.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/index.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/index.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/index.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/index.html"/>
+    <loc>https://signalcraft.click/app</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/index.html?lang=zh</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/index.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/index.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/index.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/index.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/index.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/index.html"/>
+    <loc>https://signalcraft.click/app?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/app.html?lang=de</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app.html"/>
+    <loc>https://signalcraft.click/app?lang=es</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/app.html?lang=en</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app.html"/>
+    <loc>https://signalcraft.click/app?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app"/>
   </url>
   <url>
-    <loc>https://signalcraft.click/app.html?lang=es</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app.html"/>
-  </url>
-  <url>
-    <loc>https://signalcraft.click/app.html?lang=ar</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app.html"/>
-  </url>
-  <url>
-    <loc>https://signalcraft.click/app.html?lang=zh</loc>
-    <lastmod>2026-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app.html?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app.html?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app.html?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app.html?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app.html"/>
+    <loc>https://signalcraft.click/app?lang=zh</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://signalcraft.click/app"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://signalcraft.click/app?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://signalcraft.click/app?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://signalcraft.click/app?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://signalcraft.click/app?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://signalcraft.click/app"/>
   </url>
 </urlset>

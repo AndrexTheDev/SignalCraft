@@ -54,11 +54,12 @@ describe('step25 runtime e2e', { timeout: 180_000 }, () => {
     const firstId = await page.$eval('.signal-card[data-id]', (el) => el.getAttribute('data-id'));
     const first = gated.find((s) => s.id === firstId) || seed.find((s) => s.id === firstId);
     assert.ok(first, firstId);
-    assert.match(copied, new RegExp('^' + first.pair.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' Setup \\| Entry: \\$'));
-    assert.match(copied, / \| SL: \$/);
-    assert.match(copied, / \| TP: \$/);
+    assert.ok(copied.startsWith(first.pair.split(' / ')[0] + ' / ? Setup | Entry: '));
+    assert.match(copied, / \| SL: [^|]+ \?/);
+    assert.match(copied, / \| TP: [^|]+ \?/);
     assert.match(copied, / \| R:R: /);
-    assert.match(copied, /\(Signalcraft\)$/);
+    assert.match(copied, /\(Signalcraft\) \| DEMO · \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC/);
+    assert.match(copied, /nicht verifiziert/);
     assert.ok(copied.includes(first.riskRewardRatio));
 
     await page.click('[data-filter="risk-low"]');

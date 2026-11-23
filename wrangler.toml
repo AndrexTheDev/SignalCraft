@@ -1,7 +1,10 @@
-# Signalcraft Atelier — assets-only Worker (name matches the Cloudflare script).
+# Signalcraft Atelier — Worker chooses the prerendered document by explicit language URL.
 name = "signalcraft"
 compatibility_date = "2026-11-15"
+main = "worker.mjs"
 
 [assets]
 directory = "."
+binding = "ASSETS"
+run_worker_first = true
 html_handling = "auto-trailing-slash"

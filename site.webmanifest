@@ -1,8 +1,8 @@
 {
   "name": "Signalcraft Atelier",
   "short_name": "Signalcraft",
-  "description": "Exclusive crypto signal terminal: 120 pairs scored on real Binance data, only Grade A reaches the board. Free, no account, no ads.",
-  "start_url": "./app.html",
+  "description": "Crypto research terminal: up to 120 pairs assessed, with a clearly labeled demo fallback. Free, no account, no ads.",
+  "start_url": "/app",
   "scope": "./",
   "display": "standalone",
   "background_color": "#121316",
