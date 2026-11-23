@@ -91,14 +91,29 @@ export async function launchBrowser() {
   return browser;
 }
 
+// Synthetic exchange responses are test-only; production never loads this data.
+export function liveTestCandles() {
+  const DAY = 86400000, t0 = Math.floor(Date.now() / DAY) * DAY - 199 * DAY, out = [];
+  let price = 100;
+  for (let t = 0; t < 200; t++) {
+    const p = t / 199, ret = 0.0045 + 0.016 * Math.sin(t * 0.9) + 0.0088 * Math.sin(t * 1.9 + 1.7) + 0.0048 * Math.sin(t * 3.1 + 0.4);
+    const q = 20e6 + 100e6 * p * p, ratio = 0.44 + 0.22 * p;
+    price = Math.max(1, price * (1 + ret));
+    const c = price, o = c / (1 + ret), h = Math.max(c, o) * 1.007, l = Math.min(c, o) * 0.993;
+    out.push([t0+t*DAY,+o.toFixed(6),+h.toFixed(6),+l.toFixed(6),+c.toFixed(6),+(q/c).toFixed(4),t0+t*DAY+DAY-1,+q.toFixed(2),1000+t,+((q*ratio)/c).toFixed(4),+(q*ratio).toFixed(2),0]);
+  }
+  return out;
+}
+
 export async function stubMarket(page, opts = {}) {
   const fng = opts && opts.fng ? opts.fng : null;
   const klines = opts && opts.klines ? opts.klines : null;
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const url = req.url();
+    if (opts.appHtml && url.startsWith(BASE + '/app.html')) return req.respond({ status: 200, contentType: 'text/html', body: opts.appHtml }).catch(() => {});
     if (klines && /\/ticker\/24hr(?:\?|$)/.test(url)) {
-      const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+      const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
       const isUs = url.includes('api.binance.us');
       const values = isUs ? (opts.usTicker || {}) : (opts.globalTicker || {});
       const body = values.missing ? [] : seed.map(s => ({ symbol: s.pair.split(' / ')[0] + 'USDT', quoteVolume: String(values.quoteVolume ?? opts.quoteVolume ?? klines[klines.length - 1][7]), priceChangePercent: String(values.priceChangePercent ?? opts.priceChangePercent ?? 1), closeTime: Date.now() + (values.timeOffset || 0) }));
@@ -125,17 +140,17 @@ export async function stubMarket(page, opts = {}) {
   });
 }
 
-export async function gotoLanding(page, { lang, viewport, fng } = {}) {
+export async function gotoLanding(page, { lang, viewport, fng, marketKlines } = {}) {
   if (viewport) await page.setViewport(viewport);
-  await stubMarket(page, { fng });
+  await stubMarket(page, { fng, klines: marketKlines });
   const q = lang ? `?lang=${lang}` : '';
   await page.goto(BASE + '/index.html' + q, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForSelector('.hero-title, .hero-landing', { timeout: 10000 });
 }
 
-export async function gotoApp(page, { lang, viewport, storage, query, expectCards = true, fng } = {}) {
+export async function gotoApp(page, { lang, viewport, storage, query, expectCards = true, fng, appHtml } = {}) {
   if (viewport) await page.setViewport(viewport);
-  await stubMarket(page, { fng });
+  await stubMarket(page, { fng, klines: expectCards ? liveTestCandles() : null, appHtml });
   const init = { storage: storage || {} };
   await page.evaluateOnNewDocument((init) => {
     try {

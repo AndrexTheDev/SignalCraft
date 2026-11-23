@@ -16,14 +16,14 @@ describe('step6 systematic e2e', { timeout: 240_000 }, () => {
     stopServer();
   });
 
-  it('?q=BTC deep-link fills search and filters the board', async () => {
+  it('?q=AAVE deep-link fills search and filters the board', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', query: { q: 'BTC' } });
+    await gotoApp(page, { lang: 'en', query: { q: 'AAVE' } });
     const val = await page.$eval('#pairSearchInput', (el) => el.value);
-    assert.equal(val, 'BTC');
+    assert.equal(val, 'AAVE');
     const titles = await page.$$eval('.sc-asset-title', (els) => els.map((e) => e.textContent));
     assert.ok(titles.length >= 1);
-    assert.equal(titles.every((t) => /BTC/i.test(t)), true, titles.join('|'));
+    assert.equal(titles.every((t) => /AAVE/i.test(t)), true, titles.join('|'));
     await page.close();
   });
 

@@ -27,8 +27,8 @@ describe('step15 / deep security static', () => {
     assert.equal(/innerHTML[\s\S]{0,80}(location\.|fetch\(|response)/.test(landJs), false);
     // radar rows are static, labelled build-data examples, not live-injected prices
     const markup = stripScripts(landing);
-    assert.match(markup, /id="radRow1"/);
-    assert.match(markup, /rad_live/);
+    assert.doesNotMatch(markup, /id="radRow1"/);
+    assert.match(markup, /data-i18n="rad_note"/);
     assert.equal(/radGateNote/.test(landing), false);
   });
 

@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const syms = seed.map(s => s.pair.split(' / ')[0]), DAY = 86400000;
 function candles(scale = 1, bigVolume = false) {
   const start = Math.floor(Date.now() / DAY) * DAY - 199 * DAY; let price = 100 * scale;
@@ -13,6 +13,7 @@ function candles(scale = 1, bigVolume = false) {
     return [t, open, high, low, price, 0, t + DAY - 1, volume, 0, 0, volume * ratio, 0];
   });
 }
+const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__auditSignals = () => signalsData; ME.refresh(false);');
 let browser;
 async function open(mode) {
   const page = await freshPage(browser), normal = candles(), priceOverflow = candles(1e160), volumeOverflow = candles(1, true);
@@ -20,6 +21,7 @@ async function open(mode) {
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());
+    if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: instrumented }).catch(() => {});
     if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
     if (u.pathname.endsWith('/ticker/24hr')) return req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(syms.map(sym => ({ symbol: sym + 'USDT', quoteVolume: '20000000', priceChangePercent: '1', closeTime: Date.now() }))) }).catch(() => {});
     if (u.pathname.endsWith('/klines')) {
@@ -45,13 +47,14 @@ describe('step75 / LIVE factor overflow integration', { timeout: 90000 }, () => 
       const page = await open(mode);
       try {
         const live = mode !== 'many-price';
-        assert.match(await page.$eval('#meBadge', el => el.textContent), live ? /LIVE/ : /DEMO/);
-        const cache = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
+        assert.match(await page.$eval('#meBadge', el => el.textContent), live ? /LIVE/ : /unavailable/i);
+        const cache = await page.evaluate(() => ({ signals: window.__auditSignals(), stored: localStorage.getItem('signalcraft_live_v2') }));
+        assert.equal(cache.stored, null);
         if (live) {
-          assert.ok(cache); assert.equal(cache.version, 9); assert.equal(cache.signals.length, mode === 'one-volume' ? 119 : 120);
+          assert.ok(cache); assert.equal(cache.signals.length, mode === 'one-volume' ? 119 : 120);
           if (mode === 'one-volume') assert.ok(cache.signals.every(s => !s.pair.startsWith(syms[0] + ' / ')));
           if (mode === 'global-price') assert.ok(cache.signals.every(s => s.venue === 'BINANCE-US SPOT'));
-        } else assert.equal(cache, null);
+        } else assert.equal(cache.signals.length, 0);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
     });

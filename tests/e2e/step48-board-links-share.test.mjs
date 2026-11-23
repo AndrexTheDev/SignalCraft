@@ -1,39 +1,27 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, gotoApp, stubMarket, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, gotoApp, stubMarket, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
-const fixtures = Array.from({ length: 100 }, (_, i) => ({
-  ...seed[0], id: 'LINK-' + i, pair: `TEST${i} / USDT`, modelVersion: 3,
-  quantScore: i < 10 ? 99 - i : i === 10 ? 86 : 70,
-  gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
-}));
+const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__dossierTest = { openDossierModal, signals: () => signalsData }; ME.refresh(false);');
 let browser;
-async function liveLink(id, suffix = '') {
+async function liveLink(position, suffix = '') {
   const page = await freshPage(browser);
-  await page.evaluateOnNewDocument(signals => {
-    const t = Date.now();
-    localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version: 9, t, signals: signals.map(s => ({ ...s, confluenceScore: s.quantScore, metrics: { ...s.metrics, score: s.quantScore }, timestamp: t })) }));
-  }, fixtures);
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const url = new URL(req.url());
-    if (url.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    if (url.pathname.endsWith('/ticker/24hr')) return;
-    return req.abort().catch(() => {});
-  });
-  await page.goto(BASE + '/app.html?lang=en&sig=' + id + suffix, { waitUntil: 'domcontentloaded' });
+  await stubMarket(page, { appHtml: instrumented, klines: liveTestCandles() });
+  await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.querySelector('.signal-card'));
+  const id = await page.evaluate(position => window.__dossierTest.signals()[position].id, position);
+  await page.goto(BASE + '/app.html?lang=en&sig=' + encodeURIComponent(id) + suffix, { waitUntil: 'domcontentloaded' });
   return page;
 }
 describe('step48 / board-only deep links and honest X sharing', { timeout: 120000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
   after(async () => { if (browser) await browser.close(); stopServer(); });
-  it('rejects a known demo signal that fails the board gate, preserving the other URL state', async () => {
+  it('rejects a signal when live market data is unavailable, preserving the other URL state', async () => {
     const page = await freshPage(browser);
     try {
       await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
       await stubMarket(page);
-      await page.goto(BASE + '/app.html?lang=en&sector=majors&q=BTC&campaign=test&sig=SIG-PEPE-001#faq', { waitUntil: 'domcontentloaded' });
+      await page.goto(BASE + '/app.html?lang=en&sector=majors&q=BTC&campaign=test&sig=SIG-NOT-AVAILABLE-001#faq', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => !new URL(location.href).searchParams.has('sig'));
       assert.equal(await page.$eval('#dossierModalBackdrop', el => el.classList.contains('is-visible')), false);
       const u = new URL(page.url());
@@ -50,7 +38,7 @@ describe('step48 / board-only deep links and honest X sharing', { timeout: 12000
       try {
         await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
         await stubMarket(page);
-        await page.goto(BASE + '/app.html?lang=' + lang + '&sig=SIG-PEPE-001', { waitUntil: 'domcontentloaded' });
+        await page.goto(BASE + '/app.html?lang=' + lang + '&sig=SIG-NOT-AVAILABLE-001', { waitUntil: 'domcontentloaded' });
         await page.waitForFunction(() => !new URL(location.href).searchParams.has('sig'));
         assert.match(await page.$eval('#toastMessage', el => el.textContent), expected);
         assert.deepEqual(page._pageErrors, []);
@@ -58,7 +46,7 @@ describe('step48 / board-only deep links and honest X sharing', { timeout: 12000
     }
   });
   it('rejects an otherwise gate-qualified setup ranked outside the top ten', async () => {
-    const page = await liveLink('LINK-10', '&campaign=test');
+    const page = await liveLink(10, '&campaign=test');
     try {
       await page.waitForFunction(() => !new URL(location.href).searchParams.has('sig'));
       assert.match(await page.$eval('#meBadge', el => el.textContent), /LIVE/);
@@ -69,10 +57,10 @@ describe('step48 / board-only deep links and honest X sharing', { timeout: 12000
     } finally { await page.close(); }
   });
   it('opens a top-ten deep link even when board filters hide its card', async () => {
-    const page = await liveLink('LINK-5', '&q=nomatch&campaign=test#faq');
+    const page = await liveLink(5, '&q=nomatch&campaign=test#faq');
     try {
       await page.waitForSelector('#dossierModalBackdrop.is-visible');
-      assert.match(await page.$eval('#dossierTitle', el => el.textContent), /TEST5/);
+      assert.match(await page.$eval('#dossierTitle', el => el.textContent), /USDT/);
       assert.equal(await page.$$eval('#signalsGrid .signal-card', els => els.length), 0);
       await page.click('#btnCloseDossierModal');
       const u = new URL(page.url());
@@ -84,17 +72,10 @@ describe('step48 / board-only deep links and honest X sharing', { timeout: 12000
   it('enforces the board gate inside the dossier opener, not only during URL parsing', async () => {
     const page = await freshPage(browser);
     try {
-      const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__dossierTest = { openDossierModal, seed: SEED_SIGNALS }; ME.refresh(false);');
-      await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-      await page.setRequestInterception(true);
-      page.on('request', req => {
-        const url = new URL(req.url());
-        if (url.origin === new URL(BASE).origin && url.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: instrumented }).catch(() => {});
-        if (url.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-        return req.abort().catch(() => {});
-      });
-      await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-      await page.evaluate(() => window.__dossierTest.openDossierModal(window.__dossierTest.seed[0]));
+      await stubMarket(page, {appHtml:instrumented, klines:liveTestCandles()});
+      await page.goto(BASE + '/app.html?lang=en', {waitUntil:'domcontentloaded'});
+      await page.waitForFunction(() => document.querySelector('.signal-card'));
+      await page.evaluate(() => window.__dossierTest.openDossierModal(window.__dossierTest.signals()[10]));
       assert.equal(await page.$eval('#dossierModalBackdrop', el => el.classList.contains('is-visible')), false);
       assert.match(await page.$eval('#toastMessage', el => el.textContent), /no longer available/i);
       assert.deepEqual(page._pageErrors, []);

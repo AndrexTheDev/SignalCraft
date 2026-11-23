@@ -1,10 +1,10 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, liveTestCandles, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const source = read('app.html');
-const seed = JSON.parse(extractArray(source, 'const SEED_SIGNALS ='));
-const html = source.replace('    ME.refresh(false);', "    window.__cexMedianTest = { ME, CexEngine }; ME.apply(SEED_SIGNALS, 'seed', ME_STAMP);");
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
+const html = source.replace('    ME.refresh(false);', "    window.__cexMedianTest = { ME, CexEngine }; ME.refresh(false);");
 const labels = {
   de: /Median gemeldeter USDT-Preise.*kein|Median gemeldeter USDT-Preise.*Kein/i,
   en: /Median of reported USDT prices.*Not an executable/i,
@@ -16,17 +16,20 @@ let browser;
 async function open() {
   const page = await freshPage(browser);
   await page.setViewport(VIEWPORTS.mobileSm);
-  await page.evaluateOnNewDocument(seed => {
-    window._clock53 = Date.UTC(2025, 0, 1, 12); Date.now = () => window._clock53;
+  const klines = liveTestCandles();
+  await page.evaluateOnNewDocument(({seed, klines}) => {
+    window._clock53 = Date.now(); Date.now = () => window._clock53;
     const original = window.fetch.bind(window);
     window.fetch = (input, options) => {
       const url = String(input);
+      if (url.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>seed.map(s=>({symbol:s.pair.split(' / ')[0]+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
+      if (url.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>klines});
       if (url.includes('data-api.binance.vision/api/v3/ticker/price')) return Promise.resolve({ ok: true, json: async () => [null, ...seed.map(s => ({ symbol: s.pair.split(' / ')[0] + 'USDT', price: '1.00001' }))] });
       if (url.includes('okx.com/api/v5/market/tickers')) return Promise.resolve({ ok: true, json: async () => ({ data: [null, ...seed.map(s => ({ instId: s.pair.split(' / ')[0] + '-USDT', last: '1.00003' }))] }) });
       if (/^https?:/.test(url) && !url.startsWith(location.origin)) return Promise.reject(new Error('offline'));
       return original(input, options);
     };
-  }, seed);
+  }, {seed, klines});
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());
@@ -45,7 +48,7 @@ describe('step53 / CEX median presentation', { timeout: 60000 }, () => {
     const page = await open();
     try {
       assert.ok(Math.abs(await page.evaluate(() => window.__cexMedianTest.CexEngine.data.PEPE.med) - 1.00002) < 1e-12);
-      assert.match(await page.$eval('#tickerScrollFeed', el => el.textContent), /PEPE ≈1\.00002 USDT \(2 venues\)/);
+      assert.match(await page.$eval('#tickerScrollFeed', el => el.textContent), /[A-Z0-9]+ ≈1\.00002 USDT \(2 venues\)/);
       for (const [lang, label] of Object.entries(labels)) {
         await page.select('#langSelect', lang);
         assert.equal(await page.$eval('#cexRadarNotice', el => el.hidden), false);

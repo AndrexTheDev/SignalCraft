@@ -1,7 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  startServer, stopServer, launchBrowser, freshPage, gotoLanding, gotoApp, VIEWPORTS
+  startServer, stopServer, launchBrowser, freshPage, gotoLanding, gotoApp, liveTestCandles, VIEWPORTS
 } from '../helpers/browser.mjs';
 
 let browser;
@@ -16,19 +16,19 @@ describe('step4 beta', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('happy path: landing → terminal → BTC → dossier → share', async () => {
+  it('happy path: landing → terminal → AAVE → dossier → share', async () => {
     const page = await freshPage(browser);
-    await gotoLanding(page, { lang: 'en', viewport: VIEWPORTS.desktop });
+    await gotoLanding(page, { lang: 'en', viewport: VIEWPORTS.desktop, marketKlines:liveTestCandles() });
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
       page.click('a[data-terminal-link]')
     ]);
     await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
     await new Promise((r) => setTimeout(r, 900));
-    await page.type('#pairSearchInput', 'BTC');
+    await page.type('#pairSearchInput', 'AAVE');
     await new Promise((r) => setTimeout(r, 250));
     const title = await page.$eval('.sc-asset-title', (el) => el.textContent);
-    assert.match(title, /BTC/i);
+    assert.match(title, /AAVE/i);
     await page.click('[data-inspect-sig]');
     assert.match(await page.$eval('#dossierModalBackdrop', (el) => el.className), /is-visible/);
     await page.click('#btnCloseDossierModal');
@@ -58,14 +58,14 @@ describe('step4 beta', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('Arabic RTL terminal: dir=rtl and BTC search', async () => {
+  it('Arabic RTL terminal: dir=rtl and AAVE search', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'ar', viewport: VIEWPORTS.desktop });
     assert.equal(await page.$eval('html', (el) => el.getAttribute('dir')), 'rtl');
-    await page.type('#pairSearchInput', 'BTC');
+    await page.type('#pairSearchInput', 'AAVE');
     await new Promise((r) => setTimeout(r, 250));
     const titles = await page.$$eval('.sc-asset-title', (els) => els.map((e) => e.textContent));
-    assert.ok(titles.some((t) => /BTC/i.test(t)), titles.join('|'));
+    assert.ok(titles.some((t) => /AAVE/i.test(t)), titles.join('|'));
     await page.close();
   });
 

@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', '    window.__dexNotice = { ME, DexEngine, refreshVenuePresentation }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);');
+const html = read('app.html').replace('    ME.refresh(false);', '    window.__dexNotice = { ME, DexEngine, refreshVenuePresentation }; DexEngine.fetchAll(["BTC"]).then(refreshVenuePresentation);');
 const warnings = {
   de: /Treffer nur anhand des Symbols.*Token-Identität nicht bestätigt.*Keine Preisvergleiche oder Handelsentscheidungen/,
   en: /Results match by symbol only.*token identity is not verified.*Do not use for price comparisons or trading decisions/,
@@ -71,7 +71,7 @@ describe('step65 / visible DEX caution', { timeout: 60000 }, () => {
     try {
       const after = await page.evaluate(() => {
         window._dex65 = false;
-        window.__dexNotice.ME.apply([], 'seed', Date.now());
+        window.__dexNotice.ME.apply([], 'unavailable', null);
         const notice = document.getElementById('dexRadarNotice');
         return { hidden: notice.hidden, text: notice.textContent, feed: document.getElementById('dexTickerFeed').textContent };
       });

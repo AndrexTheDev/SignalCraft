@@ -23,7 +23,7 @@ describe('step28 / storage helpers', () => {
 
   it('live cache, lang, theme and supporter flags go through the helpers', () => {
     assert.match(mainJs, /lsGet\(this\.CACHE_KEY\)/);
-    assert.match(mainJs, /lsSet\(this\.CACHE_KEY/);
+    assert.doesNotMatch(mainJs, /lsSet\(this\.CACHE_KEY/);
     assert.match(mainJs, /lsSet\('signalcraft_lang'/);
     assert.match(mainJs, /lsGet\('signalcraft_theme'\)/);
     assert.match(mainJs, /lsSet\('signalcraft_theme'/);

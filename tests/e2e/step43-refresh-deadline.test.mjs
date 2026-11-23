@@ -2,12 +2,12 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 let browser;
 describe('step43 / complete market refresh deadline', { timeout: 60000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
   after(async () => { if (browser) await browser.close(); stopServer(); });
-  it('cancels stalled candle requests, restores DEMO and permits a fresh attempt', async () => {
+  it('cancels stalled candle requests, shows unavailable and permits a fresh attempt', async () => {
     const page = await freshPage(browser);
     try {
       await page.evaluateOnNewDocument(seed => {
@@ -30,11 +30,11 @@ describe('step43 / complete market refresh deadline', { timeout: 60000 }, () => 
       await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window._candles.length === 6 && document.getElementById('btnRefreshSentimentGlobal').disabled, { timeout: 5000 });
       await page.waitForFunction(() => window._candles.length === 6 && window._candles.every(x => x.signal.aborted) && !document.getElementById('btnRefreshSentimentGlobal').disabled, { timeout: 5000 });
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
       await page.click('#btnRefreshSentimentGlobal');
       await page.waitForFunction(() => window._candles.length === 12 && window._candles.every(x => x.signal.aborted) && !document.getElementById('btnRefreshSentimentGlobal').disabled, { timeout: 5000 });
       assert.equal(await page.$eval('#btnRefreshSentimentGlobal', el => el.hasAttribute('aria-busy')), false);
-      assert.match(await page.$eval('#toastMessage', el => el.textContent), /DEMO snapshot active/);
+      assert.match(await page.$eval('#toastMessage', el => el.textContent), /unavailable/i);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });

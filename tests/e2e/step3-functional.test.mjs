@@ -60,13 +60,14 @@ describe('step3 functional', { timeout: 180_000 }, () => {
     await page.close();
   });
 
-  it('search finds BTC and clear resets', async () => {
+  it('search finds a live board symbol and clear resets', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en' });
-    await page.type('#pairSearchInput', 'BTC');
+    const symbol = await page.$eval('#signalsGrid .sc-asset-title', el => el.textContent.trim().split(/\s/)[0]);
+    await page.type('#pairSearchInput', symbol);
     await new Promise((r) => setTimeout(r, 250));
     const titles = await page.$$eval('#signalsGrid .sc-asset-title', (els) => els.map((e) => e.textContent));
-    assert.ok(titles.some((t) => /BTC/i.test(t)), titles.join('|'));
+    assert.ok(titles.some((t) => t.includes(symbol)), titles.join('|'));
     await page.click('#clearSearchBtn');
     const val = await page.$eval('#pairSearchInput', (el) => el.value);
     assert.equal(val, '');
@@ -76,15 +77,17 @@ describe('step3 functional', { timeout: 180_000 }, () => {
   it('risk filter and sector pills narrow the board', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
+    const expectedHigh = await page.$$eval('#signalsGrid .risk-badge.risk-high', els => els.length);
+    const expectedMajors = await page.$eval('.sector-pill[data-sector="majors"]', el => Number((el.textContent.match(/\((\d+)\)/) || [])[1]));
     await page.click('.filter-btn[data-filter="risk-high"]');
     await new Promise((r) => setTimeout(r, 200));
     const high = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
-    assert.equal(high, 1);
+    assert.equal(high, expectedHigh);
     await page.click('.filter-btn[data-filter="all"]');
     await page.click('.sector-pill[data-sector="majors"]');
     await new Promise((r) => setTimeout(r, 200));
     const majors = await page.$$eval('#signalsGrid article.signal-card', (els) => els.length);
-    assert.equal(majors, 6);
+    assert.equal(majors, expectedMajors);
     await page.close();
   });
 

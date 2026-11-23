@@ -1,28 +1,11 @@
-/**
- * step32 — empty-gate live fallback (v3.6 regression)
- *
- * Why this exists: with v3.6 the live recompute is honest — when NO pair
- * clears the gate in a quiet market, the terminal used to paint an empty
- * board. The documented behaviour (README) is: show the clearly-labelled
- * DEMO build snapshot instead, never relax the gate. This spec locks that
- * in with two synthetic market fixtures:
- *
- *   weak   — downtrend, ~$5M/day volume: every pair fails the gate →
- *            board shows the DEMO seed (10 cards), badge ● DEMO, toast
- *            explains why (distinguishes this path from the network-error
- *            fallback, which would toast meDemoToast instead).
- *   strong — uptrend, ramping volume & taker share: pairs clear the gate →
- *            badge ● LIVE, board paints live setups, 0 of 120 filtered.
- *
- * Fixtures are deterministic daily candles served for /klines? (200 rows,
- * Binance array shape). The complement (gate rejects) was calibrated with
- * the same engine the app uses — weak scores 16, strong scores 87.
- */
+// Browser regression: live-only handling of empty gates, ticker times and bad market data.
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   startServer, stopServer, launchBrowser, freshPage, stubMarket, BASE
 } from '../helpers/browser.mjs';
+import { read } from '../helpers/html.mjs';
+const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__market32 = { ME, signals: () => signalsData }; ME.refresh(false);');
 
 const DAY = 86_400_000;
 const DAYS = 200;
@@ -61,7 +44,7 @@ function buildKlines(kind) {
 
 let browser;
 
-describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
+describe('step32 empty-gate live-only behavior', { timeout: 180_000 }, () => {
   before(async () => {
     await startServer();
     browser = await launchBrowser();
@@ -71,34 +54,26 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('quiet market: live recompute clears 0 pairs → DEMO build snapshot, clearly labelled + toast', async () => {
+  it('quiet market: no setup clears the gate and the LIVE board remains empty', async () => {
     const page = await freshPage(browser);
-    await stubMarket(page, { klines: buildKlines('weak') });
-    await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded', timeout: 20000 });
-    await page.waitForSelector('#signalsGrid .signal-card', { timeout: 20000 });
-    // boot pre-paints DEMO synchronously; the empty-gate toast fires once the
-    // 120 synthetic klines drained and the gate came out empty — wait for it.
-    await page.waitForFunction(
-      () => /no setup clears the Grade-A gate/i.test((document.getElementById('toastMessage') || {}).textContent || ''),
-      { timeout: 20000 }
-    );
-    const badge = await page.$eval('#meBadge', (el) => el.textContent);
-    assert.match(badge, /DEMO/);
-    assert.equal(/LIVE/.test(badge), false);
-    const cards = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
-    assert.equal(cards, 10); // DEMO seed board, not an empty grid
-    const toast = await page.$eval('#toastMessage', (el) => el.textContent);
-    assert.match(toast, /no setup clears the Grade-A gate/i); // distinguishes empty-gate fallback from network-error fallback
-    assert.deepEqual(page._pageErrors, []);
-    await page.close();
+    try {
+      await stubMarket(page, { appHtml: instrumented, klines: buildKlines('weak') });
+      await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => window.__market32?.ME.status.mode === 'live', { timeout: 20000 });
+      assert.equal((await page.$$('.signal-card')).length, 0);
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /LIVE/);
+      assert.match(await page.$eval('#signalsGrid', el => el.textContent), /no setups/i);
+      assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
+      assert.deepEqual(page._pageErrors, []);
+    } finally { await page.close(); }
   });
 
   it('strong market: live recompute clears pairs → LIVE badge, live board, gate note reports 0 filtered', async () => {
     const page = await freshPage(browser);
-    await stubMarket(page, { klines: buildKlines('strong') });
+    await stubMarket(page, { appHtml: instrumented, klines: buildKlines('strong') });
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForSelector('#signalsGrid .signal-card', { timeout: 20000 });
-    // boot pre-paints DEMO first; the live upgrade replaces it once klines drain.
+    // The board is populated only after the live computation succeeds.
     await page.waitForFunction(
       () => /LIVE/.test((document.getElementById('meBadge') || {}).textContent || ''),
       { timeout: 20000 }
@@ -114,16 +89,16 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
     assert.deepEqual(page._pageErrors, []);
     await page.close();
   });
-  it('uses the oldest accepted ticker time for the cache and displayed signal snapshot', async () => {
+  it('uses the oldest accepted ticker time for the in-memory signal snapshot', async () => {
     const page = await freshPage(browser);
     try {
       await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-      await stubMarket(page, { klines: buildKlines('strong'), globalTicker: { timeOffset: -50000 }, usTicker: { timeOffset: -50000 } });
+      await stubMarket(page, { appHtml: instrumented, klines: buildKlines('strong'), globalTicker: { timeOffset: -50000 }, usTicker: { timeOffset: -50000 } });
       const started = Date.now();
       await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''), { timeout: 20000 });
-      const cache = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
-      assert.equal(cache.version, 9);
+      const cache = await page.evaluate(() => ({t:window.__market32.ME.status.when, signals:window.__market32.signals()}));
+      assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
       assert.ok(cache.t <= started - 48000, 'ticker age is not replaced by computation completion time');
       assert.ok(cache.signals.every(s => s.timestamp === cache.t));
       assert.deepEqual(page._pageErrors, []);
@@ -131,20 +106,21 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
   });
   it('uses the rolling 24h ticker, not the current daily candle, for the gate and displayed metrics', async () => {
     const page = await freshPage(browser);
-    await stubMarket(page, { klines: buildKlines('strong'), quoteVolume: 9_999_999, priceChangePercent: 42.7 });
+    await stubMarket(page, { appHtml: instrumented, klines: buildKlines('strong'), quoteVolume: 9_999_999, priceChangePercent: 42.7 });
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => /no setup clears the Grade-A gate/i.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 20000 });
-    assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+    await page.waitForFunction(() => window.__market32?.ME.status.mode === 'live', { timeout: 20000 });
+    assert.equal((await page.$$('.signal-card')).length, 0);
+    assert.match(await page.$eval('#meBadge', el => el.textContent), /LIVE/);
     await page.close();
 
     const page2 = await freshPage(browser);
     await page2.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-    await stubMarket(page2, { klines: buildKlines('strong'), quoteVolume: 10_000_000, priceChangePercent: 42.7 });
+    await stubMarket(page2, { appHtml: instrumented, klines: buildKlines('strong'), quoteVolume: 10_000_000, priceChangePercent: 42.7 });
     await page2.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
     await page2.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''), { timeout: 20000 });
-    const cache = await page2.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
+    const cache = await page2.evaluate(() => ({signals:window.__market32.signals()}));
     assert.ok(cache.signals.length >= 100);
-    assert.equal(cache.version, 9);
+    assert.equal(await page2.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
     assert.ok(cache.signals.every(sig => sig.pair.endsWith(' / USDT')), 'live calculations retain the actual quote unit');
     const close = buildKlines('strong').map(row => row[4]);
     const expectedSma200 = +(close.reduce((sum, value) => sum + value, 0) / 200).toPrecision(5);
@@ -171,10 +147,10 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
   it('never combines a ticker and candles from different venues', async () => {
     const page = await freshPage(browser);
     await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-    await stubMarket(page, { klines: buildKlines('strong'), globalTicker: { missing: true }, usTicker: { quoteVolume: 10_000_000, priceChangePercent: -12.3 } });
+    await stubMarket(page, { appHtml: instrumented, klines: buildKlines('strong'), globalTicker: { missing: true }, usTicker: { quoteVolume: 10_000_000, priceChangePercent: -12.3 } });
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''), { timeout: 20000 });
-    const cache = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
+    const cache = await page.evaluate(() => ({signals:window.__market32.signals()}));
     assert.ok(cache.signals.every(s => /BINANCE-US/i.test(s.venue)));
     assert.equal(cache.signals[0].metrics.chg24, -12.3);
     assert.deepEqual(page._pageErrors, []);
@@ -184,17 +160,17 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
   it('fails closed when both venue tickers are stale or absent', async () => {
     const page = await freshPage(browser);
     await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-    await stubMarket(page, { klines: buildKlines('strong'), globalTicker: { timeOffset: -300001 }, usTicker: { missing: true } });
+    await stubMarket(page, { appHtml: instrumented, klines: buildKlines('strong'), globalTicker: { timeOffset: -300001 }, usTicker: { missing: true } });
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#btnRefreshSentimentGlobal:not([disabled])');
     await page.click('#btnRefreshSentimentGlobal');
-    await page.waitForFunction(() => /live data unavailable or incomplete/i.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 20000 });
-    assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+    await page.waitForFunction(() => /live data unavailable/i.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 20000 });
+    assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
     assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
     await page.close();
   });
 
-  it('falls back to DEMO for insufficient or discontinuous daily history', async () => {
+  it('leaves the board unavailable for insufficient or discontinuous daily history', async () => {
     const short = buildKlines('strong').slice(1);
     const broken = buildKlines('strong');
     broken[80][0] += DAY;
@@ -207,8 +183,8 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
         await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('#btnRefreshSentimentGlobal:not([disabled])');
         await page.click('#btnRefreshSentimentGlobal');
-        await page.waitForFunction(() => /live data unavailable or incomplete/i.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 20000 });
-        assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+        await page.waitForFunction(() => /live data unavailable/i.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 20000 });
+        assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
         assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
@@ -225,7 +201,7 @@ describe('step32 empty-gate live fallback', { timeout: 180_000 }, () => {
       await stubMarket(page);
       await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#btnRefreshSentimentGlobal:not([disabled])');
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });

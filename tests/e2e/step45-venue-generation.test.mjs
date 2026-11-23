@@ -1,16 +1,19 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', "    window.__venueTest = { ME, seed: SEED_SIGNALS, CexEngine, DexEngine }; ME.apply(SEED_SIGNALS, 'seed', ME_STAMP);").replace('    ME.startAuto();', '');
+const html = read('app.html').replace('    ME.refresh(false);', "    window.__venueTest = { ME, signals: () => signalsData, CexEngine, DexEngine }; ME.refresh(false);").replace('    ME.startAuto();', '');
 let browser;
 async function instrumented(mode) {
   const page = await freshPage(browser);
-  await page.evaluateOnNewDocument(mode => {
+  const klines = liveTestCandles(), symbols = JSON.parse(read('tests/fixtures/legacy-seed.json')).map(s => s.pair.split(' / ')[0]);
+  await page.evaluateOnNewDocument(({mode, klines, symbols}) => {
     window._cex = []; window._dex = []; window._dexMode = 'old';
     const original = window.fetch.bind(window);
     window.fetch = (input, options) => {
       const url = String(input);
+      if (url.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>symbols.map(sym=>({symbol:sym+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
+      if (url.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>klines});
       if (url.includes('data-api.binance.vision/api/v3/ticker/price')) {
         if (mode === 'cex') return new Promise(resolve => window._cex.push(rows => resolve({ ok: true, json: async () => rows })));
         return Promise.resolve({ ok: true, json: async () => [{ symbol: 'GUSDT', price: '7' }, { symbol: 'WIFUSDT', price: '8' }] });
@@ -24,7 +27,7 @@ async function instrumented(mode) {
       if (/^https?:/.test(url) && !url.startsWith(location.origin)) return Promise.reject(new Error('offline'));
       return original(input, options);
     };
-  }, mode);
+  }, {mode, klines, symbols});
   await page.setRequestInterception(true);
   page.on('request', req => {
     const url = new URL(req.url());
@@ -44,8 +47,8 @@ describe('step45 / venue results and snapshot replacement', { timeout: 60000 }, 
       await page.waitForFunction(() => window._cex.length === 1);
       await page.evaluate(() => {
         const t = window.__venueTest;
-        t.ME.apply([t.seed[1]], 'seed', Date.now());
-        t.ME.apply([t.seed[2]], 'seed', Date.now());
+        t.ME.apply(t.signals().map(s => ({...s})), 'live', t.ME.status.when);
+        t.ME.apply(t.signals().map(s => ({...s})).sort((a,b) => (a.pair.startsWith('G /') ? -1 : 0) - (b.pair.startsWith('G /') ? -1 : 0)), 'live', t.ME.status.when);
         window._cex[0]([{ symbol: 'GUSDT', price: '111' }]);
       });
       await page.waitForFunction(() => window._cex.length === 2);
@@ -68,7 +71,7 @@ describe('step45 / venue results and snapshot replacement', { timeout: 60000 }, 
       const cleared = await page.evaluate(() => {
         const t = window.__venueTest;
         window._dex = [];
-        t.ME.apply([t.seed[1]], 'seed', Date.now());
+        t.ME.apply(t.signals().map(s => ({...s})), 'live', t.ME.status.when);
         return { cex: t.CexEngine.data, dex: document.getElementById('dexTickerFeed').textContent, ticker: document.getElementById('tickerScrollFeed').textContent };
       });
       assert.deepEqual(cleared.cex, {}); assert.equal(cleared.dex, '–');
@@ -76,12 +79,12 @@ describe('step45 / venue results and snapshot replacement', { timeout: 60000 }, 
       await page.waitForFunction(() => window._dex.length > 0);
       await page.evaluate(() => {
         const t = window.__venueTest;
-        t.ME.apply([t.seed[2]], 'seed', Date.now());
+        t.ME.apply(t.signals().map(s => ({...s})).sort((a,b) => (a.pair.startsWith('G /') ? -1 : 0) - (b.pair.startsWith('G /') ? -1 : 0)), 'live', t.ME.status.when);
         window._dexMode = 'new'; window._dex.forEach(resolve => resolve());
       });
       await page.waitForFunction(() => document.getElementById('dexTickerFeed')?.textContent.includes('NEW-DEX'));
       assert.doesNotMatch(await page.$eval('#dexTickerFeed', el => el.textContent), /OLD-DEX/);
-      assert.ok(await page.evaluate(() => window.__venueTest.DexEngine.wire.every(x => x.sym === 'G')));
+      assert.ok(await page.evaluate(() => window.__venueTest.DexEngine.wire.some(x => x.sym === 'G')));
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });

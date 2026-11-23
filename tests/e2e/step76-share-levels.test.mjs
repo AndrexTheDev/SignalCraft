@@ -1,26 +1,16 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 
 const app = read('app.html');
-const seed = JSON.parse(extractArray(app, 'const SEED_SIGNALS ='));
-const instrumented = app.replace('    ME.refresh(false);', '    window.__share76 = { ME, seed: SEED_SIGNALS, stamp: ME_STAMP, boardSignals, quotedPrice, takeProfitLevels, localizeSignal }; ME.refresh(false);');
+const instrumented = app.replace('    ME.refresh(false);', '    window.__share76 = { ME, signals: () => signalsData, boardSignals, quotedPrice, takeProfitLevels, localizeSignal }; ME.refresh(false);');
 let browser;
 async function open(lang) {
   const page = await freshPage(browser);
   await page.setViewport(VIEWPORTS.mobileSm);
-  await page.evaluateOnNewDocument(data => {
+  await page.evaluateOnNewDocument(() => {
     localStorage.clear();
-    const t = Date.now();
-    const signals = Array.from({ length: 100 }, (_, i) => ({
-      ...data, pair: `SAFE${i} / USDT`, id: `SHARE-${i}`, timestamp: t, modelVersion: 3,
-      entryPrice: 1.00000000000002, stopLoss: 1.00000000000001,
-      targets: [1.00000000000003, 1.00000000000004], riskRewardRatio: '1:2.0',
-      quantScore: 90, confluenceScore: 90, metrics: { ...data.metrics, score: 90 },
-      gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
-    }));
-    localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version: 9, t, signals }));
     window._drawn76 = []; window._copied76 = []; window._downloads76 = [];
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => window._copied76.push(text) } });
     const fill = CanvasRenderingContext2D.prototype.fillText;
@@ -29,17 +19,16 @@ async function open(lang) {
       return maxWidth === undefined ? fill.call(this, text, x, y) : fill.call(this, text, x, y, maxWidth);
     };
     HTMLAnchorElement.prototype.click = function() { window._downloads76.push({ href: this.href, name: this.download }); };
-  }, seed[0]);
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const u = new URL(req.url());
-    if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: instrumented }).catch(() => {});
-    if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    if (u.pathname.endsWith('/ticker/24hr')) return;
-    return req.abort().catch(() => {});
   });
+  await stubMarket(page, { appHtml: instrumented, klines: liveTestCandles() });
   await page.goto(BASE + '/app.html?lang=' + lang, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''));
+  await page.evaluate(() => {
+    const t = window.__share76;
+    const signals = t.signals().map(s => ({...s, entryPrice:1.00000000000002, stopLoss:1.00000000000001, targets:[1.00000000000003,1.00000000000004], riskRewardRatio:'1:2.0'}));
+    t.ME.apply(signals, 'live', t.ME.status.when);
+  });
+  assert.match(await page.$eval('#meBadge', e => e.textContent), /LIVE/);
   return page;
 }
 async function verify(page, mode) {
@@ -82,12 +71,10 @@ describe('step76 / complete share-card trading levels', { timeout: 90000 }, () =
   before(async () => { await startServer(); browser = await launchBrowser(); });
   after(async () => { if (browser) await browser.close(); stopServer(); });
   for (const lang of ['de', 'en', 'es', 'ar', 'zh']) {
-    it(`exports distinct LIVE and DEMO targets with the board's values in ${lang}`, async () => {
+    it(`exports distinct LIVE targets with the board's values in ${lang}`, async () => {
       const page = await open(lang);
       try {
         await verify(page, 'LIVE');
-        await page.evaluate(() => window.__share76.ME.apply(window.__share76.seed, 'seed', window.__share76.stamp));
-        await verify(page, 'DEMO');
       } finally { await page.close(); }
     });
   }

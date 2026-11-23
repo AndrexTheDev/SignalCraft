@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const syms = seed.map(s => s.pair.split(' / ')[0]);
 const DAY = 86400000;
 function strongCandles() {
@@ -16,6 +16,7 @@ function strongCandles() {
     return [t0 + t * DAY, +o.toFixed(6), +h.toFixed(6), +l.toFixed(6), +price.toFixed(6), +(qv / price).toFixed(4), t0 + t * DAY + DAY - 1, +qv.toFixed(2), 1000 + t, +((qv * ratio) / price).toFixed(4), +(qv * ratio).toFixed(2), 0];
   });
 }
+const app = read('app.html').replace('    ME.refresh(false);', '    window.__market61 = {signals: () => signalsData}; ME.refresh(false);');
 let browser;
 async function run(mode) {
   const page = await freshPage(browser), data = strongCandles();
@@ -24,6 +25,7 @@ async function run(mode) {
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());
+    if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({status:200,contentType:'text/html',body:app}).catch(() => {});
     if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
     if (u.pathname.endsWith('/ticker/24hr')) {
       tickerRequested++;
@@ -52,11 +54,11 @@ describe('step61 / malformed market input integration', { timeout: 90000 }, () =
   it('does not paint a structurally valid old cache while the refresh is pending', async () => {
     for (const version of [6, 7, 8, 9]) {
       const page = await freshPage(browser);
-      const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__cacheShape = isLiveCache; ME.refresh(false);');
+      const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__cacheShape = isLiveCache; window.__oldCache = JSON.parse(localStorage.getItem("signalcraft_live_v2")); ME.refresh(false);');
       try {
         await page.evaluateOnNewDocument(({ data, version }) => {
           localStorage.clear(); const t = Date.now();
-          const signals = Array.from({ length: 100 }, (_, i) => ({ ...data, id: `V${i}`, pair: `SAFE${i} / USDT`, timestamp: t, modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...data.metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
+          const signals = Array.from({ length: 100 }, (_, i) => ({ ...data, id: `V${i}`, pair: `SAFE${i} / USDT`, timestamp: t, live: true, modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...data.metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
           localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version, t, signals }));
         }, { data: seed[0], version });
         await page.setRequestInterception(true);
@@ -69,8 +71,10 @@ describe('step61 / malformed market input integration', { timeout: 90000 }, () =
         });
         await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
         await page.waitForFunction(() => document.getElementById('btnRefreshSentimentGlobal').disabled);
-        assert.equal(await page.evaluate(() => window.__cacheShape(JSON.parse(localStorage.getItem('signalcraft_live_v2')))), true);
-        assert.match(await page.$eval('#meBadge', e => e.textContent), version < 9 ? /DEMO/ : /LIVE/);
+        assert.equal(await page.evaluate(() => window.__cacheShape(window.__oldCache)), true);
+        assert.equal((await page.$$('.signal-card')).length, 0);
+        assert.doesNotMatch(await page.$eval('#meBadge', e => e.textContent), /LIVE|DEMO/);
+        assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
     }
@@ -81,15 +85,15 @@ describe('step61 / malformed market input integration', { timeout: 90000 }, () =
       try {
         const validLive = mode === 'valid' || mode === 'one-bad' || mode === 'global-duplicates';
         assert.equal(h.tickerRequested, 2);
-        assert.match(await h.page.$eval('#meBadge', el => el.textContent), validLive ? /LIVE/ : /DEMO/);
-        const cache = await h.page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
+        assert.match(await h.page.$eval('#meBadge', el => el.textContent), validLive ? /LIVE/ : /unavailable/i);
+        const cache = await h.page.evaluate(() => ({signals:window.__market61.signals(), stored:localStorage.getItem('signalcraft_live_v2')}));
+        assert.equal(cache.stored,null);
         if (validLive) {
           assert.ok(cache);
-          assert.equal(cache.version, 9);
           assert.equal(cache.signals.length, mode === 'one-bad' ? 119 : 120);
           if (mode === 'one-bad') assert.ok(cache.signals.every(x => !x.pair.startsWith(syms[0] + ' / ')));
           if (mode === 'global-duplicates') assert.equal(cache.signals.filter(x => x.venue === 'BINANCE-US SPOT').length, 21);
-        } else assert.equal(cache, null);
+        } else assert.equal(cache.signals.length, 0);
         if (mode === 'bad-tickers') assert.equal(h.candlesRequested, 0);
         if (mode === 'duplicates') assert.equal(h.candlesRequested, 99);
         assert.deepEqual(h.page._pageErrors, []);

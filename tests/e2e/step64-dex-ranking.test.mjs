@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', '    window.__dexRank = { DexEngine, refreshVenuePresentation }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);').replace('    ME.startAuto();', '');
+const html = read('app.html').replace('    ME.refresh(false);', '    window.__dexRank = { DexEngine, refreshVenuePresentation }; DexEngine.fetchAll(["BTC"]).then(refreshVenuePresentation);').replace('    ME.startAuto();', '');
 let browser;
 async function open() {
   const page = await freshPage(browser);
@@ -39,7 +39,7 @@ describe('step64 / DEX discovery order in the browser', { timeout: 60000 }, () =
       for (const mode of ['clear', 'ambiguous', 'reverse']) {
         await page.evaluate(async mode => {
           window._mode64 = 'manual'; window._pending64 = {};
-          const task = window.__dexRank.DexEngine.fetchAll(['BTC']);
+          const task = window.__dexRank.DexEngine.fetchAll(["BTC"]);
           const row = (dex, price, liq) => ({ baseToken: { symbol: 'BTC' }, dexId: dex, priceUsd: price, liquidity: { usd: liq } });
           const rows = [row('first', '10', '100000'), row('second', '20', mode === 'clear' ? '90000' : '100000')];
           if (mode === 'reverse') rows.reverse();

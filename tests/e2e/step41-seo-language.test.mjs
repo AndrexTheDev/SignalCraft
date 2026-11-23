@@ -12,7 +12,7 @@ describe('step41 / multilingual SEO and URL state', { timeout: 180000 }, () => {
       const page = await freshPage(browser);
       try {
         if (pageName === 'index.html') await gotoLanding(page, { lang: 'de' });
-        else await gotoApp(page, { lang: 'de' });
+        else await gotoApp(page, { lang: 'de', expectCards: false });
         for (const lang of langs) {
           await page.select('#langSelect', lang);
           const got = await page.evaluate(pageName => {
@@ -56,7 +56,7 @@ describe('step41 / multilingual SEO and URL state', { timeout: 180000 }, () => {
   it('retains filters and the selected language in shareable URLs, including after reload and return to landing', async () => {
     const page = await freshPage(browser);
     try {
-      await gotoApp(page, { lang: 'en', query: { sector: 'majors', q: 'BTC' } });
+      await gotoApp(page, { lang: 'en', query: { sector: 'majors', q: 'BTC' }, expectCards: false });
       await page.select('#langSelect', 'es');
       const url = new URL(page.url());
       assert.equal(url.searchParams.get('lang'), 'es'); assert.equal(url.searchParams.get('sector'), 'majors'); assert.equal(url.searchParams.get('q'), 'BTC');

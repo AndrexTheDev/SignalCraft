@@ -1,25 +1,19 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', '    window.__tableScroll = { ME, seed: SEED_SIGNALS, renderSignals, setLanguage }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);').replace('    ME.startAuto();', '');
+const html = read('app.html').replace('    ME.refresh(false);', '    window.__tableScroll = { ME, signals: () => signalsData, renderSignals, setLanguage }; ME.refresh(false);').replace('    ME.startAuto();', '');
 let browser;
 async function open() {
   const page = await freshPage(browser); await page.setViewport(VIEWPORTS.mobileSm);
   await page.evaluateOnNewDocument(() => localStorage.clear());
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const u = new URL(req.url());
-    if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: html }).catch(() => {});
-    if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    return req.abort().catch(() => {});
-  });
+  await stubMarket(page, { appHtml: html, klines: liveTestCandles() });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__tableScroll && document.querySelector('#signalsGrid [data-toggle-chart]'));
   await page.evaluate(() => {
     const t = window.__tableScroll, id = document.querySelector('[data-toggle-chart]').getAttribute('data-toggle-chart').replace('chart-panel-', '');
     const rows = Array.from({ length: 24 }, () => [1.00000000000002, 1.00000000000004, 1.00000000000001, 1.00000000000003]);
-    t.ME.apply(t.seed.map(x => x.id === id ? { ...x, k24: rows } : x), 'seed', Date.now());
+    t.ME.apply(t.signals().map(x => x.id === id ? { ...x, k24: rows } : x), 'live', t.ME.status.when);
     document.querySelector('[data-toggle-chart]').click();
     document.querySelector('.chart-drawer-panel.is-open summary').click();
   });
@@ -65,11 +59,11 @@ describe('step69 / keyboard access to OHLC tables', { timeout: 60000 }, () => {
       await page.focus(region);
       await page.evaluate(() => {
         const id = document.activeElement.getAttribute('data-chart-table-region'), t = window.__tableScroll;
-        t.ME.apply(t.seed.map(s => s.id === id ? { ...s, k24: [] } : s), 'seed', Date.now());
+        t.ME.apply(t.signals().map(s => s.id === id ? { ...s, k24: [] } : s), 'live', t.ME.status.when);
       });
       assert.equal(await page.$(region), null);
       assert.equal(await page.evaluate(() => document.activeElement.id), 'signalsGrid');
-      assert.match(await page.$eval('.chart-drawer-panel.is-open [data-chart-status]', el => el.textContent), /Candle data unavailable/);
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });

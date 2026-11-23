@@ -1,18 +1,21 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, liveTestCandles, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const source = read('app.html');
-const seed = JSON.parse(extractArray(source, 'const SEED_SIGNALS ='));
-const html = source.replace('    ME.refresh(false);', '    window.__radarScroll = { CexEngine, DexEngine, refreshVenuePresentation }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);').replace('    ME.startAuto();', '');
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
+const html = source.replace('    ME.refresh(false);', '    window.__radarScroll = { CexEngine, DexEngine, refreshVenuePresentation }; ME.refresh(false);').replace('    ME.startAuto();', '');
 let browser;
 async function open(reduced = false) {
   const page = await freshPage(browser); await page.setViewport(VIEWPORTS.mobileSm);
   if (reduced) await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
-  await page.evaluateOnNewDocument(seed => {
+  const klines = liveTestCandles();
+  await page.evaluateOnNewDocument(({seed, klines}) => {
     localStorage.clear(); const original = window.fetch.bind(window);
     window.fetch = (input, opt) => {
       const u = String(input);
+      if (u.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>seed.map(s=>({symbol:s.pair.split(' / ')[0]+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
+      if (u.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>klines});
       if (u.includes('data-api.binance.vision/api/v3/ticker/price')) return Promise.resolve({ ok: true, json: async () => seed.map(s => ({ symbol: s.pair.split(' / ')[0] + 'USDT', price: '1.23' })) });
       if (u.includes('api.dexscreener.com')) {
         const sym = new URL(u).searchParams.get('q');
@@ -21,7 +24,7 @@ async function open(reduced = false) {
       if (/^https?:/.test(u) && !u.startsWith(location.origin)) return Promise.reject(new Error('offline'));
       return original(input, opt);
     };
-  }, seed);
+  }, {seed, klines});
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());

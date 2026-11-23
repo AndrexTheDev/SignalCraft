@@ -16,12 +16,12 @@ function harness(time, count = 100) {
   class FakeDate extends Date { static now() { return clock.now; } }
   const seed = Array.from({ length: count }, (_, i) => ({ pair: 'P' + i, sector: 'test' }));
   let cache = null, applied = [];
-  const me = Function('Date', 'ME_STAMP', 'document', 'I18N', 'currentLang', 'SEED_SIGNALS', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsSet', 'lsDel', 'passesQualityGate', 'snapshotIsFresh', 'isLiveCache', 'compareMarketRanking', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
-    FakeDate, 1, { getElementById: () => null }, { en: {} }, 'en', seed, [], x => x, () => {}, () => cache, (k, v) => { cache = v; }, () => { cache = null; }, () => true, fresh, () => true, compareMarketRanking
+  const me = Function('Date', 'ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsSet', 'lsDel', 'passesQualityGate', 'snapshotIsFresh', 'isLiveCache', 'compareMarketRanking', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
+    FakeDate, 1, { getElementById: () => null }, { en: {} }, 'en', seed.map(s => [s.pair, s.sector]), () => 'unavailable', [], x => x, () => {}, () => cache, (k, v) => { cache = v; }, () => { cache = null; }, () => true, fresh, () => true, compareMarketRanking
   );
   me.build = sym => ({ pair: sym, score: 90, src: 'binance', metrics: { volMio: 20 } });
   me.toSignal = (b, i, at) => ({ pair: b.pair, timestamp: at, modelVersion: 3, gateMetrics: {} });
-  me.apply = (signals, mode, at) => { applied.push({ signals, mode, at }); };
+  me.apply = (signals, mode, at) => { applied.push({ signals, mode, at }); me.status.mode = mode; };
   return { me, seed, clock, get cache() { return cache && JSON.parse(cache); }, applied };
 }
 function tickers(seed, time) {
@@ -48,10 +48,10 @@ describe('step46 / conservative live snapshot timing', () => {
     await h.me.refresh(true);
     assert.equal(h.applied[0].mode, 'live');
     assert.equal(h.applied[0].at, midday - 30000);
-    assert.equal(h.cache.t, midday - 30000); assert.equal(h.cache.version, 9);
-    assert.equal(h.cache.signals.length, 100);
-    assert.ok(h.cache.signals.every(s => s.timestamp === h.cache.t));
-    assert.ok(!h.cache.signals.some(s => s.pair === 'P100'));
+    assert.equal(h.cache, null);
+    assert.equal(h.applied[0].signals.length, 100);
+    assert.ok(h.applied[0].signals.every(s => s.timestamp === h.applied[0].at));
+    assert.ok(!h.applied[0].signals.some(s => s.pair === 'P100'));
   });
   it('produces the same LIVE ranking when candle requests complete in different orders', async () => {
     async function run(reverse) {
@@ -77,14 +77,14 @@ describe('step46 / conservative live snapshot timing', () => {
     h.me.tickers24h = async () => { h.clock.now = midday + 30000; return rows; };
     h.me.kGet = async (sym, sources, signal, build) => { const k = [[Math.floor(midday / DAY) * DAY]], src = 'binance'; return { src, k, built: build(k, src) }; };
     await h.me.refresh(true);
-    assert.equal(h.applied[0].mode, 'live'); assert.equal(h.cache.t, midday);
+    assert.equal(h.applied[0].mode, 'live'); assert.equal(h.applied[0].at, midday); assert.equal(h.cache, null);
   });
   it('falls back when too few tickers remain fresh', async () => {
     const h = harness(midday), rows = tickers(h.seed, midday - 90000);
     h.me.tickers24h = async () => rows;
     h.me.kGet = async (sym, sources, signal, build) => { const k = [[Math.floor(midday / DAY) * DAY]], src = 'binance'; return { src, k, built: build(k, src) }; };
     await h.me.refresh(true);
-    assert.equal(h.applied[0].mode, 'seed'); assert.equal(h.cache, null);
+    assert.equal(h.applied[0].mode, 'unavailable'); assert.equal(h.cache, null);
   });
   it('rejects candles collected on the previous UTC day when collection crosses midnight', async () => {
     const midnight = Math.floor(midday / DAY) * DAY + DAY;
@@ -92,14 +92,14 @@ describe('step46 / conservative live snapshot timing', () => {
     h.me.tickers24h = async () => rows;
     h.me.kGet = async (sym, sources, signal, build) => { h.clock.now = midnight + 100; const k = [[midnight - DAY]], src = 'binance'; return { src, k, built: build(k, src) }; };
     await h.me.refresh(true);
-    assert.equal(h.applied[0].mode, 'seed'); assert.equal(h.cache, null);
+    assert.equal(h.applied[0].mode, 'unavailable'); assert.equal(h.cache, null);
   });
   it('refuses to cache a live snapshot if rendering finishes after its expiry', async () => {
     const h = harness(midday), rows = tickers(h.seed, midday - 80000);
     h.me.tickers24h = async () => rows;
     h.me.kGet = async (sym, sources, signal, build) => { const k = [[Math.floor(midday / DAY) * DAY]], src = 'binance'; return { src, k, built: build(k, src) }; };
-    h.me.apply = (signals, mode, at) => { h.applied.push({ signals, mode, at }); if (mode === 'live') h.clock.now += 10001; };
+    h.me.apply = (signals, mode, at) => { h.applied.push({ signals, mode, at }); h.me.status.mode = mode; if (mode === 'live') h.clock.now += 10001; };
     await h.me.refresh(true);
-    assert.deepEqual(h.applied.map(x => x.mode), ['live', 'seed']); assert.equal(h.cache, null);
+    assert.deepEqual(h.applied.map(x => x.mode), ['live', 'unavailable']); assert.equal(h.cache, null);
   });
 });

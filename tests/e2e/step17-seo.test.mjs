@@ -59,7 +59,7 @@ describe('step17 seo e2e', { timeout: 180_000 }, () => {
 
   it('terminal ?lang=es localizes title, description and og tags', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'es' });
+    await gotoApp(page, { lang: 'es', expectCards: false });
     const h = await seoHead(page);
     assert.equal(h.lang, 'es');
     assert.match(h.title, /Signalcraft/);
@@ -73,7 +73,7 @@ describe('step17 seo e2e', { timeout: 180_000 }, () => {
 
   it('Arabic terminal sets lang=ar, dir=rtl and ar_SA locale', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'ar' });
+    await gotoApp(page, { lang: 'ar', expectCards: false });
     const h = await seoHead(page);
     const dir = await page.$eval('html', (el) => el.getAttribute('dir'));
     assert.equal(h.lang, 'ar');

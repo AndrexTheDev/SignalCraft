@@ -1,7 +1,7 @@
 {
   "name": "Signalcraft Atelier",
   "short_name": "Signalcraft",
-  "description": "Crypto research terminal: up to 120 pairs assessed, with a clearly labeled demo fallback. Free, no account, no ads.",
+  "description": "Crypto research terminal: up to 120 pairs assessed, with no signals when live data is unavailable. Free, no account, no ads.",
   "start_url": "/app",
   "scope": "./",
   "display": "standalone",

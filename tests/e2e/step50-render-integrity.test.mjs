@@ -1,10 +1,10 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const html = read('app.html');
 const instrumented = html.replace('    ME.refresh(false);', '    window.__renderTest = { ME, signals: () => signalsData };\n    ME.refresh(false);');
-const seed = JSON.parse(extractArray(html, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const base = Array.from({ length: 100 }, (_, i) => ({
   ...seed[0], id: 'SIG-RENDER-' + i, pair: 'SAFE' + i + ' / USDT', modelVersion: 3,
   quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 },
@@ -37,29 +37,33 @@ describe('step50 / safe cached data rendering', { timeout: 60000 }, () => {
       const data = structuredClone(base); data[0].metrics[key] = payload;
       const page = await open(data);
       try {
-        assert.match(await page.$eval('#meBadge', e => e.textContent), /DEMO/);
+        assert.doesNotMatch(await page.$eval('#meBadge', e => e.textContent), /LIVE|DEMO/);
+        assert.equal((await page.$$('.signal-card')).length, 0);
         assert.equal(await page.$$eval('[data-injected]', es => es.length), 0);
         assert.equal(await page.evaluate(() => window.__injected), undefined);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
     }
   });
-  it('renders arbitrary numeric-field input safely even if an internal caller bypasses validation', async () => {
+  it('rejects arbitrary numeric-field input at the live snapshot boundary', async () => {
     for (const lang of ['de', 'en', 'es', 'ar', 'zh']) {
-      const page = await open(base, lang);
+      const page = await freshPage(browser);
+      await stubMarket(page, {appHtml:instrumented, klines:liveTestCandles()});
+      await page.goto(BASE + '/app.html?lang=' + lang, {waitUntil:'domcontentloaded'});
+      await page.waitForFunction(() => document.querySelector('.signal-card'));
       try {
         assert.match(await page.$eval('#meBadge', e => e.textContent), /LIVE/);
         await page.evaluate(payload => {
           const { ME, signals } = window.__renderTest;
           const data = structuredClone(signals());
           for (const k of ['volMio', 'tb7', 'volX', 'rsi', 'perf7', 'perf30', 'atrPct', 'sma50', 'sma200', 'adx', 'plusDi', 'minusDi', 'bbWidthPct', 'riskAdj30']) data[0].metrics[k] = payload;
-          ME.apply(data, 'live', Date.now());
-          document.querySelector('[data-inspect-sig]').click();
+          ME.apply(data, 'live', ME.status.when);
         }, payload);
-        assert.equal(await page.$eval('#dossierModalBackdrop', e => e.classList.contains('is-visible')), true);
+        assert.equal(await page.$eval('#dossierModalBackdrop', e => e.classList.contains('is-visible')), false);
+        assert.equal((await page.$$('.signal-card')).length, 0);
         assert.equal(await page.$$eval('[data-injected]', es => es.length), 0);
         assert.equal(await page.evaluate(() => window.__injected), undefined);
-        assert.match(await page.$eval('#dossierBody', e => e.textContent), /—/);
+        assert.equal(await page.evaluate(() => window.__renderTest.ME.status.mode), 'unavailable');
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
     }

@@ -1,31 +1,16 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
-const signals = Array.from({ length: 100 }, (_, i) => ({
-  ...seed[0], id: 'SIG-RISK-' + i, pair: 'TEST' + i + ' / USDT', modelVersion: 3,
-  entryPrice: 100, stopLoss: 90, targets: [120, 140], riskRewardRatio: '1:4.0',
-  quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 },
-  gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
-}));
+const app = read('app.html').replace('    ME.refresh(false);', '    window.__risk54 = {ME, signals: () => signalsData}; ME.refresh(false);');
 let browser;
 async function open() {
   const page = await freshPage(browser);
   await page.setViewport(VIEWPORTS.mobileSm);
-  await page.evaluateOnNewDocument(signals => {
-    const t = Date.now();
-    localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version: 9, t, signals: signals.map(s => ({ ...s, timestamp: t })) }));
-  }, signals);
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const u = new URL(req.url());
-    if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    if (u.pathname.endsWith('/ticker/24hr')) return;
-    return req.abort().catch(() => {});
-  });
+  await stubMarket(page, {appHtml:app, klines:liveTestCandles()});
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''));
+  await page.evaluate(() => { const t = window.__risk54; t.ME.apply(t.signals().map(s => ({...s,entryPrice:100,stopLoss:90,targets:[120,140],riskRewardRatio:'1:4.0'})), 'live', t.ME.status.when); });
   return page;
 }
 async function enter(page, value) {

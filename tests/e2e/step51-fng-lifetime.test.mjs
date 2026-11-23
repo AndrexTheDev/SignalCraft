@@ -44,8 +44,8 @@ describe('step51 / Fear & Greed and market refresh in browser', { timeout: 45000
       await page.click('#btnRefreshSentimentGlobal');
       await page.waitForFunction(() => window.__fngTest.manualCalls === 1 && window.__pendingIndexBodies.length === 2);
       await page.waitForFunction(() => !window.__fngTest.ME.busy);
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
-      assert.match(await page.$eval('#toastMessage', el => el.textContent), /DEMO snapshot active/);
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
+      assert.match(await page.$eval('#toastMessage', el => el.textContent), /unavailable/i);
       assert.match(await page.$eval('#globalFngBadge', el => el.textContent), /F&G –/);
       await page.evaluate(({ current, older }) => {
         window.__pendingIndexBodies[1](current);
@@ -53,9 +53,8 @@ describe('step51 / Fear & Greed and market refresh in browser', { timeout: 45000
       }, { current: body(71), older: body(12, 'Fear') });
       await page.waitForFunction(() => document.getElementById('globalFngBadge').textContent.includes('71'));
       assert.match(await page.$eval('#globalFngBadge', el => el.textContent), /^● Index 71/);
-      await page.evaluate(() => document.querySelector('[data-toggle-sentiment]').click());
-      assert.match(await page.$eval('.sentiment-drawer-panel.is-open .sentiment-fng-value', el => el.textContent), /71/);
-      await page.evaluate(() => document.querySelector('.sentiment-drawer-panel.is-open [data-refresh-sentiment]').click());
+      assert.equal(await page.$('[data-toggle-sentiment]'), null);
+      await page.click('#btnRefreshSentimentGlobal');
       await page.waitForFunction(() => window.__fngTest.manualCalls === 2 && window.__pendingIndexBodies.length === 3);
       assert.match(await page.$eval('#globalFngBadge', el => el.textContent), /F&G –/);
       await page.evaluate(value => window.__pendingIndexBodies[2](value), body(55, 'Neutral'));

@@ -15,7 +15,7 @@ const app = read('app.html');
 const landing = read('index.html');
 const appJs = inlineScripts(app).join('\n');
 const landJs = inlineScripts(landing).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 const gated = seed.filter((s) => passesQualityGate(s));
 const cex = Function('return (' + extractArray(appJs, 'const CEX_LIST =') + ')')();
 

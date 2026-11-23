@@ -1,9 +1,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 let browser;
 
 describe('step35 / venue refresh in browser', { timeout: 90000 }, () => {
@@ -13,12 +13,15 @@ describe('step35 / venue refresh in browser', { timeout: 90000 }, () => {
   it('labels symbol-only DEX search, never makes a DEX comparison, and clears failed feeds', async () => {
     const page = await freshPage(browser);
     let active = true;
+    const klines = liveTestCandles();
     try {
       await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
       await page.setRequestInterception(true);
       page.on('request', req => {
         const url = new URL(req.url());
         if (url.origin === new URL(BASE).origin) return req.continue().catch(() => {});
+        if (active && url.pathname.endsWith('/ticker/24hr')) return req.respond({status:200,contentType:'application/json',body:JSON.stringify(seed.map(s => ({symbol:s.pair.split(' / ')[0]+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()})))}).catch(() => {});
+        if (active && url.pathname.endsWith('/klines')) return req.respond({status:200,contentType:'application/json',body:JSON.stringify(klines)}).catch(() => {});
         if (active && url.hostname === 'data-api.binance.vision' && url.pathname === '/api/v3/ticker/price') {
           const rows = seed.map(s => ({ symbol: s.pair.split(' / ')[0] + 'USDT', price: '5' }));
           return req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(rows) }).catch(() => {});
@@ -49,7 +52,7 @@ describe('step35 / venue refresh in browser', { timeout: 90000 }, () => {
       await page.waitForFunction(() => /DEX SEARCH UNAVAILABLE/.test(document.getElementById('dexTickerLabel')?.textContent || ''), { timeout: 20000 });
       assert.equal(await page.$eval('#dexTickerFeed', el => el.textContent), '–');
       assert.doesNotMatch(await page.$eval('#cexTickerLabel', el => el.textContent), /LIVE 1\/11/);
-      assert.doesNotMatch(await page.$eval('#signalsGrid article.signal-card', el => el.textContent), /1 CEX/);
+      assert.equal((await page.$$('#signalsGrid article.signal-card')).length, 0);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });

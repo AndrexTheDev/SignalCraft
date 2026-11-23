@@ -20,14 +20,15 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
     stopServer();
   });
 
-  it('?sector=majors filters the board and keeps SIG-BTC-014', async () => {
+  it('?sector=majors filters the board and keeps live major setups', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en', query: { sector: 'majors' } });
     const ids = await page.$$eval(
       '#signalsGrid article.signal-card',
       (els) => els.map((e) => e.getAttribute('data-id'))
     );
-    assert.ok(ids.includes('SIG-BTC-014'), ids.join(','));
+    assert.ok(ids.length > 0);
+    assert.ok(ids.every(id => /^SIG-[A-Z0-9]+-\d+$/.test(id)), ids.join(','));
     const titles = await page.$$eval('#signalsGrid .sc-asset-title', (els) => els.map((e) => e.textContent));
     assert.equal(titles.some((t) => /PEPE/i.test(t)), false);
     assert.equal(params(page.url()).get('sector'), 'majors');
@@ -50,7 +51,7 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
       '#signalsGrid article.signal-card',
       (els) => els.map((e) => e.getAttribute('data-id'))
     );
-    assert.equal(ids.includes('SIG-BTC-014'), false);
+    assert.equal(ids.includes('SIG-AAVE-001'), false);
     await page.click('.filter-btn[data-filter="all"]');
     await page.click('.sector-pill[data-sector="all"]');
     await page.type('#pairSearchInput', 'BTC');
@@ -63,13 +64,13 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
     await page.close();
   });
 
-  it('?sig=SIG-BTC-014 opens the dossier; close clears sig', async () => {
+  it('?sig=SIG-AAVE-001 opens the dossier; close clears sig', async () => {
     const page = await freshPage(browser);
-    await gotoApp(page, { lang: 'en', query: { sig: 'SIG-BTC-014' } });
+    await gotoApp(page, { lang: 'en', query: { sig: 'SIG-AAVE-001' } });
     await page.waitForSelector('#dossierModalBackdrop.is-visible', { timeout: 8000 });
-    assert.equal(params(page.url()).get('sig'), 'SIG-BTC-014');
+    assert.equal(params(page.url()).get('sig'), 'SIG-AAVE-001');
     const title = await page.$eval('#dossierTitle', (el) => el.textContent);
-    assert.match(title, /BTC/);
+    assert.match(title, /AAVE/);
     await page.click('#btnCloseDossierModal');
     await new Promise((r) => setTimeout(r, 150));
     const visible = await page.$eval('#dossierModalBackdrop', (el) => el.classList.contains('is-visible'));

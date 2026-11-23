@@ -1,8 +1,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, stubMarket, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const signals = Array.from({ length: 100 }, (_, i) => ({ ...seed[0], pair: 'TEST' + i + ' / USDT', id: `CLOCK-${i}`, modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
 let browser;
 async function oldCachePage(version, mismatch) {
@@ -22,8 +22,9 @@ describe('step46 / browser snapshot timing and cache migration', { timeout: 6000
     it(`does not restore cache version ${version} with ${mismatch ? 'inconsistent' : 'legacy'} timestamps`, async () => {
       const page = await oldCachePage(version, mismatch);
       try {
-        assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
         await page.waitForSelector('#btnRefreshSentimentGlobal:not([disabled])');
+        assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
+        assert.equal((await page.$$('.signal-card')).length, 0);
         assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
@@ -32,23 +33,14 @@ describe('step46 / browser snapshot timing and cache migration', { timeout: 6000
   it('fails closed at UTC midnight even when the expiry timer has not yet fired', async () => {
     const page = await freshPage(browser);
     try {
-      await page.evaluateOnNewDocument(signals => {
-        window._now = Date.UTC(2025, 0, 1, 23, 59, 50);
-        Date.now = () => window._now;
-        const t = window._now;
-        localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version: 9, t, signals: signals.map(s => ({ ...s, confluenceScore: s.quantScore, metrics: { ...s.metrics, score: s.quantScore }, timestamp: t })) }));
-      }, signals);
-      await page.setRequestInterception(true);
-      page.on('request', req => {
-        const url = new URL(req.url());
-        if (url.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-        if (url.pathname.endsWith('/ticker/24hr')) return;
-        return req.abort().catch(() => {});
-      });
+      const midnight = Math.floor(Date.now() / 86400000) * 86400000 + 86400000;
+      await page.evaluateOnNewDocument(now => { window._now = now; Date.now = () => window._now; }, midnight - 10000);
+      const offset = midnight - 10000 - Date.now();
+      await stubMarket(page, { klines: liveTestCandles(), globalTicker: {timeOffset:offset}, usTicker:{timeOffset:offset} });
       await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''));
-      await page.evaluate(() => { window._now = Date.UTC(2025, 0, 2); document.querySelector('[data-inspect-sig]').click(); });
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+      await page.evaluate(() => { window._now = Math.floor(window._now / 86400000) * 86400000 + 86400000; document.querySelector('[data-inspect-sig]').click(); });
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
       assert.equal(await page.$eval('#dossierModalBackdrop', el => el.classList.contains('is-visible')), false);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }

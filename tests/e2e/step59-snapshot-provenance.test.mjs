@@ -1,43 +1,27 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const app = read('app.html');
-const seed = JSON.parse(extractArray(app, 'const SEED_SIGNALS ='));
-const source = app.replace('    ME.refresh(false);', '    window.__sourceTest = { ME, seed: SEED_SIGNALS, CexEngine, attachVenueData, renderSignals, signals: () => signalsData };\n    ME.refresh(false);');
+const source = app.replace('    ME.refresh(false);', '    window.__sourceTest = { ME, CexEngine, attachVenueData, renderSignals, signals: () => signalsData };\n    ME.refresh(false);');
 let browser;
-async function open(lang, live = false) {
+async function open(lang) {
   const page = await freshPage(browser);
-  await page.evaluateOnNewDocument(({ live, data }) => {
-    localStorage.clear();
-    if (live) {
-      const t = Date.now();
-      const signals = Array.from({ length: 100 }, (_, i) => ({ ...data, pair: `SAFE${i} / USDT`, id: `SAFE-${i}`, venue: 'BINANCE-US SPOT', timestamp: t, modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...data.metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
-      localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version: 9, t, signals }));
-    }
-  }, { live, data: seed[0] });
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const url = new URL(req.url());
-    if (url.origin === new URL(BASE).origin && url.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: source }).catch(() => {});
-    if (url.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    if (live && url.pathname.endsWith('/ticker/24hr')) return;
-    return req.abort().catch(() => {});
-  });
-  await page.goto(BASE + '/app.html?lang=' + lang, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(want => document.getElementById('meBadge')?.textContent.includes(want ? 'LIVE' : 'DEMO'), {}, live);
+  await stubMarket(page, {appHtml:source, klines:liveTestCandles(), globalTicker:{missing:true}});
+  await page.goto(BASE + '/app.html?lang=' + lang, {waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.querySelector('.signal-card') && /LIVE/.test(document.getElementById('meBadge').textContent));
   return page;
 }
 describe('step59 / snapshot time and market source provenance', { timeout: 60000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
   after(async () => { if (browser) await browser.close(); stopServer(); });
-  it('uses the actual per-setup source when a Binance.US cache is restored', async () => {
+  it('uses the actual per-setup source when data was fetched from Binance.US', async () => {
     const page = await open('en', true);
     try {
       assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /LIVE.*\d{4}-\d\d-\d\d.*UTC/);
       assert.doesNotMatch(await page.$eval('#meBadge', el => el.title), /Binance Spot API/);
       assert.match(await page.$eval('.signal-card [data-model-source]', el => el.textContent), /BINANCE-US SPOT/);
-      await page.evaluate(() => { const t = window.__sourceTest; t.CexEngine.data.SAFE0 = { n: 1, med: 1, venues: ['OKX'] }; t.CexEngine.startedAt = Date.now(); t.attachVenueData(); t.renderSignals(); });
+      await page.evaluate(() => { const t = window.__sourceTest; t.CexEngine.data[t.signals()[0].pair.split(' / ')[0]] = { n: 1, med: 1, venues: ['OKX'] }; t.CexEngine.startedAt = Date.now(); t.attachVenueData(); t.renderSignals(); });
       assert.match(await page.$eval('.signal-card [data-model-source]', el => el.textContent), /BINANCE-US SPOT/);
       assert.doesNotMatch(await page.$eval('.signal-card [data-model-source]', el => el.textContent), /OKX/);
       await page.click('[data-inspect-sig]');
@@ -48,12 +32,12 @@ describe('step59 / snapshot time and market source provenance', { timeout: 60000
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
-  it('never invents a model source for unrecognized cached labels', async () => {
+  it('never invents a model source for unrecognized source labels', async () => {
     const page = await open('en', true);
     try {
       await page.evaluate(() => {
         const t = window.__sourceTest;
-        t.ME.apply(t.signals().map(s => ({ ...s, venue: '<img src=x onerror=alert(1)>' })), 'live', Date.now());
+        t.ME.apply(t.signals().map(s => ({ ...s, venue: '<img src=x onerror=alert(1)>' })), 'live', t.ME.status.when);
       });
       assert.match(await page.$eval('.signal-card [data-model-source]', el => el.textContent), /Model source: —/);
       assert.equal(await page.$('.signal-card [data-model-source] img'), null);
@@ -67,37 +51,33 @@ describe('step59 / snapshot time and market source provenance', { timeout: 60000
     const page = await open('en');
     try {
       await page.select('#langSelect', 'de');
-      assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /DEMO · historischer Snapshot:.*UTC/);
+      assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /LIVE · Snapshot:.*UTC/);
       await page.select('#langSelect', 'zh');
-      assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /DEMO · 历史快照：.*UTC/);
+      assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /LIVE · 快照：.*UTC/);
       assert.match(await page.$eval('#ftNodes', el => el.textContent), /雷达/);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
-  it('updates the time, source and method honestly on DEMO fallback', async () => {
-    const page = await open('en', true);
+  it('removes time, source and details when live data becomes unavailable', async () => {
+    const page = await open('en');
     try {
-      await page.evaluate(() => window.__sourceTest.ME.apply(window.__sourceTest.seed, 'seed', window.__sourceTest.seed[0].timestamp));
-      assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /DEMO.*historical.*\d{4}-\d\d-\d\d.*UTC/i);
-      assert.match(await page.$eval('#ftNodes', el => el.textContent), /Radar.*0\/11.*0 DEX/i);
-      assert.doesNotMatch(await page.$eval('#ftNodes', el => el.textContent), /Live market data/i);
       await page.click('[data-inspect-sig]');
-      assert.match(await page.$eval('#dossierBody [data-dossier-source]', el => el.textContent), /DEMO/i);
-      const method = await page.$eval('#dossierBody [data-dossier-method]', el => el.textContent);
-      assert.match(method, /historical.*not current/i);
-      assert.doesNotMatch(method, /Every value is computed automatically/i);
-      assert.match(method, /\d{4}-\d\d-\d\d.*UTC/);
+      await page.evaluate(() => window.__sourceTest.ME.apply([], 'unavailable', null));
+      assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /unavailable/i);
+      assert.match(await page.$eval('#ftNodes', el => el.textContent), /Radar.*0\/11.*0 DEX/i);
+      assert.equal(await page.$eval('#dossierModalBackdrop', el => el.classList.contains('is-visible')), false);
+      assert.equal((await page.$$('.signal-card')).length, 0);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
-  it('shows a localized full UTC timestamp and DEMO method in all languages', async () => {
+  it('shows a localized full UTC timestamp and live method in all languages', async () => {
     for (const lang of ['de', 'en', 'es', 'ar', 'zh']) {
       const page = await open(lang);
       try {
-        assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /DEMO.*\d{4}-\d\d-\d\d.*UTC/);
+        assert.match(await page.$eval('#snapshotInfo', el => el.textContent), /LIVE.*\d{4}-\d\d-\d\d.*UTC/);
         await page.click('[data-inspect-sig]');
         assert.match(await page.$eval('#dossierBody [data-dossier-method]', el => el.textContent), /\d{4}-\d\d-\d\d.*UTC/);
-        assert.match(await page.$eval('#dossierBody [data-dossier-source]', el => el.textContent), /DEMO/);
+        assert.match(await page.$eval('#dossierBody [data-dossier-source]', el => el.textContent), /BINANCE-US SPOT/);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
     }

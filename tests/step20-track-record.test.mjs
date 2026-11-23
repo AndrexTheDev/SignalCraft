@@ -11,7 +11,7 @@ const app = read('app.html');
 const landing = read('index.html');
 const appJs = inlineScripts(app).join('\n');
 const landJs = inlineScripts(landing).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 const gated = seed.filter((s) => passesQualityGate(s));
 
 describe('step20 / simulateLongTp1', () => {
@@ -77,74 +77,11 @@ describe('step20 / trackRecordSetups (non-overlapping per setup)', () => {
   });
 });
 
-describe('step20 / landing is computed, not invented', () => {
-  it('proof figure is a live node, not a hardcoded 71%', () => {
+describe('step20 / historical examples are not published', () => {
+  it('does not display the historical track record or bundled example signals', () => {
     const markup = stripScripts(landing);
-    assert.match(markup, /id="proofHitPct"/);
-    assert.equal(/id="proofHitPct"[^>]*>\s*71%/.test(markup), false);
-    assert.equal(/class="proof-num"[^>]*>\s*71%/.test(markup), false);
-  });
-
-  it('copy templates use explicit counts ({resolved}/{hit}/{stop}) and never a made-up 71%', () => {
-    assert.match(landJs, /pr_d:[\s\S]{0,280}\{resolved\}/);
-    assert.match(landJs, /pr_d:[\s\S]{0,280}\{hit\}/);
-    assert.match(landJs, /pr_d:[\s\S]{0,280}\{stop\}/);
-    assert.equal(/pr_d:[\s\S]{0,280}71%/.test(landJs), false);
-    assert.equal(/\{pct\}/.test(landJs), false);
-  });
-
-  it('og:title no longer advertises an invented 71%', () => {
-    assert.equal(/og:title"[^>]*71%/.test(landing), false);
-  });
-
-  it('ships simulateLongTp1 + trackRecordSetups and paints the proof band', () => {
-    assert.match(landJs, /function simulateLongTp1\s*\(/);
-    assert.match(landJs, /function trackRecordSetups\s*\(/);
-    assert.match(landJs, /function renderProof\s*\(/);
-    assert.match(landJs, /proofHitPct/);
-    assert.match(landJs, /proofG1/);
-    assert.match(landJs, /proofG2/);
-  });
-});
-
-describe('step20 / TRACK_SET matches the gated terminal seed', () => {
-  const raw = extractArray(landJs, 'var TRACK_SET =');
-  it('TRACK_SET is present and parseable', () => {
-    assert.ok(raw, 'missing var TRACK_SET =');
-  });
-
-  it('one compact row per Grade-A board setup, same id / levels / k24', () => {
-    const track = Function('return (' + raw + ')')();
-    assert.equal(track.length, gated.length);
-    assert.equal(track.length, 10);
-    const byId = Object.fromEntries(track.map((t) => [t.id, t]));
-    for (const s of gated) {
-      const t = byId[s.id];
-      assert.ok(t, 'missing ' + s.id);
-      assert.equal(t.e, s.entryPrice);
-      assert.equal(t.sl, s.stopLoss);
-      assert.equal(t.tp, s.targets[0]);
-      assert.equal(t.g, gradeFromQuant(s.quantScore));
-      assert.deepEqual(t.k, s.k24);
-    }
-  });
-
-  it('computed TP1 hit rate is a real 0–100 integer from resolved paths', () => {
-    const track = Function('return (' + raw + ')')();
-    const tr = trackRecordSetups(track);
-    assert.equal(tr.setups, 10);
-    assert.equal(tr.resolved, 10);
-    assert.equal(Number.isInteger(tr.pct), true);
-    assert.ok(tr.pct >= 1 && tr.pct <= 99, 'pct ' + tr.pct);
-    assert.ok(tr.byGrade['A+'] && tr.byGrade.A, 'both grades reported');
-    assert.equal(tr.byGrade['A+'].n + tr.byGrade.A.n, 10);
-    writeReport('step20-track-record.json', {
-      setups: tr.setups,
-      resolved: tr.resolved,
-      hits: tr.total.hit,
-      stops: tr.total.stop,
-      pct: tr.pct,
-      byGrade: Object.fromEntries(Object.entries(tr.byGrade).map(([g, b]) => [g, { pct: b.pct, hit: b.hit, stop: b.stop }]))
-    });
+    assert.doesNotMatch(markup, /id="proofHitPct"|id="radRow1"/);
+    assert.doesNotMatch(landJs, /var TRACK_SET|function renderProof/);
+    assert.doesNotMatch(appJs, /const SEED_SIGNALS =/);
   });
 });
