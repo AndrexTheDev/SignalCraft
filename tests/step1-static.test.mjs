@@ -172,7 +172,7 @@ describe('step1 / i18n dictionaries', () => {
 });
 
 describe('step1 / seed universe', () => {
-  const seedJson = extractArray(appJs, 'const SEED_SIGNALS =');
+  const seedJson = read('tests/fixtures/legacy-seed.json');
   const seed = JSON.parse(seedJson);
 
   it('contains 120 unique pair ids', () => {

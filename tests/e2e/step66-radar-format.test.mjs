@@ -1,16 +1,19 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS, liveTestCandles } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', '    window.__radarFormat = { CexEngine, DexEngine, refreshVenuePresentation }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);').replace('    ME.startAuto();', '');
+const html = read('app.html').replace('    ME.refresh(false);', '    window.__radarFormat = { CexEngine, DexEngine, refreshVenuePresentation }; ME.refresh(false);').replace('    ME.startAuto();', '');
 let browser;
 async function open() {
   const page = await freshPage(browser); await page.setViewport(VIEWPORTS.mobileSm);
-  await page.evaluateOnNewDocument(() => {
+  const candles = liveTestCandles(), symbols = JSON.parse(read('tests/fixtures/legacy-seed.json')).map(s => s.pair.split(' / ')[0]);
+  await page.evaluateOnNewDocument(({candles, symbols}) => {
     localStorage.clear(); window._cexPrice66 = '1.00001';
     const original = window.fetch.bind(window);
     window.fetch = (input, opt) => {
       const u = String(input);
+      if (u.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>symbols.map(sym=>({symbol:sym+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
+      if (u.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>candles});
       if (u.includes('data-api.binance.vision/api/v3/ticker/price')) return Promise.resolve({ ok: true, json: async () => [{ symbol: 'PEPEUSDT', price: window._cexPrice66 }] });
       if (u.includes('api.dexscreener.com')) {
         const sym = new URL(u).searchParams.get('q');
@@ -20,7 +23,7 @@ async function open() {
       if (/^https?:/.test(u) && !u.startsWith(location.origin)) return Promise.reject(new Error('offline'));
       return original(input, opt);
     };
-  });
+  }, {candles, symbols});
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());
@@ -29,7 +32,7 @@ async function open() {
     return req.abort().catch(() => {});
   });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__radarFormat && window.__radarFormat.DexEngine.startedAt !== null && !window.__radarFormat.DexEngine.busy);
+  await page.waitForFunction(() => window.__radarFormat && document.querySelector('.signal-card') && window.__radarFormat.DexEngine.startedAt !== null && !window.__radarFormat.DexEngine.busy);
   await page.evaluate(async () => { await window.__radarFormat.DexEngine.fetchAll(['PEPE', 'WIF', 'G']); window.__radarFormat.refreshVenuePresentation(); });
   return page;
 }
@@ -52,7 +55,7 @@ describe('step66 / radar numeric presentation', { timeout: 60000 }, () => {
     const page = await open();
     try {
       for (const [price, expected] of [['1e-100', /PEPE ≈1e-100 USDT/], ['1e100', /PEPE ≈1e\+100 USDT/]]) {
-        await page.evaluate(async price => { window._cexPrice66 = price; await window.__radarFormat.CexEngine.fetchAll(['PEPE']); window.__radarFormat.refreshVenuePresentation(); }, price);
+        await page.evaluate(async price => { window._cexPrice66 = price; await window.__radarFormat.CexEngine.fetchAll(["PEPE"]); window.__radarFormat.refreshVenuePresentation(); }, price);
         const feed = await page.$eval('#tickerScrollFeed', el => el.textContent);
         assert.match(feed, expected); assert.ok(feed.length < 80, feed);
         assert.match(await page.$eval('#cexRadarNotice', el => el.textContent), /Not an executable quote/);

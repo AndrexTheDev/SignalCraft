@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { read, extractBalanced, extractArray } from './helpers/html.mjs';
 import { validLongPlan, isLiveCache as mirror } from './helpers/core-logic.mjs';
 const app = read('app.html');
-const seed = JSON.parse(extractArray(app, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 const marker = 'function isLiveCache(';
 const start = app.indexOf(marker);
 const validate = Function('validLongPlan', 'return ' + app.slice(start, app.indexOf('{', start)) + extractBalanced(app, marker))(validLongPlan);

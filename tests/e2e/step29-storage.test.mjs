@@ -1,7 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  startServer, stopServer, launchBrowser, freshPage, gotoApp, stubMarket, BASE
+  startServer, stopServer, launchBrowser, freshPage, gotoApp, stubMarket, liveTestCandles, BASE
 } from '../helpers/browser.mjs';
 
 let browser;
@@ -35,7 +35,7 @@ describe('step29 storage e2e', { timeout: 180_000 }, () => {
   it('blocked localStorage still paints the gated board without page errors', async () => {
     const page = await freshPage(browser);
     await blockStorage(page);
-    await stubMarket(page);
+    await stubMarket(page, { klines: liveTestCandles() });
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
     await new Promise((r) => setTimeout(r, 750));
@@ -44,7 +44,7 @@ describe('step29 storage e2e', { timeout: 180_000 }, () => {
     const n = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
     assert.equal(n, 10);
     const badge = await page.$eval('#meBadge', (el) => el.textContent);
-    assert.match(badge, /DEMO/);
+    assert.match(badge, /LIVE/);
     await page.select('#langSelect', 'de');
     const lang = await page.$eval('html', (el) => el.getAttribute('lang'));
     assert.equal(lang, 'de');

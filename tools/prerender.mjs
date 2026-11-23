@@ -17,15 +17,14 @@ for (const file of ['index.html', 'app.html']) {
     const { document } = dom.window;
     const scripts = [...document.querySelectorAll('script:not([type])')];
     if (file === 'index.html') {
-      if (scripts.length !== 2) throw new Error('Landing script layout changed');
+      if (scripts.length !== 1) throw new Error('Landing script layout changed');
       const german = {};
       document.querySelectorAll('[data-i18n]').forEach(el => { german[el.getAttribute('data-i18n')] = el.textContent; });
       document.querySelectorAll('[data-i18n-html]').forEach(el => { german[el.getAttribute('data-i18n-html')] = el.innerHTML; });
       dom.window.eval(scripts[0].textContent);
-      dom.window.eval(scripts[1].textContent);
       const data = document.createElement('script'); data.id = 'german-source-strings'; data.type = 'application/json';
       data.textContent = JSON.stringify(german).replace(/</g, '\\u003c');
-      document.body.insertBefore(data, scripts[1]);
+      document.body.insertBefore(data, scripts[0]);
     } else {
       if (scripts.length !== 1) throw new Error('Terminal script layout changed');
       const js = scripts[0].textContent;

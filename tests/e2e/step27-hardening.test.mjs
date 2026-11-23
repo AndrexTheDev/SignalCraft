@@ -16,11 +16,11 @@ describe('step27 hardening e2e', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('DEMO badge; exclusive board renders exactly the gated set in DE and ES', async () => {
+  it('LIVE badge; exclusive board renders exactly the gated set in DE and ES', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const badge = await page.$eval('#meBadge', (el) => el.textContent);
-    assert.match(badge, /DEMO/);
+    assert.match(badge, /LIVE/);
     const nDe = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
     assert.equal(nDe, 10);
     // pagination UI was removed with the exclusive board
@@ -53,7 +53,7 @@ describe('step27 hardening e2e', { timeout: 180_000 }, () => {
     const dos = await page.$eval('#dossierBody', (el) => el.textContent);
     assert.match(dos, /24h-Volumen/);
     assert.match(dos, /Taker-Kaufanteil/);
-    assert.match(dos, /23:59:59 UTC/);
+    assert.match(dos, /\d{2}:\d{2}:\d{2} UTC/);
     assert.equal(dos.includes('<img'), false);
     await page.click('#btnCloseDossierModal');
     await new Promise((r) => setTimeout(r, 150));

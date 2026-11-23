@@ -14,7 +14,7 @@
   <text x="55" y="328" fill="#e7b188" font-family="Georgia,serif" font-size="63">Clear risk levels.</text>
   <text x="59" y="393" fill="#c9c6c0" font-family="Arial,sans-serif" font-size="23">Entry · stop · targets · six factors</text>
   <rect x="58" y="434" width="435" height="48" rx="24" fill="#292522" stroke="#8d5a43"/>
-  <text x="81" y="465" fill="#e6cfbf" font-family="Arial,sans-serif" font-size="17" letter-spacing=".6">LIVE WHEN AVAILABLE  /  LABELLED DEMO</text>
+  <text x="81" y="465" fill="#e6cfbf" font-family="Arial,sans-serif" font-size="17" letter-spacing=".6">LIVE DATA ONLY  /  NO SIGNALS WHEN UNAVAILABLE</text>
   <g transform="translate(658 148)">
     <rect width="477" height="338" rx="12" fill="#171b1d" stroke="#645b55" stroke-opacity=".7"/>
     <g stroke="#898279" stroke-opacity=".16" stroke-width="1">

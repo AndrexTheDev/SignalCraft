@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', '    window.__dexValidation = { DexEngine, refreshVenuePresentation }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);').replace('    ME.startAuto();', '');
+const html = read('app.html').replace('    ME.refresh(false);', '    window.__dexValidation = { DexEngine, refreshVenuePresentation }; DexEngine.fetchAll(["BTC"]).then(refreshVenuePresentation);').replace('    ME.startAuto();', '');
 let browser;
 describe('step62 / DEX data in the browser', { timeout: 60000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
@@ -35,14 +35,14 @@ describe('step62 / DEX data in the browser', { timeout: 60000 }, () => {
       assert.equal(await page.$eval('#dexTickerFeed', el => el.textContent), '–');
       assert.match(await page.$eval('#ftNodes', el => el.textContent), /0 DEX/);
       mode = 'good';
-      await page.evaluate(async () => { await window.__dexValidation.DexEngine.fetchAll(['BTC']); window.__dexValidation.refreshVenuePresentation(); });
+      await page.evaluate(async () => { await window.__dexValidation.DexEngine.fetchAll(["BTC"]); window.__dexValidation.refreshVenuePresentation(); });
       assert.equal(await page.evaluate(() => window.__dexValidation.DexEngine.dexCount()), 3);
       assert.match(await page.$eval('#dexTickerFeed', el => el.textContent), /BTC REAL-DEX ≈\$1\.25e-7/);
       assert.doesNotMatch(await page.$eval('#dexTickerFeed', el => el.textContent), /FAKE-DEX/);
       assert.match(await page.$eval('#dexTickerLabel', el => el.textContent), /UNVERIFIED SYMBOLS/);
       assert.match(await page.$eval('#dexTickerLabel', el => el.title), /identity is not verified/);
       mode = 'bad';
-      await page.evaluate(async () => { await window.__dexValidation.DexEngine.fetchAll(['BTC']); window.__dexValidation.refreshVenuePresentation(); });
+      await page.evaluate(async () => { await window.__dexValidation.DexEngine.fetchAll(["BTC"]); window.__dexValidation.refreshVenuePresentation(); });
       assert.equal(await page.evaluate(() => window.__dexValidation.DexEngine.dexCount()), 0);
       assert.equal(await page.$eval('#dexTickerFeed', el => el.textContent), '–');
       assert.match(await page.$eval('#dexTickerLabel', el => el.textContent), /DEX SEARCH UNAVAILABLE/);

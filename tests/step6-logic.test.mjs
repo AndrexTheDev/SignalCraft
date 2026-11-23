@@ -5,7 +5,7 @@ import {
 } from './helpers/core-logic.mjs';
 import { read, inlineScripts, extractArray } from './helpers/html.mjs';
 
-const seed = JSON.parse(extractArray(inlineScripts(read('app.html')).join('\n'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 const gated = filterSignals(seed, {});
 
 describe('step6 / filter matrix', () => {

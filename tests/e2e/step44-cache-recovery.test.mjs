@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const signals = Array.from({ length: 100 }, (_, i) => ({ ...seed[0], pair: 'TEST' + i + ' / USDT', id: 'CACHE-' + i, modelVersion: 3, quantScore: 90, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
 let browser;
 async function setup() {
@@ -21,7 +21,8 @@ async function setup() {
   await page.goto(BASE + '/index.html?lang=en', { waitUntil: 'domcontentloaded' });
   await page.evaluate(signals => localStorage.setItem('signalcraft_live_v2', JSON.stringify(((t) => ({ version: 9, t, signals: signals.map(s => ({ ...s, confluenceScore: s.quantScore, metrics: { ...s.metrics, score: s.quantScore }, timestamp: t })) }))(Date.now()))), signals);
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || '') && document.getElementById('btnRefreshSentimentGlobal').disabled);
+  await page.waitForFunction(() => document.getElementById('btnRefreshSentimentGlobal').disabled);
+  assert.equal((await page.$$('.signal-card')).length, 0);
   return page;
 }
 describe('step44 / cached snapshot recovery', { timeout: 60000 }, () => {
@@ -30,10 +31,10 @@ describe('step44 / cached snapshot recovery', { timeout: 60000 }, () => {
   it('does not revive an old LIVE cache on reload after an automatic failed refresh', async () => {
     const page = await setup();
     try {
-      await page.waitForFunction(() => /DEMO/.test(document.getElementById('meBadge')?.textContent || '') && !document.getElementById('btnRefreshSentimentGlobal').disabled);
+      await page.waitForFunction(() => /unavailable/i.test(document.getElementById('meBadge')?.textContent || '') && !document.getElementById('btnRefreshSentimentGlobal').disabled);
       assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
       await page.reload({ waitUntil: 'domcontentloaded' });
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+      await page.waitForFunction(() => /unavailable/i.test(document.getElementById('meBadge').textContent));
       assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
@@ -49,7 +50,7 @@ describe('step44 / cached snapshot recovery', { timeout: 60000 }, () => {
         localStorage.setItem('signalcraft_live_v2', value);
         return value;
       }, signals);
-      await page.waitForFunction(() => /DEMO/.test(document.getElementById('meBadge')?.textContent || '') && !document.getElementById('btnRefreshSentimentGlobal').disabled);
+      await page.waitForFunction(() => /unavailable/i.test(document.getElementById('meBadge')?.textContent || '') && !document.getElementById('btnRefreshSentimentGlobal').disabled);
       assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), replacement);
       assert.deepEqual(page._pageErrors, []);
     } finally { await other.close(); await page.close(); }

@@ -1,16 +1,20 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS, liveTestCandles } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const html = read('app.html').replace('    ME.refresh(false);', '    window.__cexConflicts = { ME, CexEngine, refreshVenuePresentation }; ME.apply(SEED_SIGNALS, "seed", ME_STAMP);').replace('    ME.startAuto();', '');
+const html = read('app.html').replace('    ME.refresh(false);', '    window.__cexConflicts = { ME, CexEngine, refreshVenuePresentation }; ME.refresh(false);').replace('    ME.startAuto();', '');
 let browser;
 async function open() {
   const page = await freshPage(browser); await page.setViewport(VIEWPORTS.mobileSm);
-  await page.evaluateOnNewDocument(() => {
+  const candles = liveTestCandles(), symbols = JSON.parse(read('tests/fixtures/legacy-seed.json')).map(s => s.pair.split(' / ')[0]);
+  await page.evaluateOnNewDocument(({candles, symbols}) => {
     localStorage.clear(); window._mode63 = 'mixed'; window._reverse63 = false;
     const original = window.fetch.bind(window);
     window.fetch = (input, opt) => {
-      const u = String(input), reversed = window._reverse63, mode = window._mode63;
+      const u = String(input);
+      if (u.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>symbols.map(sym=>({symbol:sym+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
+      if (u.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>candles});
+      const reversed = window._reverse63, mode = window._mode63;
       if (u.includes('data-api.binance.vision/api/v3/ticker/price')) {
         const duplicate = [{ symbol: 'PEPEUSDT', price: '100' }, { symbol: 'PEPEUSDT', price: '200' }];
         if (reversed) duplicate.reverse();
@@ -21,7 +25,7 @@ async function open() {
       if (/^https?:/.test(u) && !u.startsWith(location.origin)) return Promise.reject(new Error('offline'));
       return original(input, opt);
     };
-  });
+  }, {candles, symbols});
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());
@@ -30,7 +34,7 @@ async function open() {
     return req.abort().catch(() => {});
   });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__cexConflicts && window.__cexConflicts.CexEngine.online === 3 && !window.__cexConflicts.CexEngine.busy);
+  await page.waitForFunction(() => window.__cexConflicts && document.querySelector('.signal-card') && window.__cexConflicts.CexEngine.online === 3 && !window.__cexConflicts.CexEngine.busy);
   return page;
 }
 describe('step63 / ambiguous CEX quotes in the browser', { timeout: 60000 }, () => {
@@ -46,7 +50,7 @@ describe('step63 / ambiguous CEX quotes in the browser', { timeout: 60000 }, () 
       assert.match(await page.$eval('#cexTickerLabel', el => el.textContent), /LIVE 3\/11/);
       assert.match(await page.$eval('#tickerScrollFeed', el => el.textContent), /PEPE ≈110 USDT \(2 venues\)/);
       assert.match(await page.$eval('#cexRadarNotice', el => el.textContent), /at least one accepted quote across the scanned universe/);
-      await page.evaluate(async () => { window._reverse63 = true; await window.__cexConflicts.CexEngine.fetchAll(['PEPE', 'BTC']); window.__cexConflicts.refreshVenuePresentation(); });
+      await page.evaluate(async () => { window._reverse63 = true; await window.__cexConflicts.CexEngine.fetchAll(["PEPE", "BTC"]); window.__cexConflicts.refreshVenuePresentation(); });
       assert.equal(await page.evaluate(() => window.__cexConflicts.CexEngine.data.PEPE.med), 110);
       assert.equal(await page.evaluate(() => window.__cexConflicts.CexEngine.data.PEPE.n), 2);
       for (const lang of ['de', 'en', 'es', 'ar', 'zh']) {
@@ -62,7 +66,7 @@ describe('step63 / ambiguous CEX quotes in the browser', { timeout: 60000 }, () 
   it('does not show a phantom radar if all available pair quotes are duplicated', async () => {
     const page = await open();
     try {
-      await page.evaluate(async () => { window._mode63 = 'all-bad'; await window.__cexConflicts.CexEngine.fetchAll(['PEPE']); window.__cexConflicts.refreshVenuePresentation(); });
+      await page.evaluate(async () => { window._mode63 = 'all-bad'; await window.__cexConflicts.CexEngine.fetchAll(["PEPE"]); window.__cexConflicts.refreshVenuePresentation(); });
       assert.equal(await page.evaluate(() => window.__cexConflicts.CexEngine.online), 0);
       assert.deepEqual(await page.evaluate(() => window.__cexConflicts.CexEngine.data), {});
       assert.equal(await page.$eval('#cexRadarNotice', el => el.hidden), true);

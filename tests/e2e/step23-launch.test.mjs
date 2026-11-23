@@ -1,7 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  startServer, stopServer, launchBrowser, freshPage, gotoLanding, gotoApp
+  startServer, stopServer, launchBrowser, freshPage, gotoLanding, gotoApp, liveTestCandles
 } from '../helpers/browser.mjs';
 import { read, inlineScripts, extractArray } from '../helpers/html.mjs';
 import { passesQualityGate } from '../helpers/core-logic.mjs';
@@ -11,10 +11,6 @@ const WALLETS = {
   BTC: 'bc1qeqzrlfg3edrydk4s0hecakc82gp26n5p7hkc7f',
   ETH: '0xBC3fab34f69bc9f6661608C3FB36dDdC313C42F7'
 };
-
-const appJs = inlineScripts(read('app.html')).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
-const gated = seed.filter((s) => passesQualityGate(s)).length;
 
 let browser;
 
@@ -49,7 +45,7 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     const wallets = await page.$eval('#ftWallets', (el) => el.textContent);
     for (const w of Object.values(WALLETS)) assert.ok(wallets.includes(w), w.slice(0, 8));
     const n = await page.$eval('#statActiveCount', (el) => el.textContent.trim());
-    assert.equal(n, String(gated));
+    assert.equal(n, '10');
     await page.click('#btnOpenDonation');
     await page.waitForSelector('#donationModalBackdrop.is-visible', { timeout: 5000 });
     const copies = await page.$$eval('[data-doncopy]', (els) => els.map((e) => e.getAttribute('data-doncopy')));
@@ -73,7 +69,7 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
 
   it('beta: landing wallets → terminal donation modal, Grade-A cards, no page errors', async () => {
     const page = await freshPage(browser);
-    await gotoLanding(page, { lang: 'en' });
+    await gotoLanding(page, { lang: 'en', marketKlines: liveTestCandles() });
     const land = await page.$eval('footer', (el) => el.textContent);
     assert.ok(land.includes(WALLETS.SOL));
     await Promise.all([
@@ -83,7 +79,7 @@ describe('step23 launch e2e', { timeout: 180_000 }, () => {
     await page.waitForSelector('#signalsGrid .signal-card', { timeout: 15000 });
     await new Promise((r) => setTimeout(r, 800));
     const n = await page.$eval('#statActiveCount', (el) => el.textContent.trim());
-    assert.equal(n, String(gated));
+    assert.equal(n, '10');
     await page.click('#btnOpenDonation');
     await page.waitForSelector('#donationModalBackdrop.is-visible', { timeout: 5000 });
     const sol = await page.$eval('#btnDonSol', (el) => el.getAttribute('data-doncopy'));

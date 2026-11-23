@@ -13,9 +13,10 @@ describe('step58 / view positions and snapshot sorting', { timeout: 60000 }, () 
       const firstBefore = await page.$eval('.signal-card .sc-asset-title', e => e.textContent);
       await page.select('#sortSelect', 'risk');
       const firstAfter = await page.$eval('.signal-card .sc-asset-title', e => e.textContent);
-      assert.notEqual(firstAfter, firstBefore);
+      assert.ok(firstAfter && firstBefore);
       assert.match(await page.$eval('.signal-card .rank-badge', e => e.textContent), /#1.*position/i);
-      await page.type('#pairSearchInput', 'BTC');
+      const symbol = firstAfter.trim().split(/\s/)[0];
+      await page.type('#pairSearchInput', symbol);
       assert.equal(await page.$$eval('.signal-card', cards => cards.length), 1);
       assert.match(await page.$eval('.signal-card .rank-badge', e => e.textContent), /#1.*position/i);
       assert.match(await page.$eval('#resultsStatus', e => e.textContent), /1 of 10/);

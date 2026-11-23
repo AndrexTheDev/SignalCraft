@@ -2,13 +2,13 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const signals = Array.from({ length: 100 }, (_, i) => ({ ...seed[0], pair: 'TEST' + i + ' / USDT', id: 'SIG-TIME-' + i, modelVersion: 3, quantScore: 90, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
 let browser;
 describe('step42 / stalled live market responses', { timeout: 60000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
   after(async () => { if (browser) await browser.close(); stopServer(); });
-  it('falls back from cached LIVE to DEMO and releases refresh after response bodies stall', async () => {
+  it('never restores cached signals and releases refresh after response bodies stall', async () => {
     const page = await freshPage(browser);
     try {
       await page.evaluateOnNewDocument(signals => {
@@ -23,11 +23,11 @@ describe('step42 / stalled live market responses', { timeout: 60000 }, () => {
         };
       }, signals);
       await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''));
+      assert.equal(await page.$$eval('.signal-card', el => el.length), 0);
       assert.equal(await page.$eval('#btnRefreshSentimentGlobal', el => el.disabled), true);
-      await page.waitForFunction(() => /DEMO/.test(document.getElementById('meBadge')?.textContent || '') && !document.getElementById('btnRefreshSentimentGlobal').disabled, { timeout: 5000 });
+      await page.waitForFunction(() => /unavailable/i.test(document.getElementById('meBadge')?.textContent || '') && !document.getElementById('btnRefreshSentimentGlobal').disabled, { timeout: 5000 });
       await page.click('#btnRefreshSentimentGlobal');
-      await page.waitForFunction(() => !document.getElementById('btnRefreshSentimentGlobal').disabled && /DEMO snapshot active/.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 5000 });
+      await page.waitForFunction(() => !document.getElementById('btnRefreshSentimentGlobal').disabled && /unavailable/i.test(document.getElementById('toastMessage')?.textContent || ''), { timeout: 5000 });
       assert.equal(await page.$eval('#btnRefreshSentimentGlobal', el => el.hasAttribute('aria-busy')), false);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }

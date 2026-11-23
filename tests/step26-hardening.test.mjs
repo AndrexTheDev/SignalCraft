@@ -10,7 +10,7 @@ import {
 
 const app = read('app.html');
 const appJs = inlineScripts(app).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 const gated = filterSignals(seed, {});
 
 describe('step26 / qualityScore gate', () => {

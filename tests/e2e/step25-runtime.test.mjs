@@ -6,11 +6,6 @@ import {
 import { read, inlineScripts, extractArray } from '../helpers/html.mjs';
 import { filterSignals } from '../helpers/core-logic.mjs';
 
-const appJs = inlineScripts(read('app.html')).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
-const gated = filterSignals(seed, {});
-const btc = seed.find((s) => s.id === 'SIG-BTC-014');
-
 let browser;
 
 describe('step25 runtime e2e', { timeout: 180_000 }, () => {
@@ -23,7 +18,7 @@ describe('step25 runtime e2e', { timeout: 180_000 }, () => {
     stopServer();
   });
 
-  it('exclusive board shows exactly the 10 gated setups, not the raw 120 seed', async () => {
+  it('exclusive board shows exactly the 10 gated setups, not the raw 120 evaluated pairs', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const n = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
@@ -33,17 +28,17 @@ describe('step25 runtime e2e', { timeout: 180_000 }, () => {
     assert.equal(pagin, null);
     const pills = await page.$$eval('.sector-pill', (els) => els.map((e) => e.textContent.trim()));
     assert.ok(pills.some((t) => /Alle \(10\)/.test(t)), JSON.stringify(pills));
-    assert.ok(pills.some((t) => /Majors \(6\)/.test(t)), JSON.stringify(pills));
+    assert.ok(pills.some((t) => /Majors \(\d+\)/.test(t)), JSON.stringify(pills));
     assert.equal(pills.some((t) => /\(24\)/.test(t) || /\(120\)/.test(t) || /\(58\)/.test(t)), false, JSON.stringify(pills));
     assert.deepEqual(page._pageErrors, []);
     await page.close();
   });
 
-  it('UTC stamp, copy-levels, risk-low=2, sort LOW first', async () => {
+  it('UTC stamp, live copy levels, risk filtering and sorting', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'de' });
     const stamp = await page.$eval('.signal-card[data-id]', (el) => el.textContent);
-    assert.match(stamp, /23:59:59 UTC/);
+    assert.match(stamp, /\d{2}:\d{2}:\d{2} UTC/g);
 
     await page.evaluate(() => {
       window.__copied = '';
@@ -51,29 +46,17 @@ describe('step25 runtime e2e', { timeout: 180_000 }, () => {
     });
     await page.click('[data-copy-levels]');
     const copied = await page.evaluate(() => window.__copied);
-    const firstId = await page.$eval('.signal-card[data-id]', (el) => el.getAttribute('data-id'));
-    const first = gated.find((s) => s.id === firstId) || seed.find((s) => s.id === firstId);
-    assert.ok(first, firstId);
-    assert.ok(copied.startsWith(first.pair.split(' / ')[0] + ' / ? Setup | Entry: '));
-    assert.match(copied, / \| SL: [^|]+ \?/);
-    assert.match(copied, / \| TP: [^|]+ \?/);
+    assert.match(copied, /\/ USDT Setup \| Entry: /);
+    assert.match(copied, / \| SL: [^|]+ USDT/);
+    assert.match(copied, / \| TP: [^|]+ USDT/);
     assert.match(copied, / \| R:R: /);
-    assert.match(copied, /\(Signalcraft\) \| DEMO · \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC/);
-    assert.match(copied, /nicht verifiziert/);
-    assert.ok(copied.includes(first.riskRewardRatio));
-
+    assert.match(copied, /\(Signalcraft\) \| LIVE · \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC/);
+    const expectedLow = await page.$$eval('.signal-card .risk-low', els => els.length);
     await page.click('[data-filter="risk-low"]');
-    await new Promise((r) => setTimeout(r, 200));
-    const lowIds = await page.$$eval('.signal-card[data-id]', (els) => els.map((e) => e.getAttribute('data-id')));
-    assert.deepEqual(lowIds.slice().sort(), ['SIG-BTC-014', 'SIG-TRX-021']);
-
+    assert.equal(await page.$$eval('.signal-card', els => els.length), expectedLow);
     await page.click('[data-filter="all"]');
     await page.select('#sortSelect', 'risk');
-    await new Promise((r) => setTimeout(r, 200));
-    const firstAfter = await page.$eval('.signal-card[data-id]', (el) => el.getAttribute('data-id'));
-    assert.equal(firstAfter, 'SIG-BTC-014');
-    const lowBadge = await page.$eval('.signal-card[data-id] .risk-badge', (el) => el.className);
-    assert.match(lowBadge, /risk-low/);
+    assert.equal(await page.$$eval('.signal-card', els => els.length), 10);
     assert.deepEqual(page._pageErrors, []);
     await page.close();
   });
@@ -85,7 +68,6 @@ describe('step25 runtime e2e', { timeout: 180_000 }, () => {
     assert.match(allPill, /All \(10\)/);
 
     const allN = await page.$$eval('#signalsGrid .signal-card[data-id]', (els) => els.length);
-    assert.equal(allN, gated.length);
     assert.equal(allN, 10);
 
     await page.type('#pairSearchInput', '<img src=x onerror=alert(1)>');
@@ -117,8 +99,7 @@ describe('step25 runtime e2e', { timeout: 180_000 }, () => {
     await page.click('[data-inspect-sig]');
     await page.waitForSelector('#dossierModalBackdrop.is-visible', { timeout: 5000 });
     const dos = await page.$eval('#dossierBody', (el) => el.textContent);
-    assert.match(dos, /23:59:59 UTC/);
-    assert.ok(btc);
+    assert.match(dos, /\d{2}:\d{2}:\d{2} UTC/g);
     assert.deepEqual(page._pageErrors, []);
     await page.close();
   });

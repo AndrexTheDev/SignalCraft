@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const app = read('app.html');
-const seed = JSON.parse(extractArray(app, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const symbols = seed.map(s => s.pair.split(' / ')[0]), DAY = 86400000;
 function candles(broken = false) {
   const start = Math.floor(Date.now() / DAY) * DAY - 199 * DAY; let price = 100;
@@ -27,7 +27,7 @@ async function run(mode) {
           (${JSON.stringify(mode)} === 'one-projection' && sym === ${JSON.stringify(symbols[0])})) result.metrics.volX = Infinity;
       return result;
     };
-    ME.refresh(false);`);
+    window.__auditSignals = () => signalsData; ME.refresh(false);`);
   let usRequests = 0;
   await page.evaluateOnNewDocument(() => localStorage.clear());
   await page.setRequestInterception(true);
@@ -57,14 +57,15 @@ describe('step78 / source fallback after uncomputable trade plans', { timeout: 9
       const { page, usRequests } = await run(mode);
       try {
         const live = mode !== 'many-missing';
-        assert.match(await page.$eval('#meBadge', e => e.textContent), live ? /LIVE/ : /DEMO/);
-        const cache = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
+        assert.match(await page.$eval('#meBadge', e => e.textContent), live ? /LIVE/ : /unavailable/i);
+        const cache = await page.evaluate(() => ({ signals: window.__auditSignals(), stored: localStorage.getItem('signalcraft_live_v2') }));
+        assert.equal(cache.stored, null);
         if (live) {
-          assert.ok(cache); assert.equal(cache.version, 9);
+          assert.ok(cache);
           assert.equal(cache.signals.length, (mode === 'one-missing' || mode === 'one-projection') ? 119 : 120);
           if ((mode === 'primary-fails' || mode === 'primary-projection')) assert.ok(cache.signals.every(s => s.venue === 'BINANCE-US SPOT'));
           if ((mode === 'one-missing' || mode === 'one-projection')) assert.ok(cache.signals.every(s => !s.pair.startsWith(symbols[0] + ' / ')));
-        } else assert.equal(cache, null);
+        } else assert.equal(cache.signals.length, 0);
         assert.equal(usRequests, (mode === 'primary-fails' || mode === 'primary-projection') ? 120 : (mode === 'one-missing' || mode === 'one-projection') ? 1 : mode === 'many-missing' ? 21 : 0);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }

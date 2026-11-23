@@ -2,7 +2,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const syms = seed.map(s => s.pair.split(' / ')[0]), DAY = 86400000;
 function candles(spike) {
   const start = Math.floor(Date.now() / DAY) * DAY - 199 * DAY; let price = 100;
@@ -13,6 +13,7 @@ function candles(spike) {
     return [t, open, high, low, price, 0, t + DAY - 1, volume, 0, 0, volume * ratio, 0];
   });
 }
+const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__auditSignals = () => signalsData; ME.refresh(false);');
 let browser;
 async function obtain(spike) {
   const page = await freshPage(browser), data = candles(spike);
@@ -21,6 +22,7 @@ async function obtain(spike) {
     await page.setRequestInterception(true);
     page.on('request', req => {
       const u = new URL(req.url());
+      if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: instrumented }).catch(() => {});
       if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
       if (u.pathname.endsWith('/ticker/24hr')) return req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(syms.map(sym => ({ symbol: sym + 'USDT', quoteVolume: '20000000', priceChangePercent: '1', closeTime: Date.now() }))) }).catch(() => {});
       if (u.pathname.endsWith('/klines')) return req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }).catch(() => {});
@@ -29,7 +31,8 @@ async function obtain(spike) {
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !document.getElementById('btnRefreshSentimentGlobal').disabled, { timeout: 30000 });
     assert.match(await page.$eval('#meBadge', e => e.textContent), /LIVE/);
-    const cache = await page.evaluate(() => JSON.parse(localStorage.getItem('signalcraft_live_v2')));
+    const cache = await page.evaluate(() => ({ signals: window.__auditSignals(), stored: localStorage.getItem('signalcraft_live_v2') }));
+        assert.equal(cache.stored, null);
     assert.equal(cache.signals.length, 120);
     assert.deepEqual(page._pageErrors, []);
     return cache;
@@ -43,6 +46,6 @@ describe('step77 / LIVE OBV old-volume independence', { timeout: 60000 }, () => 
     const factors = cache => cache.signals.map(s => ({ pair: s.pair, score: s.quantScore, obv: s.metrics.obvDir, volume: s.metrics.comp.vo }));
     assert.ok(normal.signals.every(s => s.metrics.obvDir === 'up'));
     assert.deepEqual(factors(spiked), factors(normal));
-    assert.equal(spiked.version, 9);
+    assert.equal(spiked.stored, null);
   });
 });

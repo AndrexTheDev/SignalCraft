@@ -12,7 +12,7 @@ import {
 const LANGS = ['de', 'en', 'es', 'ar', 'zh'];
 const app = read('app.html');
 const appJs = inlineScripts(app).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 const gated = filterSignals(seed, {});
 const counts = sectorCounts(seed);
 function qualMinGate() { return gated.length; }

@@ -1,6 +1,6 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS, liveTestCandles } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
 const html = read('app.html');
 const instrumented = html.replace('    ME.refresh(false);', '    window.__fngTimeTest = { SentimentEngine, renderSignals };\n    ME.refresh(false);');
@@ -11,16 +11,19 @@ async function open(row, mobile = false) {
   const page = await freshPage(browser);
   if (mobile) await page.setViewport(VIEWPORTS.mobileSm);
   await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
+  const candles = liveTestCandles(), seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
   await page.setRequestInterception(true);
   page.on('request', req => {
     const u = new URL(req.url());
     if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: instrumented }).catch(() => {});
     if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
+    if (u.pathname.endsWith('/ticker/24hr')) return req.respond({status:200,contentType:'application/json',body:JSON.stringify(seed.map(s => ({symbol:s.pair.split(' / ')[0]+'USDT', quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()})))}).catch(() => {});
+    if (u.pathname.endsWith('/klines')) return req.respond({status:200,contentType:'application/json',body:JSON.stringify(candles)}).catch(() => {});
     if (u.hostname === 'api.alternative.me') return req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [row] }) }).catch(() => {});
     return req.abort().catch(() => {});
   });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__fngTimeTest && window.__fngTimeTest.SentimentEngine._fngController === null);
+  await page.waitForFunction(() => window.__fngTimeTest && window.__fngTimeTest.SentimentEngine._fngController === null && document.querySelector(".signal-card"));
   return page;
 }
 const row = timestamp => ({ value: '63', value_classification: 'Greed', timestamp });

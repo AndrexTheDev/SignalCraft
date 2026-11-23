@@ -1,9 +1,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, gotoApp, gotoLanding, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, gotoApp, gotoLanding, stubMarket, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__risk37 = {ME, signals: () => signalsData}; ME.refresh(false);');
 let browser;
 describe('step37 / position risk and explanations', { timeout: 120000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
@@ -12,23 +12,13 @@ describe('step37 / position risk and explanations', { timeout: 120000 }, () => {
   it('caps the spot position, shows the actual planned loss and clears invalid input', async () => {
     const page = await freshPage(browser);
     try {
-      const signals = Array.from({ length: 100 }, (_, i) => ({
-        ...seed[0], id: `SIG-TEST-${i}`, pair: (i ? 'TEST' + i : 'TEST') + ' / USDT', entryPrice: 100, stopLoss: 99.9, targets: [101, 102], riskRewardRatio: '1:20.0',
-        quantScore: 90, confluenceScore: 90, modelVersion: 3,
-        gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
-      }));
-      await page.evaluateOnNewDocument(signals => {
-        localStorage.setItem('signalcraft_live_v2', JSON.stringify(((t) => ({ version: 9, t, signals: signals.map(s => ({ ...s, confluenceScore: s.quantScore, metrics: { ...s.metrics, score: s.quantScore }, timestamp: t })) }))(Date.now())));
-      }, signals);
-      await page.setRequestInterception(true);
-      page.on('request', req => {
-        const url = new URL(req.url());
-        if (url.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-        if (url.pathname.endsWith('/ticker/24hr')) return; // keep refresh pending while inspecting cached LIVE fixture
-        return req.abort().catch(() => {});
+      await stubMarket(page, {appHtml:instrumented, klines:liveTestCandles()});
+      await page.goto(BASE + '/app.html?lang=en', {waitUntil:'domcontentloaded'});
+      await page.waitForFunction(() => document.querySelector('.signal-card'));
+      await page.evaluate(() => {
+        const t = window.__risk37;
+        t.ME.apply(t.signals().map(s => ({...s, entryPrice:100, stopLoss:99.9, targets:[101,102], riskRewardRatio:'1:20.0'})), 'live', t.ME.status.when);
       });
-      await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''));
       await page.click('[data-inspect-sig]');
       await page.waitForSelector('#dossierModalBackdrop.is-visible');
       const text = selector => page.$eval(selector, el => el.textContent.trim());

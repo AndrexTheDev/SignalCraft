@@ -2,9 +2,9 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seed = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const signals = Array.from({ length: 100 }, (_, i) => ({
-  ...seed[0], id: `CACHE-VALID-${i}`, pair: `SAFE${i} / USDT`, modelVersion: 3,
+  ...seed[0], id: `CACHE-VALID-${i}`, pair: `SAFE${i} / USDT`, live:true, modelVersion: 3,
   quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
 }));
 let browser;
@@ -22,27 +22,27 @@ async function withCache(data) {
     return req.abort().catch(() => {});
   });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.getElementById('btnRefreshSentimentGlobal').disabled);
   return page;
 }
 describe('step49 / malformed live cache in browser', { timeout: 60000 }, () => {
   before(async () => { await startServer(); browser = await launchBrowser(); });
   after(async () => { if (browser) await browser.close(); stopServer(); });
-  it('still restores a structurally valid cache while a fresh update is pending', async () => {
+  it('never restores a structurally valid cache while a fresh update is pending', async () => {
     const page = await withCache(signals);
     try {
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /LIVE/);
-      assert.match(await page.$eval('.sc-asset-title', el => el.textContent), /SAFE0 \/ USDT/);
+      assert.doesNotMatch(await page.$eval('#meBadge', el => el.textContent), /LIVE|DEMO/);
+      assert.equal((await page.$$('.signal-card')).length, 0);
+      assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
-  it('keeps a valid cache when one indicator is unknown, but excludes that setup from the board', async () => {
+  it('discards even a cache with an unknown indicator', async () => {
     const data = structuredClone(signals); data[0].gateMetrics.adx = null;
     const page = await withCache(data);
     try {
-      assert.match(await page.$eval('#meBadge', el => el.textContent), /LIVE/);
-      const board = await page.$eval('#signalsGrid', el => el.textContent);
-      assert.doesNotMatch(board, /SAFE0\s*\/\s*USDT/);
-      assert.match(board, /SAFE1\s*\/\s*USDT/);
+      assert.doesNotMatch(await page.$eval('#signalsGrid', el => el.textContent), /SAFE\d+/);
+      assert.equal((await page.$$('.signal-card')).length, 0);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
@@ -56,13 +56,14 @@ describe('step49 / malformed live cache in browser', { timeout: 60000 }, () => {
     'no gate-qualified records': (s, all) => { all.forEach(x => { x.quantScore = 70; x.confluenceScore = 70; x.metrics.score = 70; }); }
   };
   for (const [name, mutate] of Object.entries(faults)) {
-    it(`uses DEMO instead of presenting ${name} as LIVE`, async () => {
+    it(`never displays a cached snapshot with ${name}`, async () => {
       const data = structuredClone(signals); mutate(data[0], data);
       const page = await withCache(data);
       try {
-        assert.match(await page.$eval('#meBadge', el => el.textContent), /DEMO/);
+        assert.doesNotMatch(await page.$eval('#meBadge', el => el.textContent), /LIVE|DEMO/);
         assert.doesNotMatch(await page.$eval('#signalsGrid', el => el.textContent), /SAFE0/);
-        assert.match(await page.$eval('#quoteNotice', el => el.textContent), /unverified/);
+        assert.equal((await page.$$('.signal-card')).length, 0);
+        assert.equal(await page.evaluate(() => localStorage.getItem('signalcraft_live_v2')), null);
         assert.deepEqual(page._pageErrors, []);
       } finally { await page.close(); }
     });

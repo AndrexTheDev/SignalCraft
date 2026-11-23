@@ -11,8 +11,8 @@ const never = () => new Promise(() => {});
 function engine() {
   const seed = Array.from({ length: 120 }, (_, i) => ({ pair: 'P' + i, sector: 'test' }));
   const button = { disabled: false, busy: false, setAttribute() { this.busy = true; }, removeAttribute() { this.busy = false; } };
-  const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'SEED_SIGNALS', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsDel', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
-    0, { getElementById: () => button }, { en: { meDemoToast: 'demo' } }, 'en', seed, [], s => s, () => {}, () => null, () => {}
+  const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsDel', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
+    0, { getElementById: () => button }, { en: { meDemoToast: 'demo' } }, 'en', seed.map(s => [s.pair, s.sector]), () => 'unavailable', [], s => s, () => {}, () => null, () => {}
   );
   me.REFRESH_DEADLINE = 30;
   return { me, button };
@@ -43,7 +43,7 @@ describe('step43 / full refresh deadline and cancellation', () => {
   it('bounds the whole refresh even when a ticker mock never settles', async () => {
     const { me, button } = engine(); let signal, applied = 0;
     me.tickers24h = async s => { signal = s; return never(); };
-    me.apply = (data, mode) => { assert.equal(mode, 'seed'); applied++; };
+    me.apply = (data, mode) => { assert.equal(mode, 'unavailable'); applied++; };
     await me.refresh(true);
     assert.equal(signal.aborted, true); assert.equal(applied, 1);
     assert.equal(me.busy, false); assert.equal(button.disabled, false); assert.equal(button.busy, false);

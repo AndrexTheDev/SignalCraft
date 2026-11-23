@@ -1,21 +1,15 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
-const source = read('app.html').replace('    ME.refresh(false);', '    window.__boardTest = { ME, seed: SEED_SIGNALS, renderSignals };\n    ME.refresh(false);');
+const source = read('app.html').replace('    ME.refresh(false);', '    window.__boardTest = { ME, signals: () => signalsData, renderSignals };\n    ME.refresh(false);');
 let browser;
 async function open(lang = 'en') {
   const page = await freshPage(browser);
   await page.evaluateOnNewDocument(() => localStorage.clear());
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const u = new URL(req.url());
-    if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: source }).catch(() => {});
-    if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    return req.abort().catch(() => {});
-  });
+  await stubMarket(page, { appHtml: source, klines: liveTestCandles() });
   await page.goto(BASE + '/app.html?lang=' + lang, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !document.getElementById('btnRefreshSentimentGlobal').disabled);
+  await page.waitForFunction(() => document.querySelector('.signal-card') && !document.getElementById('btnRefreshSentimentGlobal').disabled);
   return page;
 }
 describe('step57 / board controls and empty-state feedback', { timeout: 60000 }, () => {
@@ -25,7 +19,7 @@ describe('step57 / board controls and empty-state feedback', { timeout: 60000 },
     const page = await open();
     try {
       await page.focus('[data-inspect-sig]');
-      await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.seed.map(s => ({ ...s, quantScore: 0 })), 'seed', Date.now()));
+      await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.signals().map(s => ({ ...s, quantScore: 0, confluenceScore: 0, metrics: {...s.metrics, score: 0} })), 'live', window.__boardTest.ME.status.when));
       assert.equal(await page.evaluate(() => document.activeElement.id), 'signalsGrid');
       assert.equal(await page.$eval('#resetFiltersBtn', el => el.hidden), true);
       assert.match(await page.$eval('#signalsGrid', el => el.textContent), /no setups.*board/i);
@@ -39,7 +33,7 @@ describe('step57 / board controls and empty-state feedback', { timeout: 60000 },
     try {
       await page.click('.sector-pill[data-sector="majors"]');
       await page.focus('[data-inspect-sig]');
-      await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.seed.map(s => ({ ...s, sector: 'ai' })), 'seed', Date.now()));
+      await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.signals().map(s => ({ ...s, sector: 'ai' })), 'live', window.__boardTest.ME.status.when));
       assert.equal(await page.evaluate(() => document.activeElement.id), 'signalsGrid');
       assert.match(await page.$eval('#signalsGrid', el => el.textContent), /reset.*filter/i);
       assert.equal(await page.$eval('#resetFiltersBtn', el => el.hidden), false);
@@ -54,7 +48,7 @@ describe('step57 / board controls and empty-state feedback', { timeout: 60000 },
     const page = await open();
     try {
       await page.click('#btnOpenDonation');
-      await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.seed.map(s => ({ ...s, quantScore: 0 })), 'seed', Date.now()));
+      await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.signals().map(s => ({ ...s, quantScore: 0, confluenceScore: 0, metrics: {...s.metrics, score: 0} })), 'live', window.__boardTest.ME.status.when));
       assert.equal(await page.evaluate(() => document.activeElement.id), 'btnCloseDonationModal');
       assert.equal(await page.$eval('main.editorial-shell', el => el.inert), true);
       await page.keyboard.press('Escape');
@@ -95,7 +89,7 @@ describe('step57 / board controls and empty-state feedback', { timeout: 60000 },
         await page.select('#sortSelect', 'risk');
         const label = await page.$eval('#sortSelect', el => el.selectedOptions[0].textContent);
         assert.ok((await page.$eval('#toastMessage', el => el.textContent)).includes(label));
-        await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.seed.map(s => ({ ...s, quantScore: 0 })), 'seed', Date.now()));
+        await page.evaluate(() => window.__boardTest.ME.apply(window.__boardTest.signals().map(s => ({ ...s, quantScore: 0, confluenceScore: 0, metrics: {...s.metrics, score: 0} })), 'live', window.__boardTest.ME.status.when));
         assert.match(await page.$eval('#resultsStatus', el => el.textContent), /0/);
         assert.equal(await page.$eval('#resetFiltersBtn', el => el.hidden), true);
         assert.ok((await page.$eval('#signalsGrid', el => el.textContent.trim())).length > 5);

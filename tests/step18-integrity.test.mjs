@@ -11,7 +11,7 @@ const app = read('app.html');
 const landing = read('index.html');
 const appJs = inlineScripts(app).join('\n');
 const landJs = inlineScripts(landing).join('\n');
-const seed = JSON.parse(extractArray(appJs, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 
 describe('step18 / seed integrity', () => {
   it('every LONG has SL < entry < TP1 ≤ TP2', () => {
@@ -67,12 +67,12 @@ describe('step18 / storage + cache hardening', () => {
 
   it('terminal uses isLiveCache for the market cache and no lead store remains', () => {
     assert.match(appJs, /function isLiveCache\s*\(/);
-    assert.match(appJs, /isLiveCache\(ca\)/);
+    assert.match(appJs, /isLiveCache\(\{ signals: list \}\)/);
     assert.equal(/function safeJsonArray|signalcraft_leads/.test(appJs), false);
   });
 
   it('apply() refuses a non-array live list', () => {
-    assert.match(appJs, /if \(!Array\.isArray\(list\)/);
+    assert.match(appJs, /isLiveCache\(\{ signals: list \}\)/);
   });
 });
 

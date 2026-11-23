@@ -100,7 +100,7 @@ describe('step2 / lead email', () => {
 describe('step2 / seed vs live contract', () => {
   it('seed sentiment bull+bear is a 100 split (not 0 bear)', () => {
     const js = inlineScripts(read('app.html')).join('\n');
-    const seed = JSON.parse(extractArray(js, 'const SEED_SIGNALS ='));
+    const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
     const broken = seed.filter((s) => {
       const b = s.sentiment?.bullPct;
       const r = s.sentiment?.bearPct;

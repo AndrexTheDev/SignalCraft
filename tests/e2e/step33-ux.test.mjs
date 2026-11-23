@@ -1,8 +1,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, gotoApp, gotoLanding } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, gotoApp, gotoLanding, liveTestCandles } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
-const seedSignals = JSON.parse(extractArray(read('app.html'), 'const SEED_SIGNALS ='));
+const instrumented = read('app.html').replace('    ME.refresh(false);', '    window.__ux33 = {signals: () => signalsData}; ME.refresh(false);');
 
 let browser;
 describe('step33 / accessibility and feedback', { timeout: 120000 }, () => {
@@ -71,9 +71,9 @@ describe('step33 / accessibility and feedback', { timeout: 120000 }, () => {
   it('preserves a deep-linked language and keeps mobile controls usable in RTL', async () => {
     const page = await freshPage(browser);
     try {
-      await gotoLanding(page, { lang: 'ar', viewport: { width: 320, height: 740 } });
+      await gotoLanding(page, { lang: 'ar', marketKlines: liveTestCandles(), viewport: { width: 320, height: 740 } });
       assert.equal(await page.$eval('a[data-terminal-link]', a => new URL(a.href).searchParams.get('lang')), 'ar');
-      assert.match(await page.$eval('[data-i18n="pr_d"]', el => el.textContent), /أثر رجعي/);
+      assert.equal(await page.$('#proofHitPct'), null);
       await page.goto(await page.$eval('a[data-terminal-link]', a => a.href), { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#signalsGrid .signal-card');
       assert.equal(await page.$eval('html', el => el.dir), 'rtl');
@@ -83,7 +83,7 @@ describe('step33 / accessibility and feedback', { timeout: 120000 }, () => {
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
-  it('shows observed taker shares and labels demo data and the separate index in every language', async () => {
+  it('shows observed taker shares and labels live data and the separate index in every language', async () => {
     const copy = {
       de: [/separat/i, /Kaufanteil/i], en: [/separate/i, /taker-buy share/i],
       es: [/aparte/i, /proporción/i], ar: [/منفصل/, /نسبة/], zh: [/单独/, /占比/]
@@ -92,15 +92,15 @@ describe('step33 / accessibility and feedback', { timeout: 120000 }, () => {
       const page = await freshPage(browser);
       try {
         await page.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-        await gotoApp(page, { lang, fng: { value: 63 } });
+        await gotoApp(page, { lang, fng: { value: 63 }, appHtml: instrumented });
         await page.click('[data-toggle-sentiment]');
         const id = await page.$eval('#signalsGrid article.signal-card', el => el.getAttribute('data-id'));
-        const seed = seedSignals.find(s => s.id === id);
-        assert.ok(seed, `missing seed ${id}`);
-        const expected = seed.metrics.tb7.toFixed(1) + '% / ' + (100 - seed.metrics.tb7).toFixed(1) + '%';
+        const tb7 = await page.evaluate(id => window.__ux33.signals().find(s => s.id === id).metrics.tb7, id);
+        const expected = tb7.toFixed(1) + '% / ' + (100 - tb7).toFixed(1) + '%';
         assert.equal(await page.$eval('.sentiment-drawer-panel.is-open .taker-split', el => el.textContent), expected);
         const drawer = await page.$eval('.sentiment-drawer-panel.is-open', el => el.textContent);
-        assert.match(drawer, /DEMO/);
+        assert.match(await page.$eval('#meBadge', el => el.textContent), /LIVE/);
+        assert.doesNotMatch(drawer, /DEMO/i);
         assert.match(drawer, separate);
         assert.match(drawer, /63/);
         assert.match(await page.$eval('#faq-panel-1', el => el.textContent), explanation);

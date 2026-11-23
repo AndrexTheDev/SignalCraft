@@ -1,9 +1,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE, VIEWPORTS } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, stubMarket, liveTestCandles, BASE, VIEWPORTS } from '../helpers/browser.mjs';
 import { read } from '../helpers/html.mjs';
 const source = read('app.html');
-const instrumented = source.replace('    ME.refresh(false);', '    window.__modalIsolationTest = { ME, seed: SEED_SIGNALS, setModalVisible };\n    ME.refresh(false);');
+const instrumented = source.replace('    ME.refresh(false);', '    window.__modalIsolationTest = { ME, setModalVisible };\n    ME.refresh(false);');
 let browser;
 async function open({ noInert = false, lang = 'en' } = {}) {
   const page = await freshPage(browser);
@@ -12,15 +12,9 @@ async function open({ noInert = false, lang = 'en' } = {}) {
     localStorage.clear();
     if (noInert) Object.defineProperty(HTMLElement.prototype, 'inert', { configurable: true, get() { return false; }, set() {} });
   }, noInert);
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const u = new URL(req.url());
-    if (u.origin === new URL(BASE).origin && u.pathname === '/app.html') return req.respond({ status: 200, contentType: 'text/html', body: instrumented }).catch(() => {});
-    if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
-    return req.abort().catch(() => {});
-  });
+  await stubMarket(page, { appHtml: instrumented, klines: liveTestCandles() });
   await page.goto(BASE + '/app.html?lang=' + lang, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !document.getElementById('btnRefreshSentimentGlobal').disabled);
+  await page.waitForFunction(() => document.querySelector('.signal-card') && !document.getElementById('btnRefreshSentimentGlobal').disabled);
   return page;
 }
 describe('step55 / modal isolation and focus restoration', { timeout: 60000 }, () => {
@@ -73,7 +67,7 @@ describe('step55 / modal isolation and focus restoration', { timeout: 60000 }, (
       await page.click('[data-inspect-sig]');
       await page.focus('[data-possize-equity]');
       await page.evaluate(() => document.getElementById('btnOpenDonation').click());
-      await page.evaluate(() => window.__modalIsolationTest.ME.apply(window.__modalIsolationTest.seed.slice(), 'seed', Date.now()));
+      await page.evaluate(() => window.__modalIsolationTest.ME.apply([], 'unavailable', null));
       assert.equal(await page.$eval('#dossierModalBackdrop', el => el.classList.contains('is-visible')), false);
       assert.equal(await page.$eval('#donationModalBackdrop', el => el.classList.contains('is-visible') && !el.inert), true);
       assert.equal(await page.$eval('main.editorial-shell', el => el.inert), true);
@@ -89,7 +83,7 @@ describe('step55 / modal isolation and focus restoration', { timeout: 60000 }, (
     try {
       await page.click('[data-inspect-sig]');
       await page.evaluate(() => document.getElementById('btnOpenDonation').click());
-      await page.evaluate(() => window.__modalIsolationTest.ME.apply(window.__modalIsolationTest.seed.slice(), 'seed', Date.now()));
+      await page.evaluate(() => window.__modalIsolationTest.ME.apply([], 'unavailable', null));
       await page.evaluate(() => window.__modalIsolationTest.setModalVisible(document.getElementById('shareCardModalBackdrop'), true));
       const layers = await page.evaluate(() => ({
         top: +getComputedStyle(document.getElementById('shareCardModalBackdrop')).zIndex,

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { read, extractBalanced, extractArray } from './helpers/html.mjs';
 import { isLiveCache as mirror, takeProfitLevels as mirrorLevels, validLongPlan } from './helpers/core-logic.mjs';
 const app = read('app.html');
-const seed = JSON.parse(extractArray(app, 'const SEED_SIGNALS ='));
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json')); // Offline test fixture, never served to users.
 function load(name, deps = []) {
   const marker = 'function ' + name + '(';
   const start = app.indexOf(marker);

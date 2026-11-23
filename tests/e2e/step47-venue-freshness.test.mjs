@@ -1,20 +1,23 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
+import { startServer, stopServer, launchBrowser, freshPage, liveTestCandles, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const source = read('app.html');
-const seed = JSON.parse(extractArray(source, 'const SEED_SIGNALS ='));
-const html = source.replace('    ME.refresh(false);', "    window.__venueAge = { ME, seed: SEED_SIGNALS, CexEngine, DexEngine, signals: () => signalsData }; ME.apply(SEED_SIGNALS, 'seed', ME_STAMP);");
+const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
+const html = source.replace('    ME.refresh(false);', "    window.__venueAge = { ME, CexEngine, DexEngine, signals: () => signalsData }; ME.refresh(false);");
 let browser;
 async function pageWithVenues() {
   const page = await freshPage(browser);
-  await page.evaluateOnNewDocument(seed => {
-    window._now = Date.UTC(2025, 0, 1, 12);
+  const klines = liveTestCandles();
+  await page.evaluateOnNewDocument(({seed, klines}) => {
+    window._now = Date.now();
     Date.now = () => window._now;
     window._holdCex = false;
     const original = window.fetch.bind(window);
     window.fetch = (input, options) => {
       const url = String(input);
+      if (url.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>seed.map(s=>({symbol:s.pair.split(' / ')[0]+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
+      if (url.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>klines});
       if (url.includes('data-api.binance.vision/api/v3/ticker/price')) {
         if (window._holdCex) return new Promise(() => {});
         return Promise.resolve({ ok: true, json: async () => seed.map(s => ({ symbol: s.pair.split(' / ')[0] + 'USDT', price: '123' })) });
@@ -26,7 +29,7 @@ async function pageWithVenues() {
       if (/^https?:/.test(url) && !url.startsWith(location.origin)) return Promise.reject(new Error('offline'));
       return original(input, options);
     };
-  }, seed);
+  }, {seed, klines});
   await page.setRequestInterception(true);
   page.on('request', req => {
     const url = new URL(req.url());
@@ -57,15 +60,15 @@ describe('step47 / venue freshness after browser pauses', { timeout: 60000 }, ()
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
-  it('clears inherited venue metadata when the same DEMO seed objects are reapplied', async () => {
+  it('clears inherited venue metadata when a live snapshot is reapplied', async () => {
     const page = await pageWithVenues();
     try {
-      assert.ok(await page.evaluate(() => window.__venueAge.seed.some(s => s.cexN)));
+      assert.ok(await page.evaluate(() => window.__venueAge.signals().some(s => s.cexN)));
       const after = await page.evaluate(() => {
         window._holdCex = true;
         const t = window.__venueAge;
-        t.ME.apply(t.seed, 'seed', Date.now());
-        return { seedAttached: t.seed.some(s => s.cexN), cardText: document.querySelector('#signalsGrid .signal-card')?.textContent, cex: t.CexEngine.online };
+        t.ME.apply(t.signals().map(s => ({...s})), 'live', t.ME.status.when);
+        return { seedAttached: t.signals().some(s => s.cexN), cardText: document.querySelector('#signalsGrid .signal-card')?.textContent, cex: t.CexEngine.online };
       });
       assert.equal(after.seedAttached, false); assert.equal(after.cex, 0);
       assert.doesNotMatch(after.cardText, /1 CEX/);

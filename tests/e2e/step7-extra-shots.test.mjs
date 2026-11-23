@@ -70,8 +70,8 @@ describe('step7 extra screenshot matrix', { timeout: 300_000 }, () => {
     await p6.close();
 
     const p7 = await freshPage(browser);
-    await gotoApp(p7, { lang: 'de', query: { q: 'SOL' } });
-    await shot(p7, 'extra_deeplink_sol_de.png');
+    await gotoApp(p7, { lang: 'de', query: { q: 'AAVE' } });
+    await shot(p7, 'extra_deeplink_aave_de.png');
     await p7.close();
   });
 });
