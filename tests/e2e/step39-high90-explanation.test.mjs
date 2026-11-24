@@ -28,8 +28,9 @@ describe('step39 / high-distance UI', { timeout: 120000 }, () => {
     for (const [lang, [note, label, denominator, notDecline]] of Object.entries(cases)) {
       const page = await livePage(lang);
       try {
-        assert.match(await page.$eval('.signal-card .sc-thesis', el => el.textContent), note);
+        assert.equal(await page.$('.signal-card .sc-thesis'), null);
         await page.evaluate(() => document.querySelector('[data-inspect-sig]').click());
+        assert.match(await page.$eval('#dossierBody', el => el.textContent), note);
         assert.match(await page.$eval('[data-high90]', el => el.textContent), label);
         assert.match(await page.$eval('[data-high90]', el => el.textContent), /50%/);
         const help = await page.$eval('[data-high90-help]', el => el.textContent);

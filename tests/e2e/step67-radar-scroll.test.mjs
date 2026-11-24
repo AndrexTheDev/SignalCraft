@@ -34,6 +34,7 @@ async function open(reduced = false) {
   });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__radarScroll && window.__radarScroll.DexEngine.wire.length > 3 && !window.__radarScroll.DexEngine.busy);
+  await page.click('#marketRadarSummary');
   return page;
 }
 const regions = ['#cexTickerViewport', '#dexTickerViewport'];

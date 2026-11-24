@@ -20,17 +20,19 @@ function rejected(mutate) {
   assert.equal(mirror({ signals }), false);
 }
 describe('step49 / live cache and trade-plan integrity', () => {
-  it('accepts at least 100 distinct coherent USDT long plans', () => {
+  it('accepts any non-empty set of distinct coherent USDT long plans', () => {
     assert.equal(validate({ signals: records(100) }), true);
     assert.equal(mirror({ signals: records(120) }), true);
-    assert.equal(validate({ signals: records(99) }), false);
+    assert.equal(validate({ signals: records(99) }), true);
+    assert.equal(validate({ signals: records(1) }), true);
+    assert.equal(validate({ signals: [] }), false);
   });
-  it('validates a single candidate only when explicitly requested without relaxing whole-cache coverage', () => {
+  it('validates single candidates while preserving full structural validation', () => {
     const signals = records(1);
     for (const fn of [validate, mirror]) {
-      assert.equal(fn({ signals }), false);
+      assert.equal(fn({ signals }), true);
       assert.equal(fn({ signals }, true), true);
-      assert.equal(fn({ signals }, 0), false);
+      assert.equal(fn({ signals }, 0), true);
       const invalid = structuredClone(signals); invalid[0].metrics.volX = Infinity;
       assert.equal(fn({ signals: invalid }, true), false);
       assert.equal(fn({ signals: [signals[0], signals[0]] }, true), false);

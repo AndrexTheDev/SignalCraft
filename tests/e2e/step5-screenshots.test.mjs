@@ -96,6 +96,7 @@ describe('step5 extra screenshot matrix', { timeout: 420_000 }, () => {
     await shot(page, 'state_theme_paper.png');
     await page.select('#themeSelect', 'gallery-dark');
 
+    await page.click('#faqSummary');
     const toggles = await page.$$('#faq .faq-header-toggle');
     if (toggles[1]) await toggles[1].click();
     await page.evaluate(() => document.getElementById('faq')?.scrollIntoView());

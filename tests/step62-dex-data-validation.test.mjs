@@ -34,14 +34,22 @@ describe('step62 / DEX discovery data integrity', () => {
   });
   it('counts Hyperliquid and dYdX only when they contain a real positive number', async () => {
     for (const bad of [true, false, null, [], [123], {}, '', ' ', '0x10', 'Infinity', '1e-999']) {
-      const e = engine(url => url.includes('hyperliquid') ? Promise.resolve({ BTC: bad }) : url.includes('dydx') ? Promise.resolve({ markets: { BTC: { oraclePrice: bad } } }) : Promise.reject(new Error('offline')));
+      const e = engine(url => url.includes('hyperliquid') ? Promise.resolve({ BTC: bad }) : url.includes('dydx') ? Promise.resolve({ markets: { BTC: { status: 'ACTIVE', oraclePrice: bad } } }) : Promise.reject(new Error('offline')));
       await e.fetchAll([]);
       assert.equal(e.dexCount(), 0, String(bad));
     }
     const array = engine(url => url.includes('hyperliquid') ? Promise.resolve(['123']) : Promise.reject(new Error('offline')));
     await array.fetchAll([]); assert.equal(array.dexCount(), 0);
-    const valid = engine(url => url.includes('hyperliquid') ? Promise.resolve({ BTC: '1e2' }) : url.includes('dydx') ? Promise.resolve({ markets: { BTC: { oraclePrice: 99.5 } } }) : Promise.reject(new Error('offline')));
+    const valid = engine(url => url.includes('hyperliquid') ? Promise.resolve({ BTC: '1e2' }) : url.includes('dydx') ? Promise.resolve({ markets: { BTC: { status: 'ACTIVE', oraclePrice: 99.5 } } }) : Promise.reject(new Error('offline')));
     await valid.fetchAll([]); assert.equal(valid.dexCount(), 2);
+  });
+  it('does not count settled, paused or missing-status dYdX markets as active', async () => {
+    for (const status of ['FINAL_SETTLEMENT', 'PAUSED', undefined]) {
+      const e = engine(url => url.includes('dydx')
+        ? Promise.resolve({ markets: { BTC: { status, oraclePrice: '100' } } })
+        : Promise.reject(new Error('offline')));
+      await e.fetchAll([]); assert.equal(e.dexCount(), 0, String(status));
+    }
   });
   it('chooses the highest valid liquidity and discards stale results on refresh', async () => {
     let enabled = true;

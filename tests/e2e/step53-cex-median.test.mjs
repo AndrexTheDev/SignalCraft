@@ -63,11 +63,15 @@ describe('step53 / CEX median presentation', { timeout: 60000 }, () => {
     try {
       await page.evaluate(() => {
         window._clock53 += 90000;
+        // Hold the automatic refresh so this test can inspect the expired radar
+        // before a new live fetch repopulates it.
+        window.__cexMedianTest.ME.refresh = () => { window.__refresh53 = true; };
         window.__cexMedianTest.ME._last = window._clock53;
         Object.defineProperty(document, 'hidden', { value: false, configurable: true });
         document.dispatchEvent(new Event('visibilitychange'));
       });
       assert.equal(await page.$eval('#cexRadarNotice', el => el.hidden), true);
+      assert.equal(await page.evaluate(() => window.__refresh53), true);
       assert.doesNotMatch(await page.$eval('#cexTickerLabel', el => el.textContent), /LIVE 2\/11/);
       assert.doesNotMatch(await page.$eval('#tickerScrollFeed', el => el.textContent), /≈1\.00002/);
       assert.deepEqual(page._pageErrors, []);

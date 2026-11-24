@@ -15,12 +15,24 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
+    def send_not_found(self):
+        body = (ROOT / '404.html').read_bytes()
+        self.send_response(404)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'no-store')
+        self.end_headers()
+        if self.command != 'HEAD':
+            self.wfile.write(body)
+
     def send_head(self):
         request = urlsplit(self.path)
         name = unquote(request.path)
         if name.startswith('/_localized/') or name == '/_localized':
-            self.send_error(404)
+            self.send_not_found()
             return None
+        if name in ('/impressum', '/datenschutz'):
+            name += '.html'
         if name in ('/', '/app'):
             requested = parse_qs(request.query, keep_blank_values=True).get('lang', [''])[0]
             language = requested if requested in ('de', 'en', 'es', 'ar', 'zh') else 'de'
@@ -29,13 +41,13 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             relative = path.relative_to(ROOT)
         except ValueError:
-            self.send_error(404)
+            self.send_not_found()
             return None
         parts = relative.parts
         if (not parts or any(part.startswith('.') for part in parts) or
             any(fnmatch.fnmatchcase(part, pattern) for part in parts for pattern in EXCLUSIONS) or
             not path.is_file()):
-            self.send_error(404)
+            self.send_not_found()
             return None
         # Keep the browser URL (and query string) unchanged while serving the file.
         self.path = '/' + relative.as_posix()

@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { statSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { read } from './helpers/html.mjs';
 import worker from '../worker.mjs';
@@ -70,5 +71,45 @@ describe('step80 / Worker request routing', () => {
     const env = { ASSETS: { fetch: async () => new Response('missing', { status: 404 }) } };
     const response = await worker.fetch(new Request(base + '/?lang=en'), env);
     assert.equal(response.status, 503); assert.equal(response.headers.get('cache-control'), 'no-store');
+  });
+});
+
+describe('step82 / provider, privacy, fonts and 404 routing', () => {
+  it('has locally hosted licensed fonts and no third-party font requests', () => {
+    for (const file of ['index.html', 'app.html']) {
+      const source = read(file);
+      assert.doesNotMatch(source, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
+      assert.match(source, /\/assets\/fonts\/fonts\.css/);
+    }
+    const css = read('assets/fonts/fonts.css');
+    const urls = [...css.matchAll(/url\('\.\/([^']+\.woff2)'\)/g)].map(x => x[1]);
+    assert.ok(urls.length >= 20);
+    for (const name of urls) assert.ok(statSync('assets/fonts/' + name).size > 0, name);
+    for (const family of ['cormorant-garamond','jetbrains-mono','plus-jakarta-sans']) assert.match(read('assets/fonts/' + family + '-LICENSE.txt'), /SIL OPEN FONT LICENSE/i);
+  });
+  it('returns multilingual provider and privacy information, not invented identity or legal approval', () => {
+    const provider = new JSDOM(read('impressum.html')).window.document;
+    const privacy = new JSDOM(read('datenschutz.html')).window.document;
+    for (const lang of langs) {
+      assert.ok(provider.querySelector(`section#${lang}[lang="${lang}"]`));
+      assert.ok(privacy.querySelector(`section#${lang}[lang="${lang}"]`));
+    }
+    assert.match(provider.body.textContent, /AndrexTheDev/); assert.match(provider.body.textContent, /hippie\.highho@gmail\.com/);
+    assert.match(provider.body.textContent, /postalische Anschrift wurden bislang nicht bereitgestellt/);
+    assert.match(privacy.body.textContent, /nicht rechtlich geprüft/);
+    for (const term of ['Cloudflare','Binance','Binance.US','DexScreener','Alternative.me','signalcraft_lang','signalcraft_live_v2','sc_dossiers']) assert.ok(privacy.body.textContent.includes(term), term);
+  });
+  it('serves a helpful 404 with the correct HTTP status and HEAD semantics', async () => {
+    const env = { ASSETS: { fetch: async req => {
+      const path = new URL(req.url).pathname;
+      if (path === '/404.html') return new Response(req.method === 'HEAD' ? null : '<h1>not found</h1>', {status:200,headers:{'Content-Type':'text/html'}});
+      if (path === '/impressum.html' || path === '/datenschutz.html') return new Response('legal', {status:200});
+      return new Response('missing', {status:404});
+    } } };
+    for (const path of ['/impressum', '/datenschutz']) assert.equal((await worker.fetch(new Request(base + path),env)).status,200);
+    const missing = await worker.fetch(new Request(base + '/unknown'),env);
+    assert.equal(missing.status,404); assert.match(await missing.text(),/not found/); assert.equal(missing.headers.get('cache-control'),'no-store');
+    const head = await worker.fetch(new Request(base + '/unknown',{method:'HEAD'}),env);
+    assert.equal(head.status,404); assert.equal(await head.text(),'');
   });
 });

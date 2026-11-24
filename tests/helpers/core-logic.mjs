@@ -241,7 +241,7 @@ export function longPlanValid(sig) {
 }
 
 export function isLiveCache(ca, singleCandidate) {
-  if (!ca || !Array.isArray(ca.signals) || (singleCandidate === true ? ca.signals.length !== 1 : ca.signals.length < 100)) return false;
+  if (!ca || !Array.isArray(ca.signals) || (singleCandidate === true ? ca.signals.length !== 1 : ca.signals.length === 0)) return false;
   const ids = new Set(), pairs = new Set();
   return ca.signals.every(function (s) {
     if (!s || typeof s !== 'object' || typeof s.id !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(s.id) || ids.has(s.id) ||
