@@ -82,6 +82,7 @@ describe('step9 url + a11y e2e', { timeout: 240_000 }, () => {
   it('FAQ accordion updates aria-expanded', async () => {
     const page = await freshPage(browser);
     await gotoApp(page, { lang: 'en' });
+    await page.click('#faqSummary');
     const first = await page.$eval('.faq-header-toggle', (el) => el.getAttribute('aria-expanded'));
     assert.equal(first, 'true');
     await page.click('.faq-header-toggle');

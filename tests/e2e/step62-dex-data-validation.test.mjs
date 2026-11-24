@@ -19,7 +19,7 @@ describe('step62 / DEX data in the browser', { timeout: 60000 }, () => {
         if (u.origin === new URL(BASE).origin) return req.continue().catch(() => {});
         let body;
         if (u.hostname === 'api.hyperliquid.xyz') body = { BTC: mode === 'good' ? '100' : [100] };
-        else if (u.hostname === 'indexer.dydx.trade') body = { markets: { BTC: { oraclePrice: mode === 'good' ? '100' : true } } };
+        else if (u.hostname === 'indexer.dydx.trade') body = { markets: { BTC: { status: 'ACTIVE', oraclePrice: mode === 'good' ? '100' : true } } };
         else if (u.hostname === 'api.dexscreener.com') {
           const sym = u.searchParams.get('q');
           const bad = { baseToken: { symbol: sym }, dexId: 'fake-dex', priceUsd: true, liquidity: { usd: [10000000] } };

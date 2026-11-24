@@ -56,13 +56,14 @@ describe('step78 / source fallback after uncomputable trade plans', { timeout: 9
     it(`handles ${mode} with per-source construction`, async () => {
       const { page, usRequests } = await run(mode);
       try {
-        const live = mode !== 'many-missing';
+        const live = true;
         assert.match(await page.$eval('#meBadge', e => e.textContent), live ? /LIVE/ : /unavailable/i);
         const cache = await page.evaluate(() => ({ signals: window.__auditSignals(), stored: localStorage.getItem('signalcraft_live_v2') }));
         assert.equal(cache.stored, null);
         if (live) {
           assert.ok(cache);
-          assert.equal(cache.signals.length, (mode === 'one-missing' || mode === 'one-projection') ? 119 : 120);
+          assert.equal(cache.signals.length, (mode === 'one-missing' || mode === 'one-projection') ? 119 : mode === 'many-missing' ? 99 : 120);
+          if (mode === 'many-missing') assert.ok(cache.signals.every(s => !symbols.slice(0,21).includes(s.pair.split(' / ')[0])));
           if ((mode === 'primary-fails' || mode === 'primary-projection')) assert.ok(cache.signals.every(s => s.venue === 'BINANCE-US SPOT'));
           if ((mode === 'one-missing' || mode === 'one-projection')) assert.ok(cache.signals.every(s => !s.pair.startsWith(symbols[0] + ' / ')));
         } else assert.equal(cache.signals.length, 0);

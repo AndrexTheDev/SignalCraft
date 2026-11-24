@@ -13,7 +13,21 @@ export default {
       url.pathname = url.pathname === '/index.html' ? '/' : '/app';
       return Response.redirect(url.toString(), 308);
     }
-    if (url.pathname !== '/' && url.pathname !== '/app') return env.ASSETS.fetch(request);
+    if (url.pathname !== '/' && url.pathname !== '/app') {
+      // Human-readable provider/privacy pages have stable clean URLs.
+      if ((path === '/impressum' || path === '/datenschutz') && (request.method === 'GET' || request.method === 'HEAD')) {
+        url.pathname = path + '.html';
+        return env.ASSETS.fetch(new Request(url, request));
+      }
+      const response = await env.ASSETS.fetch(request);
+      if (response.status !== 404 || (request.method !== 'GET' && request.method !== 'HEAD')) return response;
+      const errorUrl = new URL('/404.html', request.url);
+      const errorPage = await env.ASSETS.fetch(new Request(errorUrl, { method: request.method }));
+      if (!errorPage.ok) return new Response(request.method === 'HEAD' ? null : 'Not found', { status: 404 });
+      const headers = new Headers(errorPage.headers);
+      headers.set('Cache-Control', 'no-store');
+      return new Response(request.method === 'HEAD' ? null : errorPage.body, { status: 404, headers });
+    }
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
     const requested = url.searchParams.get('lang');
     const lang = languages.has(requested) ? requested : 'de';

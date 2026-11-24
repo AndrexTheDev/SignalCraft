@@ -36,6 +36,7 @@ async function open() {
   });
   await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.getElementById('dexTickerFeed')?.textContent.includes('EXAMPLE'));
+  await page.click('#marketRadarSummary');
   return page;
 }
 describe('step65 / visible DEX caution', { timeout: 60000 }, () => {

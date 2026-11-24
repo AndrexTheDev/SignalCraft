@@ -30,6 +30,27 @@ describe('step46 / browser snapshot timing and cache migration', { timeout: 6000
       } finally { await page.close(); }
     });
   }
+  it('removes a pre-midnight snapshot at the next visible tick without user interaction', async () => {
+    const page = await freshPage(browser);
+    try {
+      const midnight = Math.floor(Date.now() / 86400000) * 86400000 + 86400000;
+      await page.evaluateOnNewDocument(now => {
+        window._now = now; Date.now = () => window._now;
+        const interval = window.setInterval.bind(window);
+        window.setInterval = (fn, ms, ...args) => { if (ms === 30000) window._marketTick46 = fn; return interval(fn, ms, ...args); };
+      }, midnight - 10000);
+      const offset = midnight - 10000 - Date.now();
+      const appHtml = read('app.html').replace('    ME.refresh(false);', '    window.__clock46 = ME; ME.refresh(false);');
+      await stubMarket(page, { appHtml, klines: liveTestCandles(), globalTicker: {timeOffset:offset}, usTicker:{timeOffset:offset} });
+      await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => window.__clock46 && window.__clock46.status.mode === 'live' && !window.__clock46.busy);
+      assert.ok((await page.$$('.signal-card')).length > 0);
+      await page.evaluate(now => { window.__clock46.busy = true; window._now = now; window._marketTick46(); }, midnight);
+      assert.match(await page.$eval('#meBadge', el => el.textContent), /unavailable/i);
+      assert.equal((await page.$$('.signal-card')).length, 0);
+      assert.deepEqual(page._pageErrors, []);
+    } finally { await page.close(); }
+  });
   it('fails closed at UTC midnight even when the expiry timer has not yet fired', async () => {
     const page = await freshPage(browser);
     try {

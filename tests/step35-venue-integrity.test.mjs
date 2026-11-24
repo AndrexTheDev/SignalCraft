@@ -82,7 +82,7 @@ describe('step35 / venue integrity', () => {
     assert.equal(cex.data.BTC.lo, 100);
     assert.equal(cex.data.BTC.med, 110);
     assert.equal(cex.data.BTC.hi, 120);
-    assert.ok(urls.some(url => /XBTUSDT/.test(url)));
+    assert.ok(urls.some(url => url === 'https://api.kraken.com/0/public/Ticker'));
     assert.ok(urls.some(url => /BTC-USDT\/spot/.test(url)));
     assert.equal(urls.some(url => /BTC-USD\/spot/.test(url)), false);
     const coinbase = createEngine('CexEngine', url => url.includes('coinbase.com')
@@ -91,6 +91,24 @@ describe('step35 / venue integrity', () => {
     await coinbase.fetchAll(['BTC']);
     assert.equal(coinbase.data.BTC.med, 101.5);
     assert.deepEqual(coinbase.data.BTC.venues, ['COINBASE']);
+  });
+
+  it('retains Kraken quotes when other requested symbols are unlisted and rejects API errors', async () => {
+    let invalid = false; const urls = [];
+    const fetcher = url => {
+      if (!url.includes('kraken.com')) return Promise.reject(new Error('offline'));
+      urls.push(url);
+      return Promise.resolve(invalid
+        ? { error: ['EQuery:Unknown asset pair'], result: { XBTUSDT: { c: ['99'] } } }
+        : { error: [], result: { XBTUSDT: { c: ['100'] }, ETHUSDT: { c: ['10'] }, XXBTZUSD: { c: ['90'] } } });
+    };
+    const cex = createEngine('CexEngine', fetcher, fakeTimers(), () => {});
+    await cex.fetchAll(['BTC', 'ETH', 'NOTLISTED']);
+    assert.deepEqual(urls, ['https://api.kraken.com/0/public/Ticker']);
+    assert.equal(cex.data.BTC.med, 100); assert.equal(cex.data.ETH.med, 10);
+    assert.equal(cex.data.NOTLISTED, undefined);
+    invalid = true; await cex.fetchAll(['BTC']);
+    assert.deepEqual(cex.data, {}); assert.equal(cex.online, 0);
   });
 
   it('replaces DEX discovery results, rejects invalid prices and expires the feed', async () => {
@@ -103,7 +121,7 @@ describe('step35 / venue integrity', () => {
         { baseToken: { symbol: 'BTC' }, dexId: 'other', priceUsd: 'Infinity', liquidity: { usd: 999999 } },
         { baseToken: { symbol: 'BTC' }, dexId: '<img>', priceUsd: '1', liquidity: { usd: 999999 } }
       ] });
-      if (url.includes('dydx')) return Promise.resolve({ markets: { 'BTC-USD': { oraclePrice: '10' } } });
+      if (url.includes('dydx')) return Promise.resolve({ markets: { 'BTC-USD': { status: 'ACTIVE', oraclePrice: '10' } } });
       return Promise.reject(new Error('offline'));
     };
     const dex = createEngine('DexEngine', fetcher, timers, () => redraws++);

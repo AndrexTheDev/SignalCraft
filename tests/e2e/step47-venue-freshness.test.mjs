@@ -4,7 +4,7 @@ import { startServer, stopServer, launchBrowser, freshPage, liveTestCandles, BAS
 import { read, extractArray } from '../helpers/html.mjs';
 const source = read('app.html');
 const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
-const html = source.replace('    ME.refresh(false);', "    window.__venueAge = { ME, CexEngine, DexEngine, signals: () => signalsData }; ME.refresh(false);");
+const html = source.replace('    ME.refresh(false);', "    window.__venueAge = { ME, CexEngine, DexEngine, SentimentEngine, signals: () => signalsData }; ME.refresh(false);");
 let browser;
 async function pageWithVenues() {
   const page = await freshPage(browser);
@@ -12,10 +12,13 @@ async function pageWithVenues() {
   await page.evaluateOnNewDocument(({seed, klines}) => {
     window._now = Date.now();
     Date.now = () => window._now;
+    const interval = window.setInterval.bind(window);
+    window.setInterval = (fn, ms, ...args) => { if (ms === 30000) window._marketTick47 = fn; return interval(fn, ms, ...args); };
     window._holdCex = false;
     const original = window.fetch.bind(window);
     window.fetch = (input, options) => {
       const url = String(input);
+      if (url.includes('api.alternative.me/fng/')) return Promise.resolve({ ok: true, json: async () => ({ data: [{ value: '42', value_classification: 'Fear', timestamp: String(Math.floor(Date.now()/1000)) }] }) });
       if (url.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>seed.map(s=>({symbol:s.pair.split(' / ')[0]+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
       if (url.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>klines});
       if (url.includes('data-api.binance.vision/api/v3/ticker/price')) {
@@ -57,6 +60,39 @@ describe('step47 / venue freshness after browser pauses', { timeout: 60000 }, ()
       });
       assert.equal(after.cex, 0); assert.equal(after.dex, 0); assert.equal(after.attached, false);
       assert.doesNotMatch(after.cexLabel, /LIVE 1\/11/); assert.equal(after.dexFeed, '–');
+      assert.deepEqual(page._pageErrors, []);
+    } finally { await page.close(); }
+  });
+  it('clears expired board, radar and open dossier at the next visible periodic tick', async () => {
+    const page = await pageWithVenues();
+    try {
+      await page.click('[data-inspect-sig]');
+      assert.equal(await page.$eval('#dossierModalBackdrop', el => el.classList.contains('is-visible')), true);
+      const after = await page.evaluate(() => {
+        window.__venueAge.ME.busy = true; // A separate refresh is still in flight.
+        window._now += 90000; window._marketTick47();
+        return { mode: window.__venueAge.ME.status.mode, cards: document.querySelectorAll('.signal-card').length,
+          cex: window.__venueAge.CexEngine.online, dex: window.__venueAge.DexEngine.dexCount(),
+          dossier: document.getElementById('dossierModalBackdrop').classList.contains('is-visible') };
+      });
+      assert.deepEqual(after, { mode: 'unavailable', cards: 0, cex: 0, dex: 0, dossier: false });
+      assert.deepEqual(page._pageErrors, []);
+    } finally { await page.close(); }
+  });
+  it('clears expired venues and a clock-invalid index on tick without clearing fresh signals', async () => {
+    const page = await pageWithVenues();
+    try {
+      await page.waitForFunction(() => document.getElementById('globalFngBadge').textContent.includes('Index 42'));
+      const after = await page.evaluate(() => {
+        const { CexEngine, DexEngine, SentimentEngine, ME } = window.__venueAge;
+        CexEngine.startedAt -= 90000; DexEngine.startedAt -= 90000;
+        SentimentEngine._fngReceivedAt = Date.now() + 1000;
+        ME.busy = true; window._marketTick47();
+        return { mode: ME.status.mode, cards: document.querySelectorAll('.signal-card').length,
+          cex: CexEngine.online, dex: DexEngine.dexCount(), index: document.getElementById('globalFngBadge').textContent };
+      });
+      assert.equal(after.mode, 'live'); assert.ok(after.cards > 0);
+      assert.equal(after.cex, 0); assert.equal(after.dex, 0); assert.match(after.index, /F&G –/);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });

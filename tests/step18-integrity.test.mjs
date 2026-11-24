@@ -56,7 +56,7 @@ describe('step18 / storage + cache hardening', () => {
     assert.deepEqual(safeJsonArray(null), []);
   });
 
-  it('isLiveCache requires >= 100 valid unique LIVE records', () => {
+  it('isLiveCache requires structurally valid unique LIVE records', () => {
     const ok = { signals: Array.from({ length: 110 }, (_, i) => ({ ...seed[0], id: 'SIG-' + i, pair: 'AAA' + i + ' / USDT', modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } })) };
     assert.equal(isLiveCache(ok), true);
     assert.equal(isLiveCache({ signals: 'x'.repeat(120) }), false);

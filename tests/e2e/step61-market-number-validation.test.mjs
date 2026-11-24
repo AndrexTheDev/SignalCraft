@@ -83,14 +83,16 @@ describe('step61 / malformed market input integration', { timeout: 90000 }, () =
     it(`handles ${mode} data without inventing LIVE setups`, async () => {
       const h = await run(mode);
       try {
-        const validLive = mode === 'valid' || mode === 'one-bad' || mode === 'global-duplicates';
-        assert.equal(h.tickerRequested, 2);
+        const validLive = mode !== 'bad-tickers';
+        assert.equal(h.tickerRequested, mode === 'bad-tickers' ? 3 : 2);
         assert.match(await h.page.$eval('#meBadge', el => el.textContent), validLive ? /LIVE/ : /unavailable/i);
         const cache = await h.page.evaluate(() => ({signals:window.__market61.signals(), stored:localStorage.getItem('signalcraft_live_v2')}));
         assert.equal(cache.stored,null);
         if (validLive) {
           assert.ok(cache);
-          assert.equal(cache.signals.length, mode === 'one-bad' ? 119 : 120);
+          assert.equal(cache.signals.length, mode === 'one-bad' ? 119 : ['duplicates', 'bad-candles'].includes(mode) ? 99 : 120);
+          assert.match(await h.page.$eval('#snapshotInfo', e => e.textContent), new RegExp('Evaluated: ' + cache.signals.length + '/120'));
+          if (mode === 'duplicates' || mode === 'bad-candles') assert.ok(cache.signals.every(x => !syms.slice(0,21).includes(x.pair.split(' / ')[0])));
           if (mode === 'one-bad') assert.ok(cache.signals.every(x => !x.pair.startsWith(syms[0] + ' / ')));
           if (mode === 'global-duplicates') assert.equal(cache.signals.filter(x => x.venue === 'BINANCE-US SPOT').length, 21);
         } else assert.equal(cache.signals.length, 0);

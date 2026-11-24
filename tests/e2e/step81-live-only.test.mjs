@@ -35,13 +35,16 @@ describe('step81 / live-only signal presentation', {timeout:180000}, () => {
   after(async () => { if (browser) await browser.close(); stopServer(); });
   it('offline startup never renders historical cards, radar values or demo status and discards old cache', async () => {
     const page = await freshPage(browser);
+    const requests = []; page.on('request', req => requests.push(req.url()));
     try {
       await page.evaluateOnNewDocument(() => { localStorage.setItem('signalcraft_live_v2', JSON.stringify({version:9,t:Date.now(),signals:[{id:'FAKE'}]})); });
       await install(page, null); await page.goto(BASE+'/app.html?lang=en',{waitUntil:'domcontentloaded'});
       await page.waitForFunction(() => window.__liveOnly && window.__liveOnly.ME.status.mode === 'unavailable', {timeout:20000});
       const state = await page.evaluate(() => ({text:document.body.innerText, cards:document.querySelectorAll('.signal-card').length, signals:window.__liveOnly.getSignals().length, cache:localStorage.getItem('signalcraft_live_v2'), badge:document.querySelector('#meBadge').textContent, ticker:document.querySelector('#tickerScrollFeed').textContent}));
       assert.equal(state.cards,0); assert.equal(state.signals,0); assert.equal(state.cache,null); assert.match(state.badge,/unavailable/i); assert.match(state.ticker,/unavailable/i);
-      assert.doesNotMatch(state.text, /\bDEMO\b|BUILD SNAPSHOT|SIG-PEPE-001/); assert.deepEqual(page._pageErrors,[]);
+      assert.doesNotMatch(state.text, /\bDEMO\b|BUILD SNAPSHOT|SIG-PEPE-001/);
+      assert.equal(requests.filter(url => /bybit|kraken|okx|kucoin|mexc|bitget|huobi|gateio|crypto\.com|coinbase|dexscreener|hyperliquid|dydx|ticker\/price/i.test(url)).length, 0);
+      assert.deepEqual(page._pageErrors,[]);
     } finally { await page.close(); }
   });
   it('does not restore even a structurally valid, fresh local snapshot when the network is unavailable', async () => {

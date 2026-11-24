@@ -265,8 +265,8 @@ describe('step1 / markup hygiene', () => {
     const missing = [];
     for (const h of hrefs) {
       if (/^(https?:|mailto:|data:|javascript:|#)/i.test(h)) continue;
-      const file = h.split('?')[0].replace(/^\//, '');
-      const asset = file === 'app' ? 'app.html' : file; // Cloudflare's clean HTML route
+      const file = h.split(/[?#]/)[0].replace(/^\//, '');
+      const asset = ['app', 'impressum', 'datenschutz'].includes(file) ? file + '.html' : file; // Cloudflare's clean HTML route
       if (asset && !exists(asset)) missing.push(h);
     }
     assert.deepEqual(missing, []);

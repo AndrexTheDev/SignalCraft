@@ -14,6 +14,10 @@ async function open() {
       const u = String(input);
       if (u.includes('/ticker/24hr')) return Promise.resolve({ok:true,json:async()=>symbols.map(sym=>({symbol:sym+'USDT',quoteVolume:'120000000',priceChangePercent:'3',closeTime:Date.now()}))});
       if (u.includes('/klines?')) return Promise.resolve({ok:true,json:async()=>candles});
+      if (u.includes('api.kraken.com') && window._kraken86) {
+        if (new URL(u).searchParams.has('pair')) return Promise.resolve({ ok: true, json: async () => ({ error: ['EQuery:Unknown asset pair'] }) });
+        return Promise.resolve({ ok: true, json: async () => ({ error: [], result: { XBTUSDT: { c: ['101'] }, ETHUSDT: { c: ['11'] } } }) });
+      }
       const reversed = window._reverse63, mode = window._mode63;
       if (u.includes('data-api.binance.vision/api/v3/ticker/price')) {
         const duplicate = [{ symbol: 'PEPEUSDT', price: '100' }, { symbol: 'PEPEUSDT', price: '200' }];
@@ -61,6 +65,19 @@ describe('step63 / ambiguous CEX quotes in the browser', { timeout: 60000 }, () 
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, lang);
       }
       assert.deepEqual(page._pageErrors, []);
+    } finally { await page.close(); }
+  });
+  it('preserves Kraken quotes when the requested universe also contains an unlisted pair', async () => {
+    const page = await open();
+    try {
+      const result = await page.evaluate(async () => {
+        window._kraken86 = true; window._mode63 = 'all-bad';
+        await window.__cexConflicts.CexEngine.fetchAll(['BTC', 'ETH', 'NOTLISTED']);
+        return window.__cexConflicts.CexEngine.data;
+      });
+      assert.deepEqual(result.BTC.venues, ['KRAKEN']); assert.equal(result.BTC.med, 101);
+      assert.deepEqual(result.ETH.venues, ['KRAKEN']); assert.equal(result.ETH.med, 11);
+      assert.equal(result.NOTLISTED, undefined); assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
   it('does not show a phantom radar if all available pair quotes are duplicated', async () => {

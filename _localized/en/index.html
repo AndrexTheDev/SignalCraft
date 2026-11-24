@@ -61,9 +61,7 @@
        ======================================================================== -->
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","@id":"https://signalcraft.click/#software","name":"Signalcraft Atelier Terminal","operatingSystem":"Any (Web)","applicationCategory":"FinanceApplication","url":"https://signalcraft.click/app","image":"https://signalcraft.click/og-preview.png","isAccessibleForFree":true,"softwareVersion":"3.6","availableLanguage":["de","en","es","ar","zh"],"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@id":"https://signalcraft.click/#organization"}},{"@type":"WebSite","@id":"https://signalcraft.click/#website","url":"https://signalcraft.click","name":"Signalcraft","inLanguage":["de","en","es","ar","zh"],"publisher":{"@id":"https://signalcraft.click/#organization"}},{"@type":"Organization","@id":"https://signalcraft.click/#organization","name":"Signalcraft Atelier","url":"https://signalcraft.click","email":"hippie.highho@gmail.com","logo":{"@type":"ImageObject","url":"https://signalcraft.click/logo.png","width":512,"height":512},"sameAs":["https://x.com/SignalcraftDesk","https://x.com/AndrexTheDev"],"founder":{"@type":"Person","name":"AndrexTheDev","email":"hippie.highho@gmail.com"},"contactPoint":{"@type":"ContactPoint","email":"hippie.highho@gmail.com","contactType":"customer support"}},{"@type":"FAQPage","@id":"https://signalcraft.click/?lang=en#faq","mainEntity":[{"@type":"Question","name":"Is Signalcraft really free?","acceptedAnswer":{"@type":"Answer","text":"Yes — 100%. No account, no email, no paywall, no subscription, no ads. When data is available, up to 120 pairs can be scored live; only Grade-A setups (at least 86 of 100 points) reach the board. Donations are welcome if you would like to help fund it."}},{"@type":"Question","name":"What do I get per signal?","acceptedAnswer":{"@type":"Answer","text":"A complete plan: entry price, stop-loss and take-profit at 2:1 risk-reward or better — plus a modelled buy-pressure indicator and one of three risk levels."}},{"@type":"Question","name":"Where do the numbers come from?","acceptedAnswer":{"@type":"Answer","text":"The buy-pressure score combines the taker-buy share over seven daily candles, relative daily volume and rolling 24h price change. Fear & Greed is shown separately and is not included. Social-media and news feeds are not connected."}},{"@type":"Question","name":"Who is behind Signalcraft?","acceptedAnswer":{"@type":"Answer","text":"Signalcraft is independently developed and run by AndrexTheDev (hippie.highho@gmail.com). Questions welcome anytime."}}]},{"@type":"WebPage","@id":"https://signalcraft.click/?lang=en#webpage","url":"https://signalcraft.click/?lang=en","name":"Signalcraft – Grade-A Crypto Setups | Free","isPartOf":{"@id":"https://signalcraft.click/#website"},"about":{"@id":"https://signalcraft.click/#software"},"primaryImageOfPage":"https://signalcraft.click/og-preview.png","inLanguage":"en","breadcrumb":{"@id":"https://signalcraft.click/?lang=en#breadcrumb"},"description":"Explore up to 10 Grade-A crypto setups with entry, stop and targets. Six transparent factors, USDT market data and an empty board when live data is unavailable. No account."},{"@type":"BreadcrumbList","@id":"https://signalcraft.click/?lang=en#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Signalcraft","item":"https://signalcraft.click/?lang=en"}]}]}</script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+  <link rel="stylesheet" href="/assets/fonts/fonts.css">
 
   <style>
 /* ==========================================================================
@@ -190,6 +188,10 @@ body {
   border-color: var(--accent);
   font-weight: 700;
 }
+
+.landing-more { border-bottom: 1px solid var(--border); padding: 10px 0; }
+.landing-more > summary { cursor: pointer; padding: 12px 0; color: var(--text-main); font-weight: 600; }
+.landing-more > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 .hero-landing {
   padding: 76px 0 60px 0;
@@ -483,6 +485,7 @@ body {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
 
+footer nav a { color: var(--text-main); text-decoration: underline; text-underline-offset: 3px; }
 .language-links a { color: var(--text-main); text-decoration: underline; text-underline-offset: 3px; padding: 8px 2px; }
 .language-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   </style>
@@ -499,7 +502,7 @@ body {
         <span class="crest-glyph">✦</span>
         <div>
           <div class="brand-name">Signalcraft Atelier</div>
-          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted);" data-i18n="head_sub">Real market data // Only the 10 best setups with an A grade // Free</span>
+          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted);" data-i18n="head_sub">Real market data // Up to 10 setups with an A grade // Free</span>
         </div>
       </div>
 
@@ -523,9 +526,9 @@ body {
         <div class="hero-kicker" data-i18n="kick">[ NO ACCOUNT • NO SUBSCRIPTION • COMPLETELY FREE ]</div>
         <h1 class="hero-title">
           <span data-i18n="t1">Signalcraft: crypto setups.</span><br>
-          <em data-i18n="t2">Explained so anyone can follow.</em>
+          <em data-i18n="t2">Entry, stop and targets at a glance.</em>
         </h1>
-        <p class="hero-sub" data-i18n-html="sub_html">When data is available, Signalcraft can assess <strong>up to 120 trading pairs</strong> and show <strong>up to 10 qualifying setups</strong> — each with a <strong>ready plan</strong>: where to enter, where to stop, and where the target is. <strong>Free</strong>, no account — and no get-rich promises.</p>
+        <p class="hero-sub" data-i18n-html="sub_html">Up to <strong>10 crypto signals</strong> with entry, stop and targets. Free, no account.</p>
         <details class="hero-details">
           <summary data-i18n="tech_sum">For the advanced: how the filter works</summary>
           <p data-i18n-html="sub_tech">Setups are scored on <strong>six transparent factors</strong> (trend, trend quality/ADX, risk-adjusted momentum, volume, taker buy pressure, structure). Only Grade-A setups reach the board: Quant score ≥ 86, RSI ≤ 75, ≥ 10M USDT in 24h volume, ADX ≥ 15 and positive risk-adjusted 30d momentum. The buy-pressure score combines taker-buy share, relative daily volume and 24h price change. Historical simulation ≠ the future.</p>
@@ -533,45 +536,25 @@ body {
 
         <div class="cta-row">
           <a href="/app?lang=en" data-terminal-link="" class="tactile-btn btn-accent" style="padding:14px 26px; font-size:0.88rem;">
-            <span data-i18n="cta1">🔥 See the 10 setups →</span>
+            <span data-i18n="cta1">View signals →</span>
           </a>
           <a href="#schritte" class="tactile-btn">
-            <span data-i18n="cta2">💡 How it works</span>
+            <span data-i18n="cta2">How it works</span>
           </a>
         </div>
 
-        <div class="trust-row">
-          <span><b>✓</b> <span data-i18n="tr1">100% free</span></span>
-          <span><b>✓</b> <span data-i18n="tr2">No account</span></span>
-          <span><b>✓</b> <span data-i18n="tr3">5 languages</span></span>
-          <span><b>✓</b> <span data-i18n="tr4">Real Binance data</span></span>
-          <span><b>✓</b> <span data-i18n="tr5">Only the best reach the board</span></span>
-        </div>
       </div>
 
       <aside style="background:var(--bg-surface); border:1px solid var(--border); padding:24px; border-radius:14px;">
-        <h2 data-i18n="rad_t">Live setups in the terminal</h2>
-        <p data-i18n="rad_note">Current setups appear only when sufficient live data is available. Otherwise the board stays empty.</p>
-        <a href="/app?lang=en" data-terminal-link="" class="tactile-btn" data-i18n="st_cta">Open terminal ↗</a>
+        <h2 data-i18n="rad_t">Current signals</h2>
+        <p data-i18n="rad_note">The board stays empty without current data.</p>
       </aside>
     </section>
 
-    <!-- WHY EVERY CRYPTO FAN WANTS THIS -->
-    <!-- PROOF & FUNDING BAND -->
-    <section class="proof-band">
-      <div class="proof-right">
-        <h3 data-i18n="fin_t">How it stays free</h3>
-        <p data-i18n="fin_d">No ads, no ad gate and no data sales — Signalcraft is funded by voluntary donations. That is how it stays free for everyone.</p>
-        <ul>
-          <li data-i18n="fin_l1">✓ No ads or ad gate on the board</li>
-          <li data-i18n="fin_l2">✓ Voluntary donations (SOL/BTC/ETH)</li>
-          <li data-i18n="fin_l3">✗ No data sales, no trackers</li>
-        </ul>
-      </div>
-    </section>
-
     <!-- WHAT YOU GET, IN PLAIN WORDS -->
-    <section class="features-grid" id="warum" tabindex="-1">
+    <details class="landing-more" id="warum" tabindex="-1">
+      <summary data-i18n="more_why">About the signals</summary>
+    <section class="features-grid" tabindex="-1">
       <div class="section-head" style="grid-column: 1 / -1; margin-bottom: -6px;">
         <div>
           <span class="section-kicker" data-i18n="why_k">[ AT A GLANCE ]</span>
@@ -611,12 +594,16 @@ body {
       <div class="feature-box">
         <span class="f-emoji">⚡</span>
         <h3 data-i18n="b6t">No account. Instantly.</h3>
-        <p data-i18n="b6d">No sign-up, no app, no email. Open the link, read the signals, done — funded by voluntary donations. Your data stays yours.</p>
+        <p data-i18n="b6d">No sign-up, no app, no email. Open the link, read the signals, done — funded by voluntary donations. Your browser connects directly to external providers for live data.</p>
       </div>
     </section>
 
+    </details>
+
     <!-- HOW IT WORKS -->
-    <section class="steps-section" id="schritte" tabindex="-1">
+    <details class="landing-more" id="schritte">
+      <summary data-i18n="more_steps">How it works</summary>
+    <section class="steps-section" tabindex="-1">
       <div class="section-head">
         <div>
           <span class="section-kicker" data-i18n="st_k">[ IN 3 SIMPLE STEPS ]</span>
@@ -629,7 +616,7 @@ body {
         <div class="step-box">
           <span class="step-num" data-i18n="s1n">STEP 01</span>
           <h4 data-i18n="s1t">Open the terminal</h4>
-          <p data-i18n="s1d">One click, no sign-up. You land directly on the board with the 10 best setups — sorted by grade.</p>
+          <p data-i18n="s1d">One click, no sign-up. You land directly on the board with up to 10 qualifying setups — sorted by grade.</p>
         </div>
         <div class="step-box">
           <span class="step-num" data-i18n="s2n">STEP 02</span>
@@ -644,8 +631,12 @@ body {
       </div>
     </section>
 
+    </details>
+
     <!-- BEGINNER GLOSSARY -->
-    <section class="glossary-section" id="glossar">
+    <details class="landing-more" id="glossar">
+      <summary data-i18n="more_terms">Terms explained</summary>
+    <section class="glossary-section">
       <div class="section-head">
         <div>
           <span class="section-kicker" data-i18n="g_k">[ VOCABULARY FOR THE START ]</span>
@@ -680,8 +671,12 @@ body {
       </div>
     </section>
 
+    </details>
+
     <!-- ON-PAGE SEO FAQ SECTION -->
-    <section class="seo-faq-section" id="faq">
+    <details class="landing-more" id="faq">
+      <summary data-i18n="more_faq">Common questions</summary>
+    <section class="seo-faq-section">
       <div class="section-head">
         <div>
           <span class="section-kicker" data-i18n="fq_k">[ SHORT ANSWERS ]</span>
@@ -709,12 +704,14 @@ body {
       </div>
     </section>
 
+    </details>
+
     <!-- FINAL CTA -->
     <section class="final-cta">
-      <h3 data-i18n-html="fc_t">The next move will come.<br><em style="color:var(--text-muted);">See it earlier.</em></h3>
-      <p data-i18n="fc_sub">10 Grade-A setups, explained simply, real market data. Free, no account.</p>
+      <h3 data-i18n-html="fc_t">Crypto signals at a glance</h3>
+      <p data-i18n="fc_sub">Up to 10 screened setups. Free, no account.</p>
       <a href="/app?lang=en" data-terminal-link="" class="tactile-btn btn-accent" style="padding:14px 30px; font-size:0.9rem;">
-        <span data-i18n="fc_cta">✦ Enter the terminal – start free →</span>
+        <span data-i18n="fc_cta">View signals →</span>
       </a>
     </section>
 
@@ -723,8 +720,8 @@ body {
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; width:100%; border-bottom:1px dashed var(--border); padding-bottom:12px;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <span style="color:var(--accent); font-size:1rem;">✦</span>
-          <span style="font-weight:600; color:var(--text-main); font-size:0.75rem;" data-i18n="ft_don">VOLUNTARY RESEARCH DONATION:</span>
-          <span style="color:var(--text-muted); font-size:0.68rem; word-break:break-all;">SOL: 79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8 • BTC: bc1qeqzrlfg3edrydk4s0hecakc82gp26n5p7hkc7f • ETH: 0xBC3fab34f69bc9f6661608C3FB36dDdC313C42F7</span>
+          <details class="landing-more"><summary style="font-size:0.75rem;" data-i18n="ft_don">VOLUNTARY RESEARCH DONATION:</summary>
+          <span style="color:var(--text-muted); font-size:0.68rem; word-break:break-all;">SOL: 79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8 • BTC: bc1qeqzrlfg3edrydk4s0hecakc82gp26n5p7hkc7f • ETH: 0xBC3fab34f69bc9f6661608C3FB36dDdC313C42F7</span></details>
         </div>
         <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--gain); display:flex; align-items:center; gap:6px;">
           <span style="width:6px; height:6px; border-radius:50%; background:var(--gain); display:inline-block;"></span>
@@ -745,6 +742,10 @@ body {
           <a href="/app?lang=en" data-terminal-link="" class="tactile-btn btn-accent" style="padding:4px 10px; font-size:0.68rem;"><span data-i18n="ft_term">Open the trading terminal →</span></a>
         </div>
       </div>
+      <nav aria-label="Anbieter und Datenschutz" style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.75rem;">
+        <a href="/impressum#en" data-legal="impressum" data-i18n="legal_provider">Provider information</a>
+        <a href="/datenschutz#en" data-legal="datenschutz" data-i18n="legal_privacy">Privacy information</a>
+      </nav>
       <nav class="language-links" data-language-links="" aria-label="Sprachen / Languages" style="display:flex; flex-wrap:wrap; gap:12px; width:100%; font-size:0.75rem; line-height:1.8;">
         <a href="/" hreflang="de" lang="de">Deutsch</a>
         <a href="/?lang=en" hreflang="en" lang="en">English</a>
@@ -762,23 +763,25 @@ body {
   <!-- ========================================================================
        LANDING I18N ENGINE (5 LANGUAGES, ?lang= DEEP LINKS, RTL FOR ARABIC)
        ======================================================================== -->
-  <script id="german-source-strings" type="application/json">{"skipTo":"Weiter zum Inhalt","head_sub":"Echte Börsendaten // Nur die 10 besten Setups mit Note A // Gratis","head_cta":"🚀 Jetzt kostenlos starten →","kick":"[ KEIN KONTO • KEIN ABO • KOMPLETT KOSTENLOS ]","t1":"Signalcraft: Krypto-Setups.","t2":"So einfach, dass jeder es versteht.","tech_sum":"Mehr für Fortgeschrittene: So wird gefiltert","cta1":"🔥 Die 10 Setups ansehen →","cta2":"💡 So einfach geht’s","tr1":"100% kostenlos","tr2":"Ohne Registrierung","tr3":"In 5 Sprachen","tr4":"Echte Binance-Daten","tr5":"Nur die Besten aufs Board","rad_t":"Live-Setups im Terminal","rad_note":"Aktuelle Setups erscheinen nur, wenn ausreichend Live-Daten verfügbar sind. Andernfalls bleibt das Board leer.","st_cta":"Terminal öffnen ↗","fin_t":"So bleibt es kostenlos","fin_d":"Keine Werbung, kein Ad-Gate, kein Datenverkauf — Signalcraft lebt von freiwilligen Spenden. So bleibt es für alle kostenlos.","fin_l1":"✓ Keine Werbung und kein Ad-Gate im Board","fin_l2":"✓ Freiwillige Spenden (SOL/BTC/ETH)","fin_l3":"✗ Kein Datenverkauf, keine Tracker","why_k":"[ AUF EINEN BLICK ]","why_t":"Was du bekommst — in einfachen Worten","b1t":"Fertige Pläne statt Rätselraten","b1d":"Zu jedem Signal bekommst du einen kompletten Plan: Einstiegspreis, Sicherheits-Stopp und Ziel. Das Ziel liegt mindestens doppelt so weit weg wie der Stopp (ab 1:2). In Sekunden weißt du, ob ein Trade zu dir passt.","b2t":"Zahlen statt Bauchgefühl","b2d":"Der Kaufdruck-Score ist ein modellierter Indikator aus Taker-Kaufanteil, relativem Tagesvolumen und 24h-Preisänderung – keine direkte Messung des aktuellen Kaufvolumens.","b3t":"Drei klare Risiko-Stufen","b3d":"🟢 Vorsichtig, 🟡 Mittel, 🔴 Mutig — jedes Signal ist ehrlich eingeordnet. Einsteiger starten vorsichtig, erfahrene Trader wählen gezielt.","b4t":"Echte Daten — von großen Börsen","b4d":"Live-Kurse von Binance, Coinbase, Kraken, OKX und weiteren großen Börsen — plus ein Blick auf dezentrale Handelsplätze. Alle Datenquellen sind öffentlich; nichts wird erfunden.","b5t":"In deiner Sprache","b5d":"Deutsch, English, Español, العربية und 中文 — ein Klick, und die ganze Seite wechselt.","b7t":"Nur die Besten aufs Board","b7d":"Jedes Setup bekommt eine Note von A+ bis C. Nur Note A schafft es auf das Board — und das Terminal zeigt sogar ehrlich, wie viele Kandidaten heute durchgefallen sind.","b6t":"Ohne Konto. Sofort los.","b6d":"Keine Anmeldung, keine App, keine E-Mail-Adresse. Link öffnen, Signale lesen, fertig — finanziert von freiwilligen Spenden. Deine Daten bleiben bei dir.","st_k":"[ SO GEHT’S IN 3 SCHRITTEN ]","st_t":"So nutzt du Signalcraft","s1n":"SCHRITT 01","s1t":"Terminal öffnen","s1d":"Ein Klick, kein Anmelden. Du landest direkt auf dem Board mit den 10 besten Setups — sortiert nach Note.","s2n":"SCHRITT 02","s2t":"Ein Signal auswählen","s2d":"Filtere nach Risiko (🟢🟡🔴), Bereich oder Suche. Jede Karte zeigt Note, Risiko-Stufe und den fertigen Plan.","s3n":"SCHRITT 03","s3t":"Plan umsetzen — oder nur zuschauen","s3d":"Du übernimmst Einstieg, Stopp und Ziel an deiner Börse — oder beobachtest den Trade einfach erst einmal. Die Kontrolle hast immer du.","g_k":"[ WORTSCHATZ FÜR DEN START ]","g_t":"Die wichtigsten Begriffe in einfachen Worten","g1t":"Signal","g1d":"Eine per Zahlen ausgewertete Trade-Idee mit fertigem Plan — keine Meinung, keine Wette.","g2t":"Einstieg","g2d":"Der Preis, zu dem der Plan den Kauf vorsieht. Du steigst also nicht blind ein.","g3t":"Stop-Loss (Stopp)","g3d":"Ein geplantes Ausstiegsniveau. Der tatsächliche Ausführungspreis kann abweichen; der Verlust ist nicht garantiert begrenzt.","g4t":"Take-Profit (Ziel)","g4d":"Ein geplantes Gewinnziel; eine Ausführung zu diesem Preis ist nicht garantiert.","g5t":"Chance:Risiko (R:R)","g5d":"Vergleich der geplanten Abstände: Das zweite Ziel liegt ungefähr mindestens doppelt so weit vom Einstieg entfernt wie der Stopp. Tatsächliche Ergebnisse können abweichen.","g6t":"Note A / Score","g6d":"Eine 0–100-Note. Nur Setups mit mindestens 86 Punkten (Note A) kommen aufs Board. Gemessen werden Trend, Volumen und Kaufdruck — öffentliche Daten, keine Magie.","fq_k":"[ KURZE ANTWORTEN ]","fq_t":"Häufig gestellte Fragen","q1":"1. Ist Signalcraft wirklich kostenlos?","a1":"\n            Ja – zu 100 %. Kein Konto, keine E-Mail, kein Paywall, kein Abo, keine Werbung.\n            Bis zu 120 Handelspaare können bei verfügbaren Daten live geprüft werden – nur Grade-A-Setups (mindestens 86 von 100 Punkten) kommen\n            aufs Board. Wer mag, unterstützt die Weiterentwicklung per Spende.\n          ","q2":"2. Was bekomme ich zu jedem Signal?","a2":"\n            Einen kompletten Plan: Einstiegspreis, Stop-Loss und Take-Profit mit\n            mindestens 2:1 Chance-Risiko — dazu einen modellierten Kaufdruck-Indikator\n            und eine von drei Risiko-Stufen.\n          ","q3":"3. Woher kommen die Zahlen?","a3":"\n            Der Kaufdruck-Score kombiniert den Taker-Kaufanteil über sieben Tageskerzen,\n            relatives Tagesvolumen und die rollierende 24h-Preisänderung. Der Fear & Greed Index\n            wird separat angezeigt und nicht eingerechnet. Social-Media- und News-Feeds sind nicht angebunden.\n          ","q4":"4. Wer steckt hinter Signalcraft?","a4":"\n            Signalcraft wird unabhängig von AndrexTheDev (hippie.highho@gmail.com) entwickelt\n            und betrieben. Fragen und Feedback gerne jederzeit per E-Mail.\n          ","fc_sub":"10 Grade-A-Setups, fertig erklärt, echte Börsendaten. Kostenlos und ohne Konto.","fc_cta":"✦ Jetzt ins Terminal – kostenlos starten →","ft_don":"FREIWILLIGE RESEARCH-SPENDE:","ft_sys":"100% kostenlos • ohne Konto","disc_badge":"RISIKOHINWEIS","disc":"Keine Anlageberatung. Kryptohandel birgt hohe Verlustrisiken. Signale dienen ausschließlich Bildungs- und Analysezwecken.","ft_dev":"Entwickler:","ft_term":"Trading-Terminal öffnen →","sub_html":"\n          Signalcraft kann bei verfügbaren Daten \u003cstrong>bis zu 120 Handelspaare\u003c/strong> prüfen und zeigt \u003cstrong>bis zu 10 passende Setups\u003c/strong> — jedes mit\n          einem \u003cstrong>fertigen Plan\u003c/strong>: wo du einsteigst, wo du aufhörst und wohin das Ziel geht. \u003cstrong>Kostenlos\u003c/strong>,\n          ohne Konto — und ohne Heilsversprechen.\n        ","sub_tech":"Die Setups werden nach \u003cstrong>sechs transparenten Faktoren\u003c/strong> bewertet (Trend, Trendqualität/ADX, risikoadjustiertes Momentum, Volumen, Taker-Kaufdruck, Struktur). Aufs Board kommen nur Grade-A-Setups: Quant-Score ≥ 86, RSI ≤ 75, ≥ 10 Mio. USDT 24h-Volumen, ADX ≥ 15 und positives risikoadjustiertes 30T-Momentum. Der Kaufdruck-Score kombiniert Taker-Kaufanteil, relatives Tagesvolumen und 24h-Preisänderung. Historische Simulation ≠ Zukunft.","fc_t":"Die nächste Bewegung kommt bestimmt.\u003cbr>\u003cem style=\"color:var(--text-muted);\">Sieh sie früher.\u003c/em>"}</script><script>
+  <script id="german-source-strings" type="application/json">{"skipTo":"Weiter zum Inhalt","head_sub":"Echte Börsendaten // Bis zu 10 Setups mit Note A // Gratis","head_cta":"🚀 Jetzt kostenlos starten →","kick":"[ KEIN KONTO • KEIN ABO • KOMPLETT KOSTENLOS ]","t1":"Signalcraft: Krypto-Setups.","t2":"Einstieg, Stop und Ziele auf einen Blick.","tech_sum":"Mehr für Fortgeschrittene: So wird gefiltert","cta1":"🔥 Aktuelle Setups ansehen →","cta2":"💡 So einfach geht’s","rad_t":"Live-Setups im Terminal","rad_note":"Aktuelle Setups erscheinen nur, wenn ausreichend Live-Daten verfügbar sind. Andernfalls bleibt das Board leer.","more_why":"Über die Signale","why_k":"[ AUF EINEN BLICK ]","why_t":"Was du bekommst — in einfachen Worten","b1t":"Fertige Pläne statt Rätselraten","b1d":"Zu jedem Signal bekommst du einen kompletten Plan: Einstiegspreis, Sicherheits-Stopp und Ziel. Das Ziel liegt mindestens doppelt so weit weg wie der Stopp (ab 1:2). In Sekunden weißt du, ob ein Trade zu dir passt.","b2t":"Zahlen statt Bauchgefühl","b2d":"Der Kaufdruck-Score ist ein modellierter Indikator aus Taker-Kaufanteil, relativem Tagesvolumen und 24h-Preisänderung – keine direkte Messung des aktuellen Kaufvolumens.","b3t":"Drei klare Risiko-Stufen","b3d":"🟢 Vorsichtig, 🟡 Mittel, 🔴 Mutig — jedes Signal ist ehrlich eingeordnet. Einsteiger starten vorsichtig, erfahrene Trader wählen gezielt.","b4t":"Echte Daten — von großen Börsen","b4d":"Live-Kurse von Binance, Coinbase, Kraken, OKX und weiteren großen Börsen — plus ein Blick auf dezentrale Handelsplätze. Alle Datenquellen sind öffentlich; nichts wird erfunden.","b5t":"In deiner Sprache","b5d":"Deutsch, English, Español, العربية und 中文 — ein Klick, und die ganze Seite wechselt.","b7t":"Nur die Besten aufs Board","b7d":"Jedes Setup bekommt eine Note von A+ bis C. Nur Note A schafft es auf das Board — und das Terminal zeigt sogar ehrlich, wie viele Kandidaten heute durchgefallen sind.","b6t":"Ohne Konto. Sofort los.","b6d":"Keine Anmeldung, keine App, keine E-Mail-Adresse. Link öffnen, Signale lesen, fertig — finanziert von freiwilligen Spenden. Für Live-Daten verbindet sich dein Browser direkt mit externen Anbietern.","more_steps":"So funktioniert es","st_k":"[ SO GEHT’S IN 3 SCHRITTEN ]","st_t":"So nutzt du Signalcraft","st_cta":"Terminal öffnen ↗","s1n":"SCHRITT 01","s1t":"Terminal öffnen","s1d":"Ein Klick, kein Anmelden. Du landest direkt auf dem Board mit bis zu 10 passenden Setups — sortiert nach Note.","s2n":"SCHRITT 02","s2t":"Ein Signal auswählen","s2d":"Filtere nach Risiko (🟢🟡🔴), Bereich oder Suche. Jede Karte zeigt Note, Risiko-Stufe und den fertigen Plan.","s3n":"SCHRITT 03","s3t":"Plan umsetzen — oder nur zuschauen","s3d":"Du übernimmst Einstieg, Stopp und Ziel an deiner Börse — oder beobachtest den Trade einfach erst einmal. Die Kontrolle hast immer du.","more_terms":"Begriffe erklärt","g_k":"[ WORTSCHATZ FÜR DEN START ]","g_t":"Die wichtigsten Begriffe in einfachen Worten","g1t":"Signal","g1d":"Eine per Zahlen ausgewertete Trade-Idee mit fertigem Plan — keine Meinung, keine Wette.","g2t":"Einstieg","g2d":"Der Preis, zu dem der Plan den Kauf vorsieht. Du steigst also nicht blind ein.","g3t":"Stop-Loss (Stopp)","g3d":"Ein geplantes Ausstiegsniveau. Der tatsächliche Ausführungspreis kann abweichen; der Verlust ist nicht garantiert begrenzt.","g4t":"Take-Profit (Ziel)","g4d":"Ein geplantes Gewinnziel; eine Ausführung zu diesem Preis ist nicht garantiert.","g5t":"Chance:Risiko (R:R)","g5d":"Vergleich der geplanten Abstände: Das zweite Ziel liegt ungefähr mindestens doppelt so weit vom Einstieg entfernt wie der Stopp. Tatsächliche Ergebnisse können abweichen.","g6t":"Note A / Score","g6d":"Eine 0–100-Note. Nur Setups mit mindestens 86 Punkten (Note A) kommen aufs Board. Gemessen werden Trend, Volumen und Kaufdruck — öffentliche Daten, keine Magie.","more_faq":"Häufige Fragen","fq_k":"[ KURZE ANTWORTEN ]","fq_t":"Häufig gestellte Fragen","q1":"1. Ist Signalcraft wirklich kostenlos?","a1":"\n            Ja – zu 100 %. Kein Konto, keine E-Mail, kein Paywall, kein Abo, keine Werbung.\n            Bis zu 120 Handelspaare können bei verfügbaren Daten live geprüft werden – nur Grade-A-Setups (mindestens 86 von 100 Punkten) kommen\n            aufs Board. Wer mag, unterstützt die Weiterentwicklung per Spende.\n          ","q2":"2. Was bekomme ich zu jedem Signal?","a2":"\n            Einen kompletten Plan: Einstiegspreis, Stop-Loss und Take-Profit mit\n            mindestens 2:1 Chance-Risiko — dazu einen modellierten Kaufdruck-Indikator\n            und eine von drei Risiko-Stufen.\n          ","q3":"3. Woher kommen die Zahlen?","a3":"\n            Der Kaufdruck-Score kombiniert den Taker-Kaufanteil über sieben Tageskerzen,\n            relatives Tagesvolumen und die rollierende 24h-Preisänderung. Der Fear & Greed Index\n            wird separat angezeigt und nicht eingerechnet. Social-Media- und News-Feeds sind nicht angebunden.\n          ","q4":"4. Wer steckt hinter Signalcraft?","a4":"\n            Signalcraft wird unabhängig von AndrexTheDev (hippie.highho@gmail.com) entwickelt\n            und betrieben. Fragen und Feedback gerne jederzeit per E-Mail.\n          ","fc_sub":"Bis zu 10 geprüfte Setups. Kostenlos und ohne Konto.","fc_cta":"Signale ansehen →","ft_don":"FREIWILLIGE RESEARCH-SPENDE:","ft_sys":"100% kostenlos • ohne Konto","disc_badge":"RISIKOHINWEIS","disc":"Keine Anlageberatung. Kryptohandel birgt hohe Verlustrisiken. Signale dienen ausschließlich Bildungs- und Analysezwecken.","ft_dev":"Entwickler:","ft_term":"Trading-Terminal öffnen →","legal_provider":"Anbieterinformationen","legal_privacy":"Datenschutzhinweise","sub_html":"Bis zu \u003cstrong>10 Krypto-Signale\u003c/strong> mit Einstieg, Stop und Zielen. Kostenlos und ohne Konto.","sub_tech":"Die Setups werden nach \u003cstrong>sechs transparenten Faktoren\u003c/strong> bewertet (Trend, Trendqualität/ADX, risikoadjustiertes Momentum, Volumen, Taker-Kaufdruck, Struktur). Aufs Board kommen nur Grade-A-Setups: Quant-Score ≥ 86, RSI ≤ 75, ≥ 10 Mio. USDT 24h-Volumen, ADX ≥ 15 und positives risikoadjustiertes 30T-Momentum. Der Kaufdruck-Score kombiniert Taker-Kaufanteil, relatives Tagesvolumen und 24h-Preisänderung. Historische Simulation ≠ Zukunft.","fc_t":"Krypto-Signale auf einen Blick"}</script><script>
   (function () {
     'use strict';
     var L = {
       de: { title: "Signalcraft – Grade-A-Krypto-Setups | Kostenlos", desc: "Krypto-Setups mit Einstieg, Stop und Zielen: bis zu 10 Grade-A-Ideen, sechs transparente Faktoren und ausschließlich aktuellen Marktdaten. Kostenlos ohne Konto.", skipTo: "Weiter zum Inhalt" },
       en: {
+        more_why: 'About the signals', more_steps: 'How it works', more_terms: 'Terms explained', more_faq: 'Common questions',
+        legal_provider: "Provider information", legal_privacy: "Privacy information",
         skipTo: "Skip to content",
         disc_badge: "RISK NOTICE", disc: "No investment advice. Crypto trading carries high risk of loss. Signals are for educational and analytical purposes only.",
         contact: "Contact: AndrexTheDev (hippie.highho@gmail.com)",
-        head_sub: "Real market data // Only the 10 best setups with an A grade // Free",
+        head_sub: "Real market data // Up to 10 setups with an A grade // Free",
         head_cta: "🚀 Start free now →",
         kick: "[ NO ACCOUNT • NO SUBSCRIPTION • COMPLETELY FREE ]",
         t1: "Signalcraft: crypto setups.", t2: "Explained so anyone can follow.",
         sub_html: "When data is available, Signalcraft can assess <strong>up to 120 trading pairs</strong> and show <strong>up to 10 qualifying setups</strong> — each with a <strong>ready plan</strong>: where to enter, where to stop, and where the target is. <strong>Free</strong>, no account — and no get-rich promises.",
         tech_sum: "For the advanced: how the filter works",
         sub_tech: "Setups are scored on <strong>six transparent factors</strong> (trend, trend quality/ADX, risk-adjusted momentum, volume, taker buy pressure, structure). Only Grade-A setups reach the board: Quant score ≥ 86, RSI ≤ 75, ≥ 10M USDT in 24h volume, ADX ≥ 15 and positive risk-adjusted 30d momentum. The buy-pressure score combines taker-buy share, relative daily volume and 24h price change. Historical simulation ≠ the future.",
-        cta1: "🔥 See the 10 setups →", cta2: "💡 How it works",
+        cta1: "🔥 See current setups →", cta2: "💡 How it works",
         tr1: "100% free", tr2: "No account", tr3: "5 languages", tr4: "Real Binance data", tr5: "Only the best reach the board",
         rad_t: "Live setups in the terminal",
         rad_note: "Current setups appear only when sufficient live data is available. Otherwise the board stays empty.",
@@ -789,11 +792,11 @@ body {
         b4t: "Real data — from major exchanges", b4d: "Live prices from Binance, Coinbase, Kraken, OKX and other major exchanges — plus a look at decentralized venues. All sources are public; nothing is invented.",
         b5t: "In your language", b5d: "German, English, Spanish, Arabic and Chinese — one click and the whole page switches.",
         b7t: "Only the best reach the board", b7d: "Every setup earns a grade from A+ to C. Only grade A makes it onto the board — and the terminal even shows honestly how many candidates fell short today.",
-        b6t: "No account. Instantly.", b6d: "No sign-up, no app, no email. Open the link, read the signals, done — funded by voluntary donations. Your data stays yours.",
+        b6t: "No account. Instantly.", b6d: "No sign-up, no app, no email. Open the link, read the signals, done — funded by voluntary donations. Your browser connects directly to external providers for live data.",
         fin_t: "How it stays free", fin_d: "No ads, no ad gate and no data sales — Signalcraft is funded by voluntary donations. That is how it stays free for everyone.",
-        fin_l1: "✓ No ads or ad gate on the board", fin_l2: "✓ Voluntary donations (SOL/BTC/ETH)", fin_l3: "✗ No data sales, no trackers",
+        fin_l1: "✓ No ads or ad gate on the board", fin_l2: "✓ Voluntary donations (SOL/BTC/ETH)", fin_l3: "✓ No first-party tracking scripts; see privacy information for external providers",
         st_k: "[ IN 3 SIMPLE STEPS ]", st_t: "How to use Signalcraft", st_cta: "Open terminal ↗",
-        s1n: "STEP 01", s1t: "Open the terminal", s1d: "One click, no sign-up. You land directly on the board with the 10 best setups — sorted by grade.",
+        s1n: "STEP 01", s1t: "Open the terminal", s1d: "One click, no sign-up. You land directly on the board with up to 10 qualifying setups — sorted by grade.",
         s2n: "STEP 02", s2t: "Pick a signal", s2d: "Filter by risk (🟢🟡🔴), sector or search. Every card shows grade, risk level and the ready plan.",
         s3n: "STEP 03", s3t: "Use the plan — or just watch", s3d: "Use entry, stop and target on your exchange — or just observe the trade first. You stay in control.",
         g_k: "[ VOCABULARY FOR THE START ]", g_t: "The key terms in plain words",
@@ -809,24 +812,26 @@ body {
         q3: "3. Where do the numbers come from?", a3: "The buy-pressure score combines the taker-buy share over seven daily candles, relative daily volume and rolling 24h price change. Fear & Greed is shown separately and is not included. Social-media and news feeds are not connected.",
         q4: "4. Who is behind Signalcraft?", a4: "Signalcraft is independently developed and run by AndrexTheDev (hippie.highho@gmail.com). Questions welcome anytime.",
         fc_t: "The next move will come.<br><em style=\"color:var(--text-muted);\">See it earlier.</em>",
-        fc_sub: "10 Grade-A setups, explained simply, real market data. Free, no account.",
+        fc_sub: "Up to 10 Grade-A setups, explained simply, real market data. Free, no account.",
         fc_cta: "✦ Enter the terminal – start free →",
         ft_don: "VOLUNTARY RESEARCH DONATION:", ft_sys: "100% free • no account", ft_dev: "Developer:", ft_term: "Open the trading terminal →",
         title: "Signalcraft – Grade-A Crypto Setups | Free",
         desc: "Explore up to 10 Grade-A crypto setups with entry, stop and targets. Six transparent factors, USDT market data and an empty board when live data is unavailable. No account."
       },
       es: {
+        more_why: 'Sobre las señales', more_steps: 'Cómo funciona', more_terms: 'Explicación de términos', more_faq: 'Preguntas frecuentes',
+        legal_provider: "Información del operador", legal_privacy: "Información de privacidad",
         skipTo: "Ir al contenido",
         disc_badge: "AVISO DE RIESGO", disc: "Sin asesoramiento financiero. El trading de cripto implica alto riesgo de pérdida. Las señales son solo educativas y analíticas.",
         contact: "Contacto: AndrexTheDev (hippie.highho@gmail.com)",
-        head_sub: "Datos reales de mercado // Solo los 10 mejores setups con nota A // Gratis",
+        head_sub: "Datos reales de mercado // Hasta 10 setups con nota A // Gratis",
         head_cta: "🚀 Empezar gratis →",
         kick: "[ SIN CUENTA • SIN SUSCRIPCIÓN • 100% GRATIS ]",
         t1: "Signalcraft: ideas de criptomonedas.", t2: "Explicado para que cualquiera lo entienda.",
         sub_html: "Cuando hay datos disponibles, Signalcraft puede evaluar <strong>hasta 120 pares</strong> y mostrar <strong>hasta 10 oportunidades que cumplan los filtros</strong> — cada una con un <strong>plan listo</strong>: dónde entras, dónde paras y a dónde apunta el objetivo. <strong>Gratis</strong>, sin cuenta — y sin promesas de hacerte rico.",
         tech_sum: "Para avanzados: así se filtra",
         sub_tech: "Los setups se puntúan según <strong>seis factores transparentes</strong> (tendencia, calidad de tendencia/ADX, momentum ajustado por riesgo, volumen, presión compradora taker, estructura). Solo llegan al tablero los setups Grade A: score cuantitativo ≥ 86, RSI ≤ 75, ≥ 10 M USDT de volumen en 24h, ADX ≥ 15 y momentum ajustado por riesgo positivo a 30d. El score combina proporción de compra taker, volumen diario relativo y cambio de precio en 24h. Simulación histórica ≠ futuro.",
-        cta1: "🔥 Ver los 10 setups →", cta2: "💡 Cómo funciona",
+        cta1: "🔥 Ver setups actuales →", cta2: "💡 Cómo funciona",
         tr1: "100% gratis", tr2: "Sin cuenta", tr3: "En 5 idiomas", tr4: "Datos reales de Binance", tr5: "Solo lo mejor llega al tablero",
         rad_t: "Setups en vivo en el terminal",
         rad_note: "Los setups actuales solo aparecen cuando hay suficientes datos en vivo. De lo contrario, el tablero queda vacío.",
@@ -837,11 +842,11 @@ body {
         b4t: "Datos reales — de grandes bolsas", b4d: "Precios en vivo de Binance, Coinbase, Kraken, OKX y otras grandes bolsas — además, un vistazo a las descentralizadas. Todas las fuentes son públicas; nada se inventa.",
         b5t: "En tu idioma", b5d: "Alemán, inglés, español, árabe y chino — un clic y toda la página cambia.",
         b7t: "Solo lo mejor llega al tablero", b7d: "Cada setup recibe una nota de A+ a C. Solo la nota A llega al tablero — y el terminal incluso muestra con honestidad cuántos candidatos se quedaron fuera hoy.",
-        b6t: "Sin cuenta. Al instante.", b6d: "Sin registro, sin app, sin email. Abre el enlace, lee las señales y listo — financiado con donaciones voluntarias. Tus datos siguen siendo tuyos.",
+        b6t: "Sin cuenta. Al instante.", b6d: "Sin registro, sin app, sin email. Abre el enlace, lee las señales y listo — financiado con donaciones voluntarias. Tu navegador se conecta directamente a proveedores externos para obtener datos en vivo.",
         fin_t: "Cómo sigue siendo gratis", fin_d: "Sin anuncios, sin publicidad forzada y sin venta de datos — Signalcraft se financia con donaciones voluntarias. Así sigue siendo gratis para todos.",
-        fin_l1: "✓ Sin anuncios ni publicidad en el tablero", fin_l2: "✓ Donaciones voluntarias (SOL/BTC/ETH)", fin_l3: "✗ Sin venta de datos ni rastreadores",
+        fin_l1: "✓ Sin anuncios ni publicidad en el tablero", fin_l2: "✓ Donaciones voluntarias (SOL/BTC/ETH)", fin_l3: "✓ Sin scripts de seguimiento propios; proveedores externos en privacidad",
         st_k: "[ EN 3 PASOS SENCILLOS ]", st_t: "Cómo usar Signalcraft", st_cta: "Abrir terminal ↗",
-        s1n: "PASO 01", s1t: "Abre el terminal", s1d: "Un clic, sin registro. Llegas directamente al tablero con los 10 mejores setups — ordenados por nota.",
+        s1n: "PASO 01", s1t: "Abre el terminal", s1d: "Un clic, sin registro. Llegas directamente al tablero con hasta 10 setups que cumplen los criterios — ordenados por nota.",
         s2n: "PASO 02", s2t: "Elige una señal", s2d: "Filtra por riesgo (🟢🟡🔴), sector o búsqueda. Cada tarjeta muestra nota, nivel de riesgo y el plan listo.",
         s3n: "PASO 03", s3t: "Usa el plan — o solo observa", s3d: "Usa entrada, stop y objetivo en tu exchange — o simplemente observa el trade primero. Tú tienes el control.",
         g_k: "[ VOCABULARIO PARA EMPEZAR ]", g_t: "Los conceptos clave en palabras sencillas",
@@ -857,24 +862,26 @@ body {
         q3: "3. ¿De dónde salen los números?", a3: "El score combina la proporción de compra taker de siete velas diarias, el volumen diario relativo y el cambio de precio móvil en 24h. Fear & Greed se muestra aparte y no se incluye. No se conectan fuentes de redes sociales ni noticias.",
         q4: "4. ¿Quién está detrás?", a4: "Signalcraft lo desarrolla y opera de forma independiente AndrexTheDev (hippie.highho@gmail.com).",
         fc_t: "El próximo movimiento llegará.<br><em style=\"color:var(--text-muted);\">Vélo antes.</em>",
-        fc_sub: "10 setups Grade A, explicados fácil, datos reales de mercado. Gratis y sin cuenta.",
+        fc_sub: "Hasta 10 setups Grade A, explicados fácil, datos reales de mercado. Gratis y sin cuenta.",
         fc_cta: "✦ Entrar al terminal – gratis →",
         ft_don: "DONACIÓN VOLUNTARIA DE RESEARCH:", ft_sys: "100% gratis • sin cuenta", ft_dev: "Desarrollador:", ft_term: "Abrir el terminal de trading →",
         title: "Signalcraft – Setups cripto Grade A | Gratis",
         desc: "Explora hasta 10 setups cripto Grade A con entrada, stop y objetivos. Seis factores transparentes, datos en USDT y tablero vacío si faltan datos en vivo. Sin cuenta."
       },
       ar: {
+        more_why: 'عن الإشارات', more_steps: 'كيف يعمل', more_terms: 'شرح المصطلحات', more_faq: 'أسئلة شائعة',
+        legal_provider: "معلومات المشغّل", legal_privacy: "معلومات الخصوصية",
         skipTo: "إلى المحتوى",
         disc_badge: "تنبيه المخاطر", disc: "ليست نصيحة استثمارية. تداول العملات الرقمية ينطوي على مخاطر خسارة عالية. الإشارات لأغراض تعليمية وتحليلية فقط.",
         contact: "التواصل: AndrexTheDev (hippie.highho@gmail.com)",
-        head_sub: "بيانات سوق حقيقية // فقط أفضل 10 فرص بدرجة A // مجاني",
+        head_sub: "بيانات سوق حقيقية // حتى 10 فرص بدرجة A // مجاني",
         head_cta: "🚀 ابدأ الآن مجاناً ←",
         kick: "[ بدون حساب • بدون اشتراك • مجاني بالكامل ]",
         t1: "Signalcraft: فرص العملات الرقمية.", t2: "مشروحة ببساطة ليفهمها الجميع.",
         sub_html: "يمكن لـ Signalcraft تقييم <strong>ما يصل إلى 120 زوجاً</strong> عند توفر البيانات، وعرض <strong>ما يصل إلى 10 فرص تستوفي الشروط</strong> — كل واحدة تتضمن <strong>خطة جاهزة</strong>: أين تدخل، وأين تتوقف، وأين الهدف. <strong>مجاني</strong> وبدون حساب — وبدون وعود بالثراء.",
         tech_sum: "للمتقدمين: هكذا تُرشِّح الفرص",
         sub_tech: "تُقيَّم الفرص حسب <strong>ستة عوامل شفافة</strong> (الاتجاه، جودة الاتجاه/ADX، زخم معدّل بالمخاطر، الحجم، ضغط شراء التيكر، الهيكل). تصل إلى اللوحة فرص Grade A فقط: سكور كمي ≥ 86، RSI ≤ 75، حجم 24 ساعة ≥ 10 ملايين USDT، وADX ≥ 15، وزخم إيجابي معدّل بالمخاطر خلال 30 يوماً. يجمع مؤشر ضغط الشراء نسبة شراء التيكر والحجم اليومي النسبي وتغير السعر خلال 24 ساعة. محاكاة تاريخية ≠ المستقبل.",
-        cta1: "🔥 شاهد الـ 10 فرص →", cta2: "💡 كيف يعمل؟",
+        cta1: "🔥 شاهد الفرص الحالية →", cta2: "💡 كيف يعمل؟",
         tr1: "مجاني 100%", tr2: "بدون حساب", tr3: "بـ 5 لغات", tr4: "بيانات Binance حقيقية", tr5: "الأفضل فقط يصل إلى اللوحة",
         rad_t: "الفرص المباشرة في المنصة",
         rad_note: "تظهر الفرص الحالية فقط عند توفر بيانات مباشرة كافية، وإلا تبقى اللوحة فارغة.",
@@ -885,11 +892,11 @@ body {
         b4t: "بيانات حقيقية — من كبرى البورصات", b4d: "أسعار مباشرة من Binance وCoinbase وKraken وOKX وغيرها من البورصات — مع لمحة على المنصات اللامركزية. كل المصادر عامة؛ لا شيء مختلق.",
         b5t: "بلغتك", b5d: "الألمانية والإنجليزية والإسبانية والعربية والصينية — نقرة واحدة وتتبدل الصفحة كاملة.",
         b7t: "الأفضل فقط يصل إلى اللوحة", b7d: "كل فرصة تنال درجة من A+ إلى C. درجة A فقط تصل إلى اللوحة — وتعرض المنصة حتى بكل صراحة كم مرشحاً لم ينجح اليوم.",
-        b6t: "بدون حساب. فوراً.", b6d: "بدون تسجيل وبدون تطبيق وبدون بريد. افتح الرابط واقرأ الإشارات — ممول بتبرعات طوعية. بياناتك تبقى لك.",
+        b6t: "بدون حساب. فوراً.", b6d: "بدون تسجيل وبدون تطبيق وبدون بريد. افتح الرابط واقرأ الإشارات — ممول بتبرعات طوعية. يتصل متصفحك مباشرة بمزودي بيانات خارجيين للحصول على البيانات المباشرة.",
         fin_t: "كيف يبقى مجانياً", fin_d: "لا إعلانات ولا بوابة إعلانية ولا بيع بيانات — يُموَّل Signalcraft عبر تبرعات طوعية. هكذا يبقى مجانياً للجميع.",
-        fin_l1: "✓ لا إعلانات ولا بوابة إعلانية في اللوحة", fin_l2: "✓ تبرعات طوعية (SOL/BTC/ETH)", fin_l3: "✗ لا بيع بيانات ولا متتبعات",
+        fin_l1: "✓ لا إعلانات ولا بوابة إعلانية في اللوحة", fin_l2: "✓ تبرعات طوعية (SOL/BTC/ETH)", fin_l3: "✓ لا نصوص تتبع خاصة بالموقع؛ راجع الخصوصية بشأن المزودين الخارجيين",
         st_k: "[ في 3 خطوات بسيطة ]", st_t: "كيف تستخدم Signalcraft", st_cta: "افتح المنصة ↗",
-        s1n: "الخطوة 01", s1t: "افتح المنصة", s1d: "نقرة واحدة بدون تسجيل. تصل مباشرة إلى اللوحة التي تضم أفضل 10 فرص — مرتبة حسب الدرجة.",
+        s1n: "الخطوة 01", s1t: "افتح المنصة", s1d: "نقرة واحدة بدون تسجيل. تصل مباشرة إلى اللوحة التي تضم حتى 10 فرص مطابقة للشروط — مرتبة حسب الدرجة.",
         s2n: "الخطوة 02", s2t: "اختر إشارة", s2d: "رشّح حسب المخاطر (🟢🟡🔴) أو القطاع أو البحث. كل بطاقة تعرض الدرجة ومستوى المخاطر والخطة الجاهزة.",
         s3n: "الخطوة 03", s3t: "نفّذ الخطة — أو راقب فقط", s3d: "استخدم الدخول والوقف والهدف في منصتك — أو راقب الصفقة أولاً. أنت المتحكم دائماً.",
         g_k: "[ مفردات للبداية ]", g_t: "أهم المصطلحات بكلمات بسيطة",
@@ -905,24 +912,26 @@ body {
         q3: "3. من أين تأتي الأرقام؟", a3: "يجمع المؤشر نسبة شراء التيكر خلال سبع شمعات يومية والحجم اليومي النسبي وتغير السعر المتحرك خلال 24 ساعة. يُعرض الخوف والطمع منفصلاً ولا يدخل في الحساب، ولا ترتبط مصادر أخبار أو شبكات اجتماعية.",
         q4: "4. من وراء Signalcraft؟", a4: "يطوره ويشغله باستقلالية AndrexTheDev (hippie.highho@gmail.com).",
         fc_t: "الحركة القادمة قادمة حتماً.<br><em style=\"color:var(--text-muted);\">ارصدها أبكر.</em>",
-        fc_sub: "10 فرص Grade A، موضحة ببساطة، بيانات سوق حقيقية. مجاناً وبدون حساب.",
+        fc_sub: "حتى 10 فرص Grade A، موضحة ببساطة، بيانات سوق حقيقية. مجاناً وبدون حساب.",
         fc_cta: "✦ ادخل المنصة وابدأ مجاناً ←",
         ft_don: "تبرع طوعي للبحث:", ft_sys: "مجاني 100% • بدون حساب", ft_dev: "المطور:", ft_term: "افتح منصة التداول ←",
         title: "Signalcraft – فرص كريبتو Grade A | مجاناً",
         desc: "استكشف حتى 10 فرص كريبتو Grade A مع الدخول والوقف والأهداف. ستة عوامل شفافة وبيانات USDT ولوحة فارغة عند غياب البيانات المباشرة. مجاناً دون حساب."
       },
       zh: {
+        more_why: '关于信号', more_steps: '使用方法', more_terms: '术语解释', more_faq: '常见问题',
+        legal_provider: "运营者信息", legal_privacy: "隐私信息",
         skipTo: "跳到正文",
         disc_badge: "风险提示", disc: "非投资建议。加密货币交易存在高亏损风险。信号仅用于教育与量化分析目的。",
         contact: "联系：AndrexTheDev (hippie.highho@gmail.com)",
-        head_sub: "真实市场数据 // 仅展示评分 A 的 10 大机会 // 免费",
+        head_sub: "真实市场数据 // 最多展示 10 个评分 A 的机会 // 免费",
         head_cta: "🚀 立即免费开始 →",
         kick: "[ 无需账户 • 无需订阅 • 完全免费 ]",
         t1: "Signalcraft：加密交易机会。", t2: "简单到人人都能看懂。",
         sub_html: "数据可用时，Signalcraft 可评估 <strong>最多 120 个交易对</strong>，并展示<strong>最多 10 个符合条件的机会</strong>——每个都配有<strong>现成计划</strong>：在哪里入场、在哪里止损、目标走向何处。<strong>免费</strong>、无需账户——也没有暴富承诺。",
         tech_sum: "给进阶用户：过滤机制详解",
         sub_tech: "交易机会按<strong>六个透明因子</strong>评分（趋势、趋势质量/ADX、风险调整动能、成交量、主动买压、结构）。只有 Grade A 机会才能上板：量化评分 ≥ 86、RSI ≤ 75、24小时成交量 ≥ 1000 万 USDT、ADX ≥ 15 且30日风险调整动能为正。买压评分结合主动买入占比、相对日成交量和24小时价格变化。历史模拟 ≠ 未来。",
-        cta1: "🔥 查看这 10 个机会 →", cta2: "💡 它是怎么工作的",
+        cta1: "🔥 查看当前机会 →", cta2: "💡 它是怎么工作的",
         tr1: "100% 免费", tr2: "无需账户", tr3: "5 种语言", tr4: "真实 Binance 数据", tr5: "只有最好的才能上板",
         rad_t: "终端中的实时交易机会",
         rad_note: "只有实时数据充足时才显示当前机会；否则看板保持空白。",
@@ -933,11 +942,11 @@ body {
         b4t: "真实数据——来自大型交易所", b4d: "来自 Binance、Coinbase、Kraken、OKX 等大型交易所的实时价格——另有去中心化场所数据。所有数据源公开透明，绝不编造。",
         b5t: "用你的语言", b5d: "德语、英语、西班牙语、阿拉伯语、中文——一键切换，整页随之变。",
         b7t: "只有最好的才能上板", b7d: "每个机会都会获得 A+ 到 C 的评级。只有评级 A 能上板——终端还会诚实地告诉你今天有多少候选没能入选。",
-        b6t: "无需账户，即刻开始。", b6d: "不用注册、不用应用、不用邮箱。打开链接，阅读信号，完成——由自愿捐赠维持。数据永远属于你。",
+        b6t: "无需账户，即刻开始。", b6d: "不用注册、不用应用、不用邮箱。打开链接，阅读信号，完成——由自愿捐赠维持。浏览器会直接连接外部提供商以获取实时数据。",
         fin_t: "它为何能免费", fin_d: "没有广告、没有广告门槛，也不卖数据——Signalcraft 由自愿捐赠资助。这就是它能让人人免费使用的原因。",
-        fin_l1: "✓ 看板无广告、无广告门槛", fin_l2: "✓ 自愿捐赠 (SOL/BTC/ETH)", fin_l3: "✗ 不卖数据、无跟踪器",
+        fin_l1: "✓ 看板无广告、无广告门槛", fin_l2: "✓ 自愿捐赠 (SOL/BTC/ETH)", fin_l3: "✓ 无本站跟踪脚本；外部提供商见隐私信息",
         st_k: "[ 3 步搞定 ]", st_t: "如何使用 Signalcraft", st_cta: "打开终端 ↗",
-        s1n: "第 1 步", s1t: "打开终端", s1d: "一次点击，无需注册。直接进入展示 10 大机会的看板——按评分排序。",
+        s1n: "第 1 步", s1t: "打开终端", s1d: "一次点击，无需注册。直接进入展示最多 10 个符合条件机会的看板——按评分排序。",
         s2n: "第 2 步", s2t: "挑选一个信号", s2d: "按风险（🟢🟡🔴）、板块或搜索筛选。每张卡片显示评级、风险等级和现成计划。",
         s3n: "第 3 步", s3t: "照计划操作——或先观望", s3d: "在你的交易所使用入场、止损和目标——或者先只观察这笔交易。控制权永远在你手里。",
         g_k: "[ 新手词汇表 ]", g_t: "最重要的几个术语，大白话解释",
@@ -953,7 +962,7 @@ body {
         q3: "3. 这些数字从哪来？", a3: "评分结合七根日线的主动买入占比、相对日成交量和滚动24小时价格变化。恐惧贪婪指数单独展示，不计入评分；不接入社交媒体或新闻源。",
         q4: "4. 谁在维护 Signalcraft？", a4: "由 AndrexTheDev (hippie.highho@gmail.com) 独立开发运营。",
         fc_t: "下一波行情总会到来。<br><em style=\"color:var(--text-muted);\">比别人更早看见。</em>",
-        fc_sub: "10 个 Grade A 机会，讲清楚、看得懂，真实市场数据。免费、无需账户。",
+        fc_sub: "最多 10 个 Grade A 机会，讲清楚、看得懂，真实市场数据。免费、无需账户。",
         fc_cta: "✦ 进入终端 – 免费开始 →",
         ft_don: "自愿研究捐赠：", ft_sys: "100% 免费 • 无需账户", ft_dev: "开发者：", ft_term: "打开交易终端 →",
         title: "Signalcraft – Grade A 加密机会 | 免费",
@@ -973,6 +982,28 @@ body {
         L.de[el.getAttribute('data-i18n-html')] = el.innerHTML;
       });
     }
+
+    const SIMPLE_LANDING = {
+      de: { more_why: 'Über die Signale', more_steps: 'So funktioniert es', more_terms: 'Begriffe erklärt', more_faq: 'Häufige Fragen', t2: 'Einstieg, Stop und Ziele auf einen Blick.', sub_html: 'Bis zu <strong>10 Krypto-Signale</strong> mit Einstieg, Stop und Zielen. Kostenlos und ohne Konto.', rad_t: 'Aktuelle Signale', rad_note: 'Ohne aktuelle Daten bleibt das Board leer.', cta1: 'Signale ansehen →', cta2: 'So funktioniert es', fc_t: 'Krypto-Signale auf einen Blick', fc_sub: 'Bis zu 10 geprüfte Setups. Kostenlos und ohne Konto.', fc_cta: 'Signale ansehen →' },
+      en: { more_why: 'About the signals', more_steps: 'How it works', more_terms: 'Terms explained', more_faq: 'Common questions', t2: 'Entry, stop and targets at a glance.', sub_html: 'Up to <strong>10 crypto signals</strong> with entry, stop and targets. Free, no account.', rad_t: 'Current signals', rad_note: 'The board stays empty without current data.', cta1: 'View signals →', cta2: 'How it works', fc_t: 'Crypto signals at a glance', fc_sub: 'Up to 10 screened setups. Free, no account.', fc_cta: 'View signals →' },
+      es: { more_why: 'Sobre las señales', more_steps: 'Cómo funciona', more_terms: 'Explicación de términos', more_faq: 'Preguntas frecuentes', t2: 'Entrada, stop y objetivos de un vistazo.', sub_html: 'Hasta <strong>10 señales cripto</strong> con entrada, stop y objetivos. Gratis y sin cuenta.', rad_t: 'Señales actuales', rad_note: 'Sin datos actuales el tablero queda vacío.', cta1: 'Ver señales →', cta2: 'Cómo funciona', fc_t: 'Señales cripto de un vistazo', fc_sub: 'Hasta 10 oportunidades filtradas. Gratis y sin cuenta.', fc_cta: 'Ver señales →' },
+      ar: { more_why: 'عن الإشارات', more_steps: 'كيف يعمل', more_terms: 'شرح المصطلحات', more_faq: 'أسئلة شائعة', t2: 'الدخول والوقف والأهداف في لمحة.', sub_html: 'حتى <strong>10 إشارات رقمية</strong> مع الدخول والوقف والأهداف. مجاناً وبدون حساب.', rad_t: 'الإشارات الحالية', rad_note: 'تبقى اللوحة فارغة دون بيانات حالية.', cta1: 'عرض الإشارات ←', cta2: 'كيف يعمل', fc_t: 'إشارات رقمية في لمحة', fc_sub: 'حتى 10 فرص مفحوصة. مجاناً وبدون حساب.', fc_cta: 'عرض الإشارات ←' },
+      zh: { more_why: '关于信号', more_steps: '使用方法', more_terms: '术语解释', more_faq: '常见问题', t2: '入场、止损和目标一目了然。', sub_html: '最多 <strong>10 个加密货币信号</strong>，包含入场、止损和目标。免费，无需账户。', rad_t: '当前信号', rad_note: '没有当前数据时看板为空。', cta1: '查看信号 →', cta2: '使用方法', fc_t: '加密货币信号一目了然', fc_sub: '最多 10 个经过筛选的机会。免费，无需账户。', fc_cta: '查看信号 →' }
+    };
+    Object.keys(SIMPLE_LANDING).forEach(function (lang) { Object.assign(L[lang], SIMPLE_LANDING[lang]); });
+    function revealAnchor() {
+      const id = location.hash.slice(1);
+      const target = id && document.getElementById(id);
+      if (target && target.matches('details.landing-more')) target.open = true;
+    }
+    document.addEventListener('click', function (event) {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      const target = document.getElementById(link.getAttribute('href').slice(1));
+      if (target && target.matches('details.landing-more')) target.open = true;
+    });
+    window.addEventListener('hashchange', revealAnchor);
+    revealAnchor();
 
     const SEO_IMAGE_ALT = { de: 'Signalcraft: Grafik zu Krypto-Setups und Risikoanalyse', en: 'Signalcraft: graphic about crypto setups and risk analysis', es: 'Signalcraft: gráfico sobre ideas cripto y análisis de riesgos', ar: 'Signalcraft: رسم عن فرص العملات الرقمية وتحليل المخاطر', zh: 'Signalcraft：加密交易机会与风险分析图' };
     var SEO_LOCALE = { de: 'de_DE', en: 'en_US', es: 'es_ES', ar: 'ar_SA', zh: 'zh_CN' };
@@ -1055,6 +1086,7 @@ body {
       applySeoHead(code);
       syncLanguageUrl(code);
       document.querySelectorAll('a[data-terminal-link]').forEach(function (link) { link.setAttribute('href', '/app' + (code === 'de' ? '' : '?lang=' + encodeURIComponent(code))); });
+      document.querySelectorAll('a[data-legal]').forEach(function (link) { link.setAttribute('href', '/' + link.getAttribute('data-legal') + '#' + code); });
       var sel = document.getElementById('langSelect');
       if (sel) sel.value = code;
     }

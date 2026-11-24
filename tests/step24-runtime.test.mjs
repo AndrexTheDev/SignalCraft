@@ -118,7 +118,8 @@ describe('step24 / clocks, cache, query', () => {
   it('isLiveCache rejects the wrong length and non-objects', () => {
     const one = i => ({ ...seed[0], id: 'SIG-' + i, pair: 'AAA' + i + ' / USDT', modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } });
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, (_, i) => one(i)) }), true);
-    assert.equal(isLiveCache({ signals: Array.from({ length: 99 }, (_, i) => one(i)) }), false);
+    assert.equal(isLiveCache({ signals: Array.from({ length: 99 }, (_, i) => one(i)) }), true);
+    assert.equal(isLiveCache({ signals: [] }), false);
     assert.equal(isLiveCache({ signals: Array.from({ length: 100 }, (_, i) => one(i)) }), true);
     assert.equal(isLiveCache({ signals: Array.from({ length: 120 }, () => null) }), false);
     assert.equal(isLiveCache({ signals: Array.from({ length: 100 }, () => one(1)) }), false);

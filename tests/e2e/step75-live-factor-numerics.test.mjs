@@ -46,12 +46,13 @@ describe('step75 / LIVE factor overflow integration', { timeout: 90000 }, () => 
     it(`handles ${mode} sources conservatively`, async () => {
       const page = await open(mode);
       try {
-        const live = mode !== 'many-price';
+        const live = true;
         assert.match(await page.$eval('#meBadge', el => el.textContent), live ? /LIVE/ : /unavailable/i);
         const cache = await page.evaluate(() => ({ signals: window.__auditSignals(), stored: localStorage.getItem('signalcraft_live_v2') }));
         assert.equal(cache.stored, null);
         if (live) {
-          assert.ok(cache); assert.equal(cache.signals.length, mode === 'one-volume' ? 119 : 120);
+          assert.ok(cache); assert.equal(cache.signals.length, mode === 'one-volume' ? 119 : mode === 'many-price' ? 99 : 120);
+          if (mode === 'many-price') assert.ok(cache.signals.every(s => !syms.slice(0,21).includes(s.pair.split(' / ')[0])));
           if (mode === 'one-volume') assert.ok(cache.signals.every(s => !s.pair.startsWith(syms[0] + ' / ')));
           if (mode === 'global-price') assert.ok(cache.signals.every(s => s.venue === 'BINANCE-US SPOT'));
         } else assert.equal(cache.signals.length, 0);

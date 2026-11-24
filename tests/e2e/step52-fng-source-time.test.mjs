@@ -84,11 +84,14 @@ describe('step52 / source date, attribution and index expiry', { timeout: 60000 
       assert.match(await page.$eval('#globalFngBadge', el => el.textContent), /Index 63/);
       await page.evaluate(() => {
         const original = Date.now;
-        Date.now = () => window.__fngTimeTest.SentimentEngine._fngReceivedAt - 1;
+        const engine = window.__fngTimeTest.SentimentEngine;
+        engine.fetchLiveFearAndGreed = () => { window.__fngRetryRequested = true; };
+        Date.now = () => engine._fngReceivedAt - 1;
         document.dispatchEvent(new Event('visibilitychange'));
         Date.now = original;
       });
       assert.equal(await page.$eval('#globalFngBadge', el => el.textContent.trim()), '● F&G –');
+      assert.equal(await page.evaluate(() => window.__fngRetryRequested), true);
       assert.deepEqual(page._pageErrors, []);
     } finally { await page.close(); }
   });
