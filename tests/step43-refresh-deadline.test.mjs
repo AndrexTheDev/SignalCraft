@@ -11,7 +11,7 @@ const never = () => new Promise(() => {});
 function engine() {
   const seed = Array.from({ length: 120 }, (_, i) => ({ pair: 'P' + i, sector: 'test' }));
   const button = { disabled: false, busy: false, setAttribute() { this.busy = true; }, removeAttribute() { this.busy = false; } };
-  const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsDel', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
+  const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsDel', 'const setMarketQuotes = () => {}; return (' + extractBalanced(html, 'const ME = {') + ')')(
     0, { getElementById: () => button }, { en: { meDemoToast: 'demo' } }, 'en', seed.map(s => [s.pair, s.sector]), () => 'unavailable', [], s => s, () => {}, () => null, () => {}
   );
   me.REFRESH_DEADLINE = 30;

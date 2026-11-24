@@ -8,7 +8,7 @@ const marker = 'function isLiveCache(';
 const start = app.indexOf(marker);
 const validate = Function('validLongPlan', 'return ' + app.slice(start, app.indexOf('{', start)) + extractBalanced(app, marker))(validLongPlan);
 const base = Array.from({ length: 100 }, (_, i) => ({
-  ...structuredClone(seed[0]), id: 'SIG-TEST-' + i, pair: 'TEST' + i + ' / USDT', modelVersion: 3,
+  ...structuredClone(seed[0]), id: 'SIG-TEST-' + i, pair: 'TEST' + i + ' / USDT', modelVersion: 4,
   quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 },
   gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
 }));

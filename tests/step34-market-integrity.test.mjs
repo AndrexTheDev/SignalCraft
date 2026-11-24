@@ -59,13 +59,13 @@ describe('step34 / market data integrity', () => {
   });
 
   it('live gate checks unrounded metrics and fails closed when a metric is missing', () => {
-    const sig = { quantScore: 90, live: true, modelVersion: 3, gateMetrics: { rsi: 75, volMio: 10, adx: 15, riskAdj30: 0.001 } };
+    const sig = { quantScore: 90, live: true, modelVersion: 4, gateMetrics: { rsi: 75, volMio: 10, adx: 15, riskAdj30: 0.001 } };
     assert.equal(passesQualityGate(sig), true);
     for (const [key, value] of [['rsi', 75.01], ['volMio', 9.999], ['adx', 14.99], ['riskAdj30', 0], ['adx', null], ['rsi', NaN]]) {
       const altered = { ...sig, gateMetrics: { ...sig.gateMetrics, [key]: value } };
       assert.equal(passesQualityGate(altered), false, key + ': ' + value);
     }
-    assert.equal(passesQualityGate({ quantScore: 90, modelVersion: 3 }), false);
+    assert.equal(passesQualityGate({ quantScore: 90, modelVersion: 4 }), false);
     assert.equal(passesQualityGate({ quantScore: 90, metrics: { rsi: 70, volMio: 20 } }), false, 'legacy signals never pass the live gate');
     assert.equal(passesQualityGate({ ...sig, live: false }), false);
   });

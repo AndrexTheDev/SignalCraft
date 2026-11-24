@@ -52,7 +52,7 @@ describe('step81 / live-only signal presentation', {timeout:180000}, () => {
     try {
       await page.evaluateOnNewDocument(data => {
         const t = Date.now();
-        const signals = Array.from({length:100}, (_,i) => ({...data, id:'FORGED-'+i, pair:'F'+i+' / USDT', timestamp:t, live:true, modelVersion:3, quantScore:90, confluenceScore:90, metrics:{...data.metrics,score:90}, gateMetrics:{rsi:60,volMio:20,adx:25,riskAdj30:1}}));
+        const signals = Array.from({length:100}, (_,i) => ({...data, id:'FORGED-'+i, pair:'F'+i+' / USDT', timestamp:t, live:true, modelVersion:4, quantScore:90, confluenceScore:90, metrics:{...data.metrics,score:90}, gateMetrics:{rsi:60,volMio:20,adx:25,riskAdj30:1}}));
         localStorage.setItem('signalcraft_live_v2', JSON.stringify({version:9,t,signals}));
       }, seed[0]);
       await install(page,null); await page.goto(BASE+'/app.html?lang=en',{waitUntil:'domcontentloaded'});
@@ -70,7 +70,7 @@ describe('step81 / live-only signal presentation', {timeout:180000}, () => {
       await page.waitForFunction(() => window.__liveOnly && window.__liveOnly.ME.status.mode === 'live',{timeout:30000});
       const cards = await page.$$('#signalsGrid .signal-card');
       assert.equal(cards.length,strong ? 10 : 0); assert.match(await page.$eval('#meBadge',e=>e.textContent),/LIVE/);
-      assert.equal(await page.evaluate(() => window.__liveOnly.getSignals().every(s => s.live === true && s.modelVersion === 3)),true);
+      assert.equal(await page.evaluate(() => window.__liveOnly.getSignals().every(s => s.live === true && s.modelVersion === 4)),true);
       if (!strong) assert.match(await page.$eval('#signalsGrid',e=>e.textContent),/no setups/i);
       if (strong) {
         await page.click('[data-inspect-sig]');

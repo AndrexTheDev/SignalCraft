@@ -15,7 +15,7 @@ function engine(fetcher, valid = () => true, current = () => true) {
   const parser = functionFactory('parse24hTickers', 'parseMarketNumber')(functionFactory('parseMarketNumber')());
   const expiry = functionFactory('snapshotExpiry')();
   const fresh = functionFactory('snapshotIsFresh', 'snapshotExpiry')(expiry);
-  return Function('ME_STAMP', 'fetchVenueJson', 'validModelCandles', 'candlesAreCurrent', 'parse24hTickers', 'MARKET_UNIVERSE', 'snapshotIsFresh', 'return (' + source + ')')(
+  return Function('ME_STAMP', 'fetchVenueJson', 'validModelCandles', 'candlesAreCurrent', 'parse24hTickers', 'MARKET_UNIVERSE', 'snapshotIsFresh', 'const setMarketQuotes = () => {}; return (' + source + ')')(
     0, bounded, valid, current, parser, [['BTC', 'majors']], fresh
   );
 }
@@ -36,7 +36,7 @@ describe('step42 / bounded market refresh requests', () => {
   });
   it('tries each endpoint once even if another concurrent worker changes the preference', async () => {
     const urls = []; let rejectFirst;
-    const me = Function('ME_STAMP', 'fetchVenueJson', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
+    const me = Function('ME_STAMP', 'fetchVenueJson', 'const setMarketQuotes = () => {}; return (' + extractBalanced(html, 'const ME = {') + ')')(
       0, url => {
         urls.push(url);
         if (urls.length === 1) return new Promise((resolve, reject) => { rejectFirst = reject; });
@@ -154,7 +154,7 @@ describe('step42 / bounded market refresh requests', () => {
   });  it('releases the refresh button even if the fallback rendering itself throws', async () => {
     const source = extractBalanced(html, 'const ME = {');
     const button = { disabled: false, busy: false, setAttribute() { this.busy = true; }, removeAttribute() { this.busy = false; } };
-    const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'SEED_SIGNALS', 'signalsData', 'pairSymbol', 'lsGet', 'lsDel', 'return (' + source + ')')(
+    const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'SEED_SIGNALS', 'signalsData', 'pairSymbol', 'lsGet', 'lsDel', 'const setMarketQuotes = () => {}; return (' + source + ')')(
       0, { getElementById: () => button }, { en: {} }, 'en', [], [], s => s, () => null, () => {}
     );
     me.tickers24h = async () => { throw new Error('network'); };

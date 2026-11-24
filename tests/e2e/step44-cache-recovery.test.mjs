@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../helpers/browser.mjs';
 import { read, extractArray } from '../helpers/html.mjs';
 const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
-const signals = Array.from({ length: 100 }, (_, i) => ({ ...seed[0], pair: 'TEST' + i + ' / USDT', id: 'CACHE-' + i, modelVersion: 3, quantScore: 90, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
+const signals = Array.from({ length: 100 }, (_, i) => ({ ...seed[0], pair: 'TEST' + i + ' / USDT', id: 'CACHE-' + i, modelVersion: 4, quantScore: 90, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
 let browser;
 async function setup() {
   const page = await freshPage(browser);

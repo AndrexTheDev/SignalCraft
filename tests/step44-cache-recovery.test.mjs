@@ -10,7 +10,7 @@ function harness(initial, gatePass = true) {
   let cache = initial, deletes = 0;
   const seed = Array.from({ length: 100 }, (_, i) => ({ pair: `P${i}`, sector: 'test' }));
   const button = { disabled: false, setAttribute() {}, removeAttribute() {} };
-  const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsSet', 'lsDel', 'passesQualityGate', 'snapshotIsFresh', 'isLiveCache', 'compareMarketRanking', 'return (' + source + ')')(
+  const me = Function('ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsSet', 'lsDel', 'passesQualityGate', 'snapshotIsFresh', 'isLiveCache', 'compareMarketRanking', 'const setMarketQuotes = () => {}; return (' + source + ')')(
     0, { getElementById: () => button }, { en: { meDemoToast: 'demo', meLiveToast: 'live' } }, 'en', seed.map(s => [s.pair, s.sector]), () => 'unavailable', [], s => s,
     () => {}, () => cache, (key, val) => { cache = val; }, () => { cache = null; deletes++; }, () => gatePass, (t, now, ttl) => Number.isFinite(t) && t <= now && now - t < ttl, () => true, compareMarketRanking
   );

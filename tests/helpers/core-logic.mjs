@@ -246,7 +246,7 @@ export function isLiveCache(ca, singleCandidate) {
   return ca.signals.every(function (s) {
     if (!s || typeof s !== 'object' || typeof s.id !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(s.id) || ids.has(s.id) ||
         typeof s.pair !== 'string' || !/^[A-Z0-9]{1,20} \/ USDT$/.test(s.pair) || pairs.has(s.pair) ||
-        s.live !== true || s.modelVersion !== 3 || s.type !== 'LONG' ||
+        s.live !== true || s.modelVersion !== 4 || s.type !== 'LONG' ||
         !['LOW', 'MEDIUM', 'HIGH'].includes(s.riskLevel) ||
         !['majors', 'layer1-2', 'defi', 'ai', 'memes'].includes(s.sector) ||
         !Array.isArray(s.indicatorsUsed) || !s.indicatorsUsed.every(function (v) { return typeof v === 'string'; }) ||
@@ -550,12 +550,15 @@ export function bbWidthPercentile(c, p, lookback) {
   return Math.round((below / hist.length) * 100);
 }
 
-export function factorScores(h, l, c, qv, tq) {
+export function factorScores(h, l, c, qv, tq, relativeVolume) {
   const last = c[c.length - 1];
   const e20 = emaLast(c, 20), e50 = emaLast(c, 50), e200 = emaLast(c, 200);
   const p7 = last / c[c.length - 8] - 1;
   const p30 = last / c[c.length - 31] - 1;
-  const relVol = qv[qv.length - 1] / (qv.slice(-31, -1).reduce((x, y) => x + y, 0) / 30);
+  // Live supplies the validated rolling 24h volume ratio. Historical closed
+  // candles use the completed day's volume when no override is supplied.
+  const relVol = relativeVolume === undefined ? qv[qv.length - 1] / (qv.slice(-31, -1).reduce((x, y) => x + y, 0) / 30) : relativeVolume;
+  if (!Number.isFinite(relVol) || relVol < 0) throw new Error('invalid-relative-volume');
   const adxR = adxWilder(h, l, c, 14);
   const ra30 = riskAdjMom(c, 30);
   const obv = obvTrend(c, qv, 20);

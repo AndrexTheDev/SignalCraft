@@ -4,7 +4,7 @@ import { startServer, stopServer, launchBrowser, freshPage, BASE } from '../help
 import { read, extractArray } from '../helpers/html.mjs';
 const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const signals = Array.from({ length: 100 }, (_, i) => ({
-  ...seed[0], id: `CACHE-VALID-${i}`, pair: `SAFE${i} / USDT`, live:true, modelVersion: 3,
+  ...seed[0], id: `CACHE-VALID-${i}`, pair: `SAFE${i} / USDT`, live:true, modelVersion: 4,
   quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
 }));
 let browser;
