@@ -26,6 +26,15 @@ describe('step61 / strict market inputs', () => {
     assert.deepEqual(tickers([{ ...valid, closeTime: String(now), quoteVolume: '2e7' }], now).BTCUSDT, { volume: 20000000, change: -1.25, time: now });
     assert.equal(tickers([valid], NaN).BTCUSDT, undefined);
   });
+  it('accepts an optional positive last price without letting invalid prices poison model tickers', () => {
+    assert.equal(tickers([{ ...valid, lastPrice: '60123.456789' }], now).BTCUSDT.price, 60123.456789);
+    for (const price of [undefined, null, true, [], '0', '-1', '1e999', '1e-999', '<img>', '0x10']) {
+      const result = tickers([{ ...valid, lastPrice: price }], now).BTCUSDT;
+      assert.ok(result); assert.equal(result.price, undefined, String(price));
+    }
+    assert.equal(tickers([{ ...valid, closeTime: now + 60001, lastPrice: '1' }], now).BTCUSDT, undefined);
+    assert.equal(tickers([{ ...valid, lastPrice: '1' }, { ...valid, lastPrice: '2' }], now).BTCUSDT, undefined);
+  });
   it('drops ambiguous duplicate valid ticker symbols, not unrelated or malformed rows', () => {
     const eth = { ...valid, symbol: 'ETHUSDT' };
     for (const rows of [[valid, { ...valid, quoteVolume: '30000000' }, eth], [eth, { ...valid, quoteVolume: '30000000' }, valid], [valid, valid, valid, eth]]) {

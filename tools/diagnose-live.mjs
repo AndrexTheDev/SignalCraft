@@ -116,8 +116,9 @@ async function main() {
     const ui = await page.evaluate(() => {
       const text = id => document.getElementById(id)?.textContent.trim() || '';
       return { market: text('meBadge'), snapshot: text('snapshotInfo'), activeSignals: text('statActiveCount'),
-        visibleCards: document.querySelectorAll('.signal-card').length, cex: text('cexTickerLabel'),
-        dex: text('dexTickerLabel'), fearGreed: text('globalFngBadge') };
+        visibleCards: document.querySelectorAll('.signal-card').length, gateBreakdown: text('gateBreakdown'),
+        marketPriceCount: document.getElementById('marketQuotes')?.hidden === false ? document.querySelectorAll('#marketQuotesList > div').length : 0,
+        cex: text('cexTickerLabel'), dex: text('dexTickerLabel'), fearGreed: text('globalFngBadge') };
     });
     const probes = probe ? await page.evaluate(async definitions => {
       const shapes = {

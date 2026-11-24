@@ -12,7 +12,7 @@ function load(name, deps = []) {
 const validate = load('isLiveCache', ['validLongPlan'])(validLongPlan);
 const levels = load('takeProfitLevels')();
 function records(n = 100) {
-  return Array.from({ length: n }, (_, i) => ({ ...structuredClone(seed[0]), id: 'ID-' + i, pair: 'A' + i + ' / USDT', modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
+  return Array.from({ length: n }, (_, i) => ({ ...structuredClone(seed[0]), id: 'ID-' + i, pair: 'A' + i + ' / USDT', modelVersion: 4, quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
 }
 function rejected(mutate) {
   const signals = records(); mutate(signals[0], signals);

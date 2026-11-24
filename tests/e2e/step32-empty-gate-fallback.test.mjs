@@ -106,7 +106,10 @@ describe('step32 empty-gate live-only behavior', { timeout: 180_000 }, () => {
   });
   it('uses the rolling 24h ticker, not the current daily candle, for the gate and displayed metrics', async () => {
     const page = await freshPage(browser);
-    await stubMarket(page, { appHtml: instrumented, klines: buildKlines('strong'), quoteVolume: 9_999_999, priceChangePercent: 42.7 });
+    // Keep current-day candle volume below the rolling 24h ticker while still
+    // exercising the exact 10M gate boundary and the revised volume factor.
+    const klines = buildKlines('strong').map(row => row.map((v, i) => [5, 7, 9, 10].includes(i) ? v * 0.03 : v));
+    await stubMarket(page, { appHtml: instrumented, klines, quoteVolume: 9_999_999, priceChangePercent: 42.7 });
     await page.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__market32?.ME.status.mode === 'live', { timeout: 20000 });
     assert.equal((await page.$$('.signal-card')).length, 0);
@@ -115,7 +118,7 @@ describe('step32 empty-gate live-only behavior', { timeout: 180_000 }, () => {
 
     const page2 = await freshPage(browser);
     await page2.evaluateOnNewDocument(() => localStorage.removeItem('signalcraft_live_v2'));
-    await stubMarket(page2, { appHtml: instrumented, klines: buildKlines('strong'), quoteVolume: 10_000_000, priceChangePercent: 42.7 });
+    await stubMarket(page2, { appHtml: instrumented, klines, quoteVolume: 10_000_000, priceChangePercent: 42.7 });
     await page2.goto(BASE + '/app.html?lang=en', { waitUntil: 'domcontentloaded' });
     await page2.waitForFunction(() => /LIVE/.test(document.getElementById('meBadge')?.textContent || ''), { timeout: 20000 });
     const cache = await page2.evaluate(() => ({signals:window.__market32.signals()}));
@@ -195,7 +198,7 @@ describe('step32 empty-gate live-only behavior', { timeout: 180_000 }, () => {
     const page = await freshPage(browser);
     try {
       await page.evaluateOnNewDocument(() => {
-        const signals = Array.from({ length: 100 }, (_, i) => ({ id: 'old-' + i, pair: 'BTC / USD', modelVersion: 3, gateMetrics: { rsi: 60, volMio: 20, adx: 20, riskAdj30: 1 } }));
+        const signals = Array.from({ length: 100 }, (_, i) => ({ id: 'old-' + i, pair: 'BTC / USD', modelVersion: 4, gateMetrics: { rsi: 60, volMio: 20, adx: 20, riskAdj30: 1 } }));
         localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version: 4, t: Date.now(), signals }));
       });
       await stubMarket(page);

@@ -6,7 +6,7 @@ const html = read('app.html');
 const instrumented = html.replace('    ME.refresh(false);', '    window.__renderTest = { ME, signals: () => signalsData };\n    ME.refresh(false);');
 const seed = JSON.parse(read('tests/fixtures/legacy-seed.json'));
 const base = Array.from({ length: 100 }, (_, i) => ({
-  ...seed[0], id: 'SIG-RENDER-' + i, pair: 'SAFE' + i + ' / USDT', modelVersion: 3,
+  ...seed[0], id: 'SIG-RENDER-' + i, pair: 'SAFE' + i + ' / USDT', modelVersion: 4,
   quantScore: 90, confluenceScore: 90, metrics: { ...seed[0].metrics, score: 90 },
   gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 }
 }));

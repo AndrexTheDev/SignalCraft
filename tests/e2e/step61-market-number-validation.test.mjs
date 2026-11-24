@@ -58,7 +58,7 @@ describe('step61 / malformed market input integration', { timeout: 90000 }, () =
       try {
         await page.evaluateOnNewDocument(({ data, version }) => {
           localStorage.clear(); const t = Date.now();
-          const signals = Array.from({ length: 100 }, (_, i) => ({ ...data, id: `V${i}`, pair: `SAFE${i} / USDT`, timestamp: t, live: true, modelVersion: 3, quantScore: 90, confluenceScore: 90, metrics: { ...data.metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
+          const signals = Array.from({ length: 100 }, (_, i) => ({ ...data, id: `V${i}`, pair: `SAFE${i} / USDT`, timestamp: t, live: true, modelVersion: 4, quantScore: 90, confluenceScore: 90, metrics: { ...data.metrics, score: 90 }, gateMetrics: { rsi: 60, volMio: 20, adx: 25, riskAdj30: 1 } }));
           localStorage.setItem('signalcraft_live_v2', JSON.stringify({ version, t, signals }));
         }, { data: seed[0], version });
         await page.setRequestInterception(true);

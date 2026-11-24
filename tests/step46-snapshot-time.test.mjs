@@ -16,11 +16,11 @@ function harness(time, count = 100) {
   class FakeDate extends Date { static now() { return clock.now; } }
   const seed = Array.from({ length: count }, (_, i) => ({ pair: 'P' + i, sector: 'test' }));
   let cache = null, applied = [];
-  const me = Function('Date', 'ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsSet', 'lsDel', 'passesQualityGate', 'snapshotIsFresh', 'isLiveCache', 'compareMarketRanking', 'return (' + extractBalanced(html, 'const ME = {') + ')')(
+  const me = Function('Date', 'ME_STAMP', 'document', 'I18N', 'currentLang', 'MARKET_UNIVERSE', 'liveStateText', 'signalsData', 'pairSymbol', 'showToast', 'lsGet', 'lsSet', 'lsDel', 'passesQualityGate', 'snapshotIsFresh', 'isLiveCache', 'compareMarketRanking', 'const setMarketQuotes = () => {}; return (' + extractBalanced(html, 'const ME = {') + ')')(
     FakeDate, 1, { getElementById: () => null }, { en: {} }, 'en', seed.map(s => [s.pair, s.sector]), () => 'unavailable', [], x => x, () => {}, () => cache, (k, v) => { cache = v; }, () => { cache = null; }, () => true, fresh, () => true, compareMarketRanking
   );
   me.build = sym => ({ pair: sym, score: 90, src: 'binance', metrics: { volMio: 20 } });
-  me.toSignal = (b, i, at) => ({ pair: b.pair, timestamp: at, modelVersion: 3, gateMetrics: {} });
+  me.toSignal = (b, i, at) => ({ pair: b.pair, timestamp: at, modelVersion: 4, gateMetrics: {} });
   me.apply = (signals, mode, at) => { applied.push({ signals, mode, at }); me.status.mode = mode; };
   return { me, seed, clock, get cache() { return cache && JSON.parse(cache); }, applied };
 }
