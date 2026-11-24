@@ -14,14 +14,11 @@ export default {
       return Response.redirect(url.toString(), 308);
     }
     if (url.pathname !== '/' && url.pathname !== '/app') {
-      // Human-readable provider/privacy pages have stable clean URLs.
-      if ((path === '/impressum' || path === '/datenschutz') && (request.method === 'GET' || request.method === 'HEAD')) {
-        url.pathname = path + '.html';
-        return env.ASSETS.fetch(new Request(url, request));
-      }
+      // Assets use Cloudflare's clean-URL handling. Fetching an explicit .html
+      // internally would redirect to the clean URL and loop through this Worker.
       const response = await env.ASSETS.fetch(request);
       if (response.status !== 404 || (request.method !== 'GET' && request.method !== 'HEAD')) return response;
-      const errorUrl = new URL('/404.html', request.url);
+      const errorUrl = new URL('/404', request.url);
       const errorPage = await env.ASSETS.fetch(new Request(errorUrl, { method: request.method }));
       if (!errorPage.ok) return new Response(request.method === 'HEAD' ? null : 'Not found', { status: 404 });
       const headers = new Headers(errorPage.headers);
