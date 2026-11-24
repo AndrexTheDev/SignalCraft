@@ -35,6 +35,8 @@ Die Browser-Beta-Durchläufe sind **automatisiert und verwenden künstliche Bör
 2. War Trendqualität der stärkste Modellfaktor, konnte statt einer Übersetzung `undefined` erscheinen. Alle fünf Übersetzungen und ein sicherer Fallback wurden ergänzt.
 3. Der automatische Kontrasttest meldete zu geringe Kontraste bei den Links zu Anbieter und Datenschutz, der aktiven Sektorauswahl, einzelnen Grade- und Risikofarben sowie im hellen Farbschema. Die betroffenen Farben wurden angepasst; die getesteten Zustände bestehen anschließend den automatischen axe-Lauf. Die Überschriftenhierarchie der Karten wurde ebenfalls korrigiert.
 
+4. Nach dem ersten Merge lieferten die produktiven Rechtsseiten HTTP 500. Ursache war eine Umleitungsschleife durch die `.html`-Weiterleitung der Cloudflare-Asset-Auslieferung. Das Worker-Routing wurde angepasst und mit lokalem Wrangler überprüft: Rechtsseiten HTTP 200, `.html`-Weiterleitung 307 und unbekannte Route HTTP 404 mit Fehlerseite. Die erneute Produktionsprüfung ist separat erforderlich.
+
 ## Echte Netz- und Produktionsprüfung
 
 - Die **lokale** App wurde zusätzlich in Chromium ohne API-Mocks gestartet. Ihr Board blieb leer und zeigte fehlende Live-Daten. Alle 21 optionalen API-Stichproben scheiterten in dieser Umgebung mit Browser-Verbindungsfehlern ohne HTTP-Status; daraus lässt sich nicht ableiten, ob die Ursache Netzwerk, Browser, CORS, Region oder Anbieter ist.

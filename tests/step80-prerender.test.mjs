@@ -102,11 +102,21 @@ describe('step82 / provider, privacy, fonts and 404 routing', () => {
   it('serves a helpful 404 with the correct HTTP status and HEAD semantics', async () => {
     const env = { ASSETS: { fetch: async req => {
       const path = new URL(req.url).pathname;
-      if (path === '/404.html') return new Response(req.method === 'HEAD' ? null : '<h1>not found</h1>', {status:200,headers:{'Content-Type':'text/html'}});
-      if (path === '/impressum.html' || path === '/datenschutz.html') return new Response('legal', {status:200});
+      // Mirror Cloudflare's auto-trailing-slash asset behavior: .html URLs
+      // redirect to clean URLs, which resolve to the corresponding files.
+      if (['/404.html','/impressum.html','/datenschutz.html'].includes(path)) return Response.redirect(base + path.slice(0, -5), 307);
+      if (path === '/404') return new Response(req.method === 'HEAD' ? null : '<h1>not found</h1>', {status:200,headers:{'Content-Type':'text/html'}});
+      if (path === '/impressum' || path === '/datenschutz') return new Response(req.method === 'HEAD' ? null : 'legal', {status:200});
       return new Response('missing', {status:404});
     } } };
-    for (const path of ['/impressum', '/datenschutz']) assert.equal((await worker.fetch(new Request(base + path),env)).status,200);
+    for (const path of ['/impressum', '/datenschutz']) {
+      const page = await worker.fetch(new Request(base + path + '?lang=en'),env);
+      assert.equal(page.status,200); assert.equal(await page.text(),'legal');
+      const head = await worker.fetch(new Request(base + path, {method:'HEAD'}),env);
+      assert.equal(head.status,200); assert.equal(await head.text(),'');
+      const explicit = await worker.fetch(new Request(base + path + '.html'),env);
+      assert.equal(explicit.status,307); assert.equal(explicit.headers.get('location'),base + path);
+    }
     const missing = await worker.fetch(new Request(base + '/unknown'),env);
     assert.equal(missing.status,404); assert.match(await missing.text(),/not found/); assert.equal(missing.headers.get('cache-control'),'no-store');
     const head = await worker.fetch(new Request(base + '/unknown',{method:'HEAD'}),env);
